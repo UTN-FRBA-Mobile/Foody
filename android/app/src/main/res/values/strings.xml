@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Foody</string>
+    <string name="boton_login">Ingresar</string>
+    <string name="boton_registro">Registrarse</string>
+    <string name="label_mail">Correo electrónico</string>
+    <string name="label_contrasena">Contraseña</string>
+    <string name="ok">Ok</string>
+</resources>
