@@ -16,7 +16,7 @@ fun AppNavigation(){
         composable(route = AppScreens.Home_Screen.route){
             val viewModel = viewModel<MainViewModel>()
             viewModel.labelBotonIngresar = "boton"
-            HomeScreen(viewModel = viewModel, onButtonClicked ={},navController )
+            HomeScreen(navController )
         }
         composable(route = AppScreens.Login_Screen.route){
             LoginScreen(navController = navController)

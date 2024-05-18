@@ -11,13 +11,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.ui.UiString
 
 @Composable
 fun HomeScreen(
-    viewModel: MainViewModel,
-    onButtonClicked: (UiString) -> Unit,
-    navController: NavController? = null) {
+    navController: NavController) {
     AppScaffold(navController = navController) {
         Box(
             contentAlignment = Alignment.Center,
@@ -36,10 +35,6 @@ fun HomeScreen(
 @Preview
 @Composable
 fun DefaultPreview() {
-    val viewModel = viewModel<MainViewModel>()
-    viewModel.labelBotonIngresar = "boton"
-    HomeScreen(
-        viewModel = viewModel,
-        onButtonClicked = {}
-    )
+    val navController= rememberNavController()
+    HomeScreen(navController)
 }
