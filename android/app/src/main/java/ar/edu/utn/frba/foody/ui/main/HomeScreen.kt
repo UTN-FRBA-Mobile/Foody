@@ -17,7 +17,7 @@ import ar.edu.utn.frba.foody.ui.UiString
 fun HomeScreen(
     viewModel: MainViewModel,
     onButtonClicked: (UiString) -> Unit,
-    navController: NavController? = null) {
+    navController: NavController) {
     AppScaffold(navController = navController) {
         Box(
             contentAlignment = Alignment.Center,
@@ -35,11 +35,13 @@ fun HomeScreen(
 
 @Preview
 @Composable
-fun DefaultPreview() {
+fun DefaultPreview(navController: NavController) {
     val viewModel = viewModel<MainViewModel>()
     viewModel.labelBotonIngresar = "boton"
+
     HomeScreen(
         viewModel = viewModel,
-        onButtonClicked = {}
+        onButtonClicked = {},
+        navController
     )
 }

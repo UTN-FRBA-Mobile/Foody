@@ -19,6 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
+import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
 fun LoginScreen(navController: NavHostController) {
@@ -43,7 +44,7 @@ fun LoginScreen(navController: NavHostController) {
                 .fillMaxWidth()
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                painter = painterResource(id = R.drawable.foody_logo),
                 contentDescription = "Delivery Logo",
                 modifier = Modifier
                     .size(120.dp)
@@ -87,7 +88,7 @@ fun LoginScreen(navController: NavHostController) {
 
             Button(
                 onClick = {
-                          navController.navigate("home")
+                          navController.navigate(AppScreens.Home_Screen.route)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -117,6 +118,8 @@ fun LoginScreen(navController: NavHostController) {
                     style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.primary)
                 )
             }
+            Spacer(modifier = Modifier.height(100.dp))
+
         }
     }
 }
