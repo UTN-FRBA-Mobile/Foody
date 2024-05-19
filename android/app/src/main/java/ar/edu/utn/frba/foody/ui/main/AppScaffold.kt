@@ -4,10 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,16 +24,6 @@ fun AppScaffold(
     navController: NavController,
     title: String? = null,
     content: @Composable (PaddingValues) -> Unit) {
-    val navigationIcon: (@Composable () -> Unit)? =
-        if (navController.previousBackStackEntry != null) {
-            {
-                IconButton(onClick = {
-                    navController.popBackStack()
-                }) {
-                    Icons.Filled.ArrowBack
-                }
-            }
-        } else null
     FoodyTheme {
         Scaffold(
             topBar = {
@@ -57,8 +44,7 @@ fun AppScaffold(
                             )
                         }
                         Text(text = title ?: stringResource(id = R.string.app_name))
-                    },
-                    navigationIcon = navigationIcon,
+                    }
                 )
             },
             content = {
