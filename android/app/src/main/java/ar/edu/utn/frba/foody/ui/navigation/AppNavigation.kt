@@ -14,12 +14,22 @@ fun AppNavigation(){
     val navController= rememberNavController()
     NavHost(navController = navController , startDestination = AppScreens.Login_Screen.route) {
         composable(route = AppScreens.Home_Screen.route){
-            val viewModel = viewModel<MainViewModel>()
-            viewModel.labelBotonIngresar = "boton"
-            HomeScreen(navController )
+            HomeScreen(navController = navController )
         }
         composable(route = AppScreens.Login_Screen.route){
             LoginScreen(navController = navController)
+        }
+        composable(route = AppScreens.Profile_Screen.route){
+
+        }
+        composable(route = AppScreens.Cart_Screen.route){
+
+        }
+        composable(route = AppScreens.Order_Screen.route){
+
+        }
+        composable(route = AppScreens.Restaurant_Screen.route){
+
         }
     }
 }
