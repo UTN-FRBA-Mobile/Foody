@@ -114,7 +114,9 @@ fun LoginScreen(navController: NavHostController) {
                 Spacer(modifier = Modifier.width(4.dp))
                 ClickableText(
                     text = AnnotatedString("Sign Up"),
-                    onClick = { /* Aquí puedes manejar la lógica de registro */ },
+                    onClick = {
+                        navController.navigate(AppScreens.SignUp_Screen.route)
+                    },
                     style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.primary)
                 )
             }

@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.ui.main.HomeScreen
 import ar.edu.utn.frba.foody.ui.main.LoginScreen
 import ar.edu.utn.frba.foody.ui.main.MainViewModel
+import ar.edu.utn.frba.foody.ui.main.SignUpScreen
 
 @Composable
 fun AppNavigation(){
@@ -20,6 +21,9 @@ fun AppNavigation(){
         }
         composable(route = AppScreens.Login_Screen.route){
             LoginScreen(navController = navController)
+        }
+        composable(route = AppScreens.SignUp_Screen.route){
+            SignUpScreen(navController)
         }
     }
 }
