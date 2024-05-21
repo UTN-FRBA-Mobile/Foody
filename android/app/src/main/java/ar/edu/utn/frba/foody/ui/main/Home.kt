@@ -2,11 +2,12 @@ package ar.edu.utn.frba.foody.ui.main
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.*
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -20,16 +21,16 @@ import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 @Composable
 fun HomeScreen(
     navController: NavController) {
-    AppScaffold(navController) {
+    AppScaffold(navController, null, { ButtonGroup(navController) }) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = Color.Cyan)) {
+                ) {
             Box(modifier = Modifier
                 .align(Alignment.TopCenter)
+                .padding(top = 32.dp)
                 .fillMaxWidth()
-                .background(color = Color.White)
             ) {
                     Text(text = "Restaurants",
                         modifier = Modifier
@@ -38,21 +39,22 @@ fun HomeScreen(
                         fontSize = 24.sp
                     )
             }
-            Column(horizontalAlignment = Alignment.CenterHorizontally,
+            Spacer(modifier = Modifier.height(16.dp))
+            LazyColumn(horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .height(505.dp)
             ) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Divider()
                 repeat(8) {
-                    RestaurantItem(navController)
+                    item {
+                        RestaurantItem(navController)
+
+                    }
                 }
-                Spacer(modifier = Modifier.height(16.dp))
             }
             Box(modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)) {
-                ButtonGroup(navController)
             }
         }
     }
@@ -61,25 +63,28 @@ fun HomeScreen(
 
 @Composable
 fun RestaurantItem(navController: NavController) {
-    Row (modifier = Modifier
-        .fillMaxWidth()
-        .clickable(onClick = { navController.navigate(AppScreens.Restaurant_Screen.route) })
-        .padding(16.dp, 4.dp)) {
-        Image(
-            painter = painterResource(id = R.drawable.restaurant),
-            contentDescription = "Restaurant Image",
-            modifier = Modifier.size(128.dp, 64.dp),
-            contentScale = ContentScale.FillBounds,
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(text = "Restaurant 1",
-            Modifier
-                .fillMaxWidth()
-                .align(Alignment.CenterVertically),
-            textAlign = TextAlign.Center
-        )
+    Card(backgroundColor = MaterialTheme.colors.secondary) {
+        Row (modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = { navController.navigate(AppScreens.Restaurant_Screen.route) })
+            .padding(16.dp, 4.dp)) {
+            Image(
+                painter = painterResource(id = R.drawable.restaurant),
+                contentDescription = "Restaurant Image",
+                modifier = Modifier.size(128.dp, 64.dp)
+                    .clip(shape = RoundedCornerShape(10.dp)),
+                contentScale = ContentScale.FillBounds,
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(text = "Restaurant 1",
+                Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.CenterVertically),
+                textAlign = TextAlign.Center
+            )
+        }
+        Divider()
     }
-    Divider()
 }
 
 data class ButtonInterface(
@@ -94,26 +99,24 @@ fun ButtonGroup(navController: NavController) {
         ButtonInterface(
             resourceId = R.drawable.user_icon,
             imageDescription = "User Icon",
-            route = AppScreens.Login_Screen.route,
+            route = AppScreens.Profile_Screen.route,
         ),
         ButtonInterface(
             resourceId = R.drawable.cart_icon,
             imageDescription = "Cart Icon",
-            route = AppScreens.Login_Screen.route,
+            route = AppScreens.Cart_Screen.route,
         ),
         ButtonInterface(
             resourceId = R.drawable.order_icon,
             imageDescription = "Order Icon",
-            route = AppScreens.Login_Screen.route,
+            route = AppScreens.Order_Screen.route,
         )
     )
 
     Row(modifier = Modifier.fillMaxWidth()) {
         buttons.forEach{
-            OutlinedButton(
+            IconButton(
                 onClick = { navController.navigate(it.route) },
-                shape = RoundedCornerShape(0.dp),
-                contentPadding = PaddingValues(10.dp),
                 modifier = Modifier.weight(1f)
             ) {
                 Image(
