@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.ui.main.HomeScreen
 import ar.edu.utn.frba.foody.ui.main.LoginScreen
+import ar.edu.utn.frba.foody.ui.main.RestaurantScreen
 
 @Composable
 fun AppNavigation(){
@@ -27,7 +28,7 @@ fun AppNavigation(){
 
         }
         composable(route = AppScreens.Restaurant_Screen.route){
-
+            RestaurantScreen(navController = navController)
         }
     }
 }
