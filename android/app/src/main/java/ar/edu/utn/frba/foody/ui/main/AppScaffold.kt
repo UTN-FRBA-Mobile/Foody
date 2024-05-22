@@ -20,25 +20,12 @@ fun AppScaffold(
     navController: NavController,
     title: String? = null,
     bottomAppBar: (@Composable () -> Unit)? = null,
+    topAppBar: (@Composable () -> Unit)? = null,
     content: @Composable (PaddingValues) -> Unit) {
     FoodyTheme {
         Scaffold(
             topBar = {
-                TopAppBar(
-                    title = {
-                        Text(text = title ?: stringResource(id = R.string.app_name))
-                    },
-                    actions = {
-                        IconButton(onClick = { navController.navigate(AppScreens.Login_Screen.route) }) {
-                            Image(
-                                painter = painterResource(id = R.drawable.logout_icon),
-                                contentDescription = "Logout Icon",
-                                modifier = Modifier.size(24.dp),
-                                contentScale = ContentScale.FillBounds
-                            )
-                        }
-                    }
-                )
+                     topAppBar?.invoke()
             },
             bottomBar = {
                 BottomAppBar {

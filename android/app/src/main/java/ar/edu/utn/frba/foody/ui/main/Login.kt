@@ -126,7 +126,7 @@ fun LoginScreen(navController: NavHostController) {
 
 @Preview
 @Composable
-fun DefaultPreviews() {
+fun DefaultPreviewLogin() {
     val navController= rememberNavController()
     LoginScreen(navController)
 }

@@ -10,6 +10,7 @@ import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
@@ -21,7 +22,7 @@ import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 @Composable
 fun HomeScreen(
     navController: NavController) {
-    AppScaffold(navController, null, { ButtonGroup(navController) }) {
+    AppScaffold(navController, null, { BottomGroupHome(navController) },{ TopGroupHome(navController)}) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -45,7 +46,7 @@ fun HomeScreen(
                     .fillMaxWidth()
                     .height(505.dp)
             ) {
-                repeat(8) {
+                repeat(7) {
                     item {
                         RestaurantItem(navController)
 
@@ -71,7 +72,8 @@ fun RestaurantItem(navController: NavController) {
             Image(
                 painter = painterResource(id = R.drawable.restaurant),
                 contentDescription = "Restaurant Image",
-                modifier = Modifier.size(128.dp, 64.dp)
+                modifier = Modifier
+                    .size(128.dp, 64.dp)
                     .clip(shape = RoundedCornerShape(10.dp)),
                 contentScale = ContentScale.FillBounds,
             )
@@ -93,8 +95,9 @@ data class ButtonInterface(
     val route: String
 )
 
+
 @Composable
-fun ButtonGroup(navController: NavController) {
+fun BottomGroupHome(navController: NavController) {
     val buttons = listOf(
         ButtonInterface(
             resourceId = R.drawable.user_icon,
@@ -130,6 +133,24 @@ fun ButtonGroup(navController: NavController) {
     }
 }
 
+@Composable
+fun TopGroupHome(navController: NavController) {
+    TopAppBar(
+        title = {
+            Text(text = stringResource(id = R.string.app_name))
+        },
+        actions = {
+            IconButton(onClick = { navController.navigate(AppScreens.Login_Screen.route) }) {
+                Image(
+                    painter = painterResource(id = R.drawable.logout_icon),
+                    contentDescription = "Logout Icon",
+                    modifier = Modifier.size(24.dp),
+                    contentScale = ContentScale.FillBounds
+                )
+            }
+        }
+    )
+}
 @Preview
 @Composable
 fun DefaultPreview() {
