@@ -1,19 +1,21 @@
 package ar.edu.utn.frba.foody.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.main.HomeScreen
 import ar.edu.utn.frba.foody.ui.main.LoginScreen
 import ar.edu.utn.frba.foody.ui.main.RestaurantScreen
 
 @Composable
-fun AppNavigation(){
+fun AppNavigation(viewModel: MainViewModel){
     val navController= rememberNavController()
     NavHost(navController = navController , startDestination = AppScreens.Login_Screen.route) {
         composable(route = AppScreens.Home_Screen.route){
-            HomeScreen(navController = navController )
+            HomeScreen(navController = navController, viewModel = viewModel )
         }
         composable(route = AppScreens.Login_Screen.route){
             LoginScreen(navController = navController)
@@ -28,7 +30,7 @@ fun AppNavigation(){
 
         }
         composable(route = AppScreens.Restaurant_Screen.route){
-            RestaurantScreen(navController = navController)
+            RestaurantScreen(navController = navController, viewModel = viewModel)
         }
     }
 }

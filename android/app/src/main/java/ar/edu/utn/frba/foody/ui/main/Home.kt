@@ -17,11 +17,14 @@ import androidx.compose.ui.unit.*
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
+import ar.edu.utn.frba.foody.ui.Classes.Restaurant
+import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
 fun HomeScreen(
-    navController: NavController) {
+    navController: NavController,
+    viewModel: MainViewModel) {
     AppScaffold(navController, null, { BottomGroupHome(navController) },{ TopGroupHome(navController)}) {
         Box(
             contentAlignment = Alignment.Center,
@@ -46,10 +49,9 @@ fun HomeScreen(
                     .fillMaxWidth()
                     .height(505.dp)
             ) {
-                repeat(7) {
+                for (restaurant in viewModel.restaurants) {
                     item {
-                        RestaurantItem(navController)
-
+                        RestaurantItem(navController = navController, viewModel = viewModel, restaurant = restaurant)
                     }
                 }
             }
@@ -63,22 +65,25 @@ fun HomeScreen(
 }
 
 @Composable
-fun RestaurantItem(navController: NavController) {
+fun RestaurantItem(navController: NavController, viewModel: MainViewModel, restaurant: Restaurant.RestaurantInfo) {
     Card(backgroundColor = MaterialTheme.colors.secondary) {
         Row (modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = { navController.navigate(AppScreens.Restaurant_Screen.route) })
+            .clickable(onClick = {
+                viewModel.updateRestaurant(restaurant)
+                navController.navigate(AppScreens.Restaurant_Screen.route)
+            })
             .padding(16.dp, 4.dp)) {
             Image(
-                painter = painterResource(id = R.drawable.restaurant),
-                contentDescription = "Restaurant Image",
+                painter = painterResource(id = restaurant.image),
+                contentDescription = restaurant.imageDescription,
                 modifier = Modifier
                     .size(128.dp, 64.dp)
                     .clip(shape = RoundedCornerShape(10.dp)),
                 contentScale = ContentScale.FillBounds,
             )
             Spacer(modifier = Modifier.width(16.dp))
-            Text(text = "Restaurant 1",
+            Text(text = restaurant.name,
                 Modifier
                     .fillMaxWidth()
                     .align(Alignment.CenterVertically),
@@ -155,5 +160,6 @@ fun TopGroupHome(navController: NavController) {
 @Composable
 fun DefaultPreview() {
     val navController= rememberNavController()
-    HomeScreen(navController)
+    val viewModel = MainViewModel()
+    HomeScreen(navController, viewModel)
 }

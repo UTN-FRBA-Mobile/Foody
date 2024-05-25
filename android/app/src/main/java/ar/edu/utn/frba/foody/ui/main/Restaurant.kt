@@ -50,16 +50,16 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Dish
+import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 
 
 @Composable
-fun RestaurantScreen(navController: NavHostController) {
+fun RestaurantScreen(navController: NavHostController, viewModel: MainViewModel) {
     AppScaffold(navController, "Restaurant 1", {BottomGroupRestaurant(navController)},
         { TopGroupRestaurant(navController) }){
-        val dishes: Dish=Dish();
-        DishesGrid(navController = navController, dishes=dishes.getDishes())
+        DishesGrid(navController = navController, viewModel.getPickedRestaurant().dishes)
     }
 }
 
@@ -196,5 +196,6 @@ fun DishCard(navController: NavController, dish: Dish.DishInfo) {
 @Composable
 fun DefaultPreviewRestaurant() {
     val navController= rememberNavController()
-    RestaurantScreen(navController)
+    val viewModel = MainViewModel()
+    RestaurantScreen(navController, viewModel)
 }
