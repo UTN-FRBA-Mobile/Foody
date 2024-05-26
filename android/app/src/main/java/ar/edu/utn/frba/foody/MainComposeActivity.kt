@@ -4,13 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.viewmodel.compose.viewModel
-import ar.edu.utn.frba.foody.ui.Classes.Dish
-import ar.edu.utn.frba.foody.ui.Classes.Order
-import ar.edu.utn.frba.foody.ui.Classes.OrderItemInfo
-import ar.edu.utn.frba.foody.ui.Classes.Restaurant
-import ar.edu.utn.frba.foody.ui.Classes.User
-import ar.edu.utn.frba.foody.ui.Classes.UserOrder
-import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
+import ar.edu.utn.frba.foody.ui.Classes.*
+import ar.edu.utn.frba.foody.ui.dataClasses.*
 import ar.edu.utn.frba.foody.ui.navigation.AppNavigation
 
 class MainComposeActivity : ComponentActivity() {
@@ -18,12 +13,13 @@ class MainComposeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val viewModel = viewModel<MainViewModel>()
-            createTestData(viewModel)
-            AppNavigation(viewModel)
+            val orderViewModel = viewModel<OrderViewModel>()
+            createTestData(orderViewModel)
+            AppNavigation(viewModel, orderViewModel)
         }
     }
 
-    fun createTestData(viewModel: MainViewModel){
+    fun createTestData(viewModel: OrderViewModel){
         val dish1 = Dish.DishInfo(
             dishId = 1,
             name = "Spaghetti Carbonara",
@@ -66,9 +62,14 @@ class MainComposeActivity : ComponentActivity() {
         val userOrder4 = UserOrder(userOrderId = 4, items = orderItems4, user = user4)
         val userOrder5 = UserOrder(userOrderId = 5, items = orderItems5, user = user5)
 
-        val order = Order(orderId = 123, description = "Sample Order", restaurant = restaurant, userOrders = listOf(userOrder1, userOrder2, userOrder3, userOrder4, userOrder5))
+        val order1 = Order(orderId = 123, name = "Sample Order", restaurant = restaurant, userOrders = listOf(userOrder1, userOrder2, userOrder3, userOrder4, userOrder5))
+        viewModel.updateOrder(order1)
 
-        viewModel.updateOrder(order)
+        val order2 = Order(orderId = 222, name = "Order", restaurant = restaurant, userOrders = listOf(userOrder1, userOrder3, userOrder5))
+        viewModel.updateOrder(order2)
+
+        val order3 = Order(orderId = 321, name = "Super Order", restaurant = restaurant, userOrders = listOf(userOrder1, userOrder2, userOrder3, userOrder5))
+        viewModel.updateOrder(order3)
     }
 }
 

@@ -117,7 +117,7 @@ fun BottomGroupHome(navController: NavController) {
         ButtonInterface(
             resourceId = R.drawable.order_icon,
             imageDescription = "Order Icon",
-            route = AppScreens.Order_Screen.route,
+            route = AppScreens.Orders_Screen.route,
         )
     )
 

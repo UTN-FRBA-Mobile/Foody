@@ -1,60 +1,29 @@
 package ar.edu.utn.frba.foody.ui.main
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.primarySurface
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.*
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.*
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.material.*
+import androidx.compose.ui.unit.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
+import androidx.compose.material.icons.filled.*
+import androidx.compose.runtime.*
+import androidx.navigation.*
 import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
-import ar.edu.utn.frba.foody.ui.Classes.Dish
-import ar.edu.utn.frba.foody.ui.Classes.OrderItemInfo
-import ar.edu.utn.frba.foody.ui.Classes.UserOrder
-import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
+import ar.edu.utn.frba.foody.ui.Classes.*
+import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
-fun CartScreen(navController: NavHostController, viewModel: MainViewModel) {
-    var order = viewModel.getPickedOrder()
+fun CartScreen(navController: NavHostController, viewModel: OrderViewModel) {
+    val order = viewModel.getPickedOrder()
     AppScaffold(navController, stringResource(id = R.string.label_titulo_carrito), {BottomGroupCart(navController)},
         { TopGroupCart(navController) }){
         OrdersGrid(navController = navController, order.userOrders)
@@ -70,11 +39,6 @@ fun TopGroupCart(navController: NavController) {
             route = AppScreens.Home_Screen.route,
 
             )
-    val button_cart=ButtonInterface(
-        resourceId = R.drawable.cart_icon,
-        imageDescription = "Cart Icon",
-        route = AppScreens.Cart_Screen.route,
-    )
     Row(modifier = Modifier
         .fillMaxWidth()
         .background(MaterialTheme.colors.primarySurface),
@@ -226,6 +190,6 @@ fun OrderItem(navController: NavController, orderItem: OrderItemInfo, userOrder:
 @Composable
 fun DefaultPreviewOrder() {
     val navController= rememberNavController()
-    val viewModel = MainViewModel()
+    val viewModel = OrderViewModel()
     CartScreen(navController, viewModel)
 }
