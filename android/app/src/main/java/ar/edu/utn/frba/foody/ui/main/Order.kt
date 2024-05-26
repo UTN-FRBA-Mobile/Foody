@@ -79,7 +79,7 @@ fun TopGroupOrder(navController: NavController) {
 }
 
 @Composable
-fun OrderItem(navController: NavController, viewModel: OrderViewModel, order: Order.OrderInfo) {
+fun OrderItem(navController: NavController, viewModel: OrderViewModel, order: Order) {
     Card(backgroundColor = MaterialTheme.colors.secondary) {
         Row (modifier = Modifier
             .fillMaxWidth()

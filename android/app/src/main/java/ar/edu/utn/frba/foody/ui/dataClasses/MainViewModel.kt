@@ -1,20 +1,12 @@
 package ar.edu.utn.frba.foody.ui.dataClasses
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import ar.edu.utn.frba.foody.R
-import ar.edu.utn.frba.foody.ui.Classes.Dish
-import ar.edu.utn.frba.foody.ui.Classes.Order
-import ar.edu.utn.frba.foody.ui.Classes.Restaurant
-import ar.edu.utn.frba.foody.ui.UiString
+import ar.edu.utn.frba.foody.ui.Classes.*
 
 class MainViewModel() : ViewModel() {
     private var restaurant by mutableStateOf(Restaurant.RestaurantInfo())
-        private set
-
-    private var order by mutableStateOf(Order())
         private set
 
     fun updateRestaurant(newRestaurant: Restaurant.RestaurantInfo) {
@@ -23,14 +15,6 @@ class MainViewModel() : ViewModel() {
 
     fun getPickedRestaurant(): Restaurant.RestaurantInfo {
         return restaurant
-    }
-
-    fun updateOrder(newOrder: Order) {
-        order = newOrder
-    }
-
-    fun getPickedOrder(): Order {
-        return order
     }
 
     //TODO: pasar los datos estáticos a otro lado
