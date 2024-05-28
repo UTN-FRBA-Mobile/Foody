@@ -36,6 +36,33 @@ class OrderViewModel() : ViewModel() {
         order = order.copy(userOrders = updatedUserOrders.toList())
     }
 
+    fun changeItemQuantity(userOrderId: Int, userItemId: Int, variation: Int) {
+        val userOrderIndex = order.userOrders.indexOfFirst { it.userOrderId == userOrderId }
+
+        var userOrder = order.userOrders[userOrderIndex]
+
+        val userItemIndex = userOrder.items.indexOfFirst { it.id == userItemId }
+
+        var userItem = userOrder.items[userItemIndex]
+
+        if(variation < 0 && userItem.quantity == 0)
+            return;
+
+        val newQuantity = userItem.quantity + variation
+
+        val updatedUserItem = userItem.copy(quantity = newQuantity)
+
+        val updatedUserItems = userOrder.items.toMutableList()
+        updatedUserItems[userItemIndex] = updatedUserItem
+
+        val updatedUserOrder = userOrder.copy(items = updatedUserItems)
+
+        val updatedUserOrders = order.userOrders.toMutableList()
+        updatedUserOrders[userOrderIndex] = updatedUserOrder
+
+        order = order.copy(userOrders = updatedUserOrders.toList())
+    }
+
     val orders: List<Order> = listOf(
         Order(
             orderId = 1,

@@ -1,7 +1,7 @@
 package ar.edu.utn.frba.foody.ui.Classes
 
 
-class OrderItemInfo(
+data class OrderItemInfo(
     val id: Int,
     val dish: Dish.DishInfo,
     var quantity: Int

@@ -27,10 +27,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -110,28 +106,27 @@ fun BottomGroupCart(navController: NavController, orderViewModel: OrderViewModel
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(56.dp) // Set a fixed height for the bottom bar
+            .height(56.dp)
             .padding(8.dp)
     ) {
-        // Amount Text Field
         Text(
             text = "Total: $" + orderViewModel.getTotal(),
             modifier = Modifier
-                .weight(2f) // Give more weight to the label
+                .weight(2f)
                 .padding(vertical = 8.dp)
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp),
-            style = MaterialTheme.typography.h6 // Apply a larger font size for the label
+            style = MaterialTheme.typography.h6
         )
 
-        Spacer(modifier = Modifier.width(8.dp)) // Add a spacer between text field and buttons
+        Spacer(modifier = Modifier.width(8.dp))
 
         // Buttons
         buttons.forEach { button ->
             IconButton(
                 onClick = { navController.navigate(button.route) },
                 modifier = Modifier
-                    .weight(1f) // Distribute remaining weight equally among buttons
+                    .weight(1f)
                     .padding(vertical = 8.dp)
             ) {
                 Image(
@@ -199,8 +194,6 @@ fun OrderCard(navController: NavController, viewModel: OrderViewModel, userOrder
 
 @Composable
 fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: UserOrder) {
-    var quantity by remember { mutableStateOf(orderItem.quantity) }
-
     Card(
         modifier = Modifier
             .padding(10.dp)
@@ -225,13 +218,13 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            IconButton(onClick = { quantity++ }) {
+            IconButton(onClick = { viewModel.changeItemQuantity(userOrder.userOrderId, orderItem.id, 1) }) {
                 Icon(imageVector = Icons.Default.KeyboardArrowUp, contentDescription = "Increase")
             }
 
-            Text(text = quantity.toString(), fontSize = 18.sp)
+            Text(text = orderItem.quantity.toString(), fontSize = 18.sp)
 
-            IconButton(onClick = { if (quantity > 0) quantity-- }) {
+            IconButton(onClick = { viewModel.changeItemQuantity(userOrder.userOrderId, orderItem.id, -1) }) {
                 Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "Decrease")
             }
         }
