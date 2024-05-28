@@ -1,8 +1,10 @@
 package ar.edu.utn.frba.foody.ui.dataClasses
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import ar.edu.utn.frba.foody.ui.Classes.*
+import ar.edu.utn.frba.foody.ui.Classes.Order
 
 class OrderViewModel() : ViewModel() {
     private var order by mutableStateOf(Order())
@@ -13,6 +15,10 @@ class OrderViewModel() : ViewModel() {
 
     fun getPickedOrder(): Order {
         return order
+    }
+
+    fun getTotal(): Double {
+        return 100.0;
     }
 
     val orders: List<Order> = listOf(

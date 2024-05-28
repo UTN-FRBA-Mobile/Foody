@@ -1,30 +1,58 @@
 package ar.edu.utn.frba.foody.ui.main
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.*
-import androidx.compose.material.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.*
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.*
-import androidx.navigation.*
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
-import ar.edu.utn.frba.foody.ui.Classes.*
+import ar.edu.utn.frba.foody.ui.Classes.OrderItemInfo
+import ar.edu.utn.frba.foody.ui.Classes.UserOrder
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
 fun CartScreen(navController: NavHostController, viewModel: OrderViewModel) {
     val order = viewModel.getPickedOrder()
-    AppScaffold(navController, stringResource(id = R.string.label_titulo_carrito), {BottomGroupCart(navController)},
+    AppScaffold(navController, stringResource(id = R.string.label_titulo_carrito), {BottomGroupCart(navController, orderViewModel = viewModel)},
         { TopGroupCart(navController) }){
         OrdersGrid(navController = navController, order.userOrders)
     }
@@ -36,8 +64,7 @@ fun TopGroupCart(navController: NavController) {
         ButtonInterface(
             resourceId = R.drawable.go_back,
             imageDescription = "Go Back Icon",
-            route = AppScreens.Home_Screen.route,
-
+            route = AppScreens.Home_Screen.route
             )
     Row(modifier = Modifier
         .fillMaxWidth()
@@ -61,29 +88,55 @@ fun TopGroupCart(navController: NavController) {
 }
 
 @Composable
-fun BottomGroupCart(navController: NavController) {
+fun BottomGroupCart(navController: NavController, orderViewModel: OrderViewModel) {
     val buttons = listOf(
         ButtonInterface(
             resourceId = R.drawable.user_icon,
-            imageDescription = "User Icon",
+            imageDescription = "Button 1 Icon",
             route = AppScreens.Profile_Screen.route,
         ),
         ButtonInterface(
-            resourceId = R.drawable.order_icon,
-            imageDescription = "Order Icon",
-            route = AppScreens.Order_Screen.route,
+            resourceId = R.drawable.user_icon,
+            imageDescription = "Button 2 Icon",
+            route = AppScreens.Profile_Screen.route,
+        ),
+        ButtonInterface(
+            resourceId = R.drawable.user_icon,
+            imageDescription = "Button 3 Icon",
+            route = AppScreens.Profile_Screen.route,
         )
     )
 
-    Row(modifier = Modifier.fillMaxWidth()) {
-        buttons.forEach{
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp) // Set a fixed height for the bottom bar
+            .padding(8.dp)
+    ) {
+        // Amount Text Field
+        Text(
+            text = "Total: $" + orderViewModel.getTotal(),
+            modifier = Modifier
+                .weight(2f) // Give more weight to the label
+                .padding(vertical = 8.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
+            style = MaterialTheme.typography.h6 // Apply a larger font size for the label
+        )
+
+        Spacer(modifier = Modifier.width(8.dp)) // Add a spacer between text field and buttons
+
+        // Buttons
+        buttons.forEach { button ->
             IconButton(
-                onClick = { navController.navigate(it.route) },
-                modifier = Modifier.weight(1f)
+                onClick = { navController.navigate(button.route) },
+                modifier = Modifier
+                    .weight(1f) // Distribute remaining weight equally among buttons
+                    .padding(vertical = 8.dp)
             ) {
                 Image(
-                    painter = painterResource(id = it.resourceId),
-                    contentDescription = it.imageDescription,
+                    painter = painterResource(id = button.resourceId),
+                    contentDescription = button.imageDescription,
                     modifier = Modifier.size(24.dp),
                     contentScale = ContentScale.FillBounds
                 )
@@ -97,7 +150,8 @@ fun OrdersGrid(navController: NavController, userOrders: List<UserOrder>) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(1),
         contentPadding = PaddingValues(8.dp),
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
+
     ) {
         items(userOrders.size) { index ->
             OrderCard(navController, userOrders[index])
@@ -110,8 +164,7 @@ fun OrderCard(navController: NavController, userOrder: UserOrder) {
     Card(
         modifier = Modifier
             .padding(15.dp)
-            .fillMaxWidth()
-            .height(200.dp),
+            .fillMaxWidth(),
         elevation = 4.dp
     ) {
         Column(
@@ -128,7 +181,7 @@ fun OrderCard(navController: NavController, userOrder: UserOrder) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(1),
                 contentPadding = PaddingValues(8.dp),
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.height(140.dp),
             ) {
                 items(userOrder.items.size) { index ->
                     OrderItem(navController, userOrder.items[index], userOrder)
@@ -150,9 +203,9 @@ fun OrderItem(navController: NavController, orderItem: OrderItemInfo, userOrder:
 
     Card(
         modifier = Modifier
-            .padding(15.dp)
+            .padding(10.dp)
             .fillMaxWidth()
-            .height(70.dp),
+            .height(60.dp),
         elevation = 4.dp
     ) {
         Row(
