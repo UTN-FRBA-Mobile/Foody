@@ -18,7 +18,22 @@ class OrderViewModel() : ViewModel() {
     }
 
     fun getTotal(): Double {
-        return 100.0;
+        return order.userOrders.sumOf { x -> x.items.sumOf { y -> y.quantity * y.dish.price } }
+    }
+
+    fun deleteItem(userOrderId: Int, userItemId: Int) {
+        val userOrderIndex = order.userOrders.indexOfFirst { it.userOrderId == userOrderId }
+
+        val userOrder = order.userOrders[userOrderIndex]
+
+        val updatedItems = userOrder.items.filter { it.id != userItemId }
+
+        val updatedUserOrder = userOrder.copy(items = updatedItems)
+
+        val updatedUserOrders = order.userOrders.toMutableList()
+        updatedUserOrders[userOrderIndex] = updatedUserOrder
+
+        order = order.copy(userOrders = updatedUserOrders.toList())
     }
 
     val orders: List<Order> = listOf(

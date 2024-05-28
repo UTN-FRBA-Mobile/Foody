@@ -4,8 +4,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.viewmodel.compose.viewModel
-import ar.edu.utn.frba.foody.ui.Classes.*
-import ar.edu.utn.frba.foody.ui.dataClasses.*
+import ar.edu.utn.frba.foody.ui.Classes.Dish
+import ar.edu.utn.frba.foody.ui.Classes.Order
+import ar.edu.utn.frba.foody.ui.Classes.OrderItemInfo
+import ar.edu.utn.frba.foody.ui.Classes.Restaurant
+import ar.edu.utn.frba.foody.ui.Classes.User
+import ar.edu.utn.frba.foody.ui.Classes.UserOrder
+import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
+import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppNavigation
 
 class MainComposeActivity : ComponentActivity() {
@@ -44,11 +50,11 @@ class MainComposeActivity : ComponentActivity() {
             dishes = listOf(dish1, dish2)
         )
 
-        val orderItems1 = listOf(OrderItemInfo(dish = dish1, quantity = 2), OrderItemInfo(dish = dish2, quantity = 1))
-        val orderItems2 = listOf(OrderItemInfo(dish = dish2, quantity = 3), OrderItemInfo(dish = dish1, quantity = 1))
-        val orderItems3 = listOf(OrderItemInfo(dish = dish2, quantity = 2))
-        val orderItems4 = listOf(OrderItemInfo(dish = dish1, quantity = 4), OrderItemInfo(dish = dish2, quantity = 2))
-        val orderItems5 = listOf(OrderItemInfo(dish = dish1, quantity = 1))
+        val orderItems1 = listOf(OrderItemInfo(dish = dish1, quantity = 2, id = 1), OrderItemInfo(dish = dish2, quantity = 1, id = 2))
+        val orderItems2 = listOf(OrderItemInfo(dish = dish2, quantity = 3, id = 2), OrderItemInfo(dish = dish1, quantity = 1, id = 3))
+        val orderItems3 = listOf(OrderItemInfo(dish = dish2, quantity = 2, id = 3))
+        val orderItems4 = listOf(OrderItemInfo(dish = dish1, quantity = 4, id = 4), OrderItemInfo(dish = dish2, quantity = 2, id = 1))
+        val orderItems5 = listOf(OrderItemInfo(dish = dish1, quantity = 1, id = 5))
 
         val user1 = User(userId = 1, userName = "Alice")
         val user2 = User(userId = 2, userName = "Bob")

@@ -5,5 +5,5 @@ data class Order(
     val restaurant: Restaurant.RestaurantInfo = Restaurant.RestaurantInfo(),
     val name: String = "",
     val inProgress: Boolean = false,
-    val userOrders: List<UserOrder> = emptyList()
+    var userOrders: List<UserOrder> = emptyList()
 )

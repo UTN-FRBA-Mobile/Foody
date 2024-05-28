@@ -54,7 +54,7 @@ fun CartScreen(navController: NavHostController, viewModel: OrderViewModel) {
     val order = viewModel.getPickedOrder()
     AppScaffold(navController, stringResource(id = R.string.label_titulo_carrito), {BottomGroupCart(navController, orderViewModel = viewModel)},
         { TopGroupCart(navController) }){
-        OrdersGrid(navController = navController, order.userOrders)
+        OrdersGrid(navController = navController, viewModel, order.userOrders)
     }
 }
 
@@ -146,7 +146,7 @@ fun BottomGroupCart(navController: NavController, orderViewModel: OrderViewModel
 }
 
 @Composable
-fun OrdersGrid(navController: NavController, userOrders: List<UserOrder>) {
+fun OrdersGrid(navController: NavController, viewModel: OrderViewModel, userOrders: List<UserOrder>) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(1),
         contentPadding = PaddingValues(8.dp),
@@ -154,13 +154,13 @@ fun OrdersGrid(navController: NavController, userOrders: List<UserOrder>) {
 
     ) {
         items(userOrders.size) { index ->
-            OrderCard(navController, userOrders[index])
+            OrderCard(navController, viewModel, userOrders[index])
         }
     }
 }
 
 @Composable
-fun OrderCard(navController: NavController, userOrder: UserOrder) {
+fun OrderCard(navController: NavController, viewModel: OrderViewModel, userOrder: UserOrder) {
     Card(
         modifier = Modifier
             .padding(15.dp)
@@ -184,7 +184,7 @@ fun OrderCard(navController: NavController, userOrder: UserOrder) {
                 modifier = Modifier.height(140.dp),
             ) {
                 items(userOrder.items.size) { index ->
-                    OrderItem(navController, userOrder.items[index], userOrder)
+                    OrderItem(viewModel, userOrder.items[index], userOrder)
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -198,7 +198,7 @@ fun OrderCard(navController: NavController, userOrder: UserOrder) {
 }
 
 @Composable
-fun OrderItem(navController: NavController, orderItem: OrderItemInfo, userOrder: UserOrder) {
+fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: UserOrder) {
     var quantity by remember { mutableStateOf(orderItem.quantity) }
 
     Card(
@@ -215,7 +215,7 @@ fun OrderItem(navController: NavController, orderItem: OrderItemInfo, userOrder:
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { /* Borrar item */ }) {
+            IconButton(onClick = { viewModel.deleteItem(userOrderId = userOrder.userOrderId, userItemId = orderItem.id) }) {
                 Icon(imageVector = Icons.Default.Clear, contentDescription = "Remove")
             }
 
