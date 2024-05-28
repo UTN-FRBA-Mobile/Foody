@@ -31,7 +31,7 @@ fun AppNavigation(viewModel: MainViewModel, orderViewModel: OrderViewModel){
 
         }
         composable(route = AppScreens.Progress_Order_Screen.route){
-
+            ProgressOrderScreen(navController = navController, orderViewModel = orderViewModel)
         }
     }
 }
