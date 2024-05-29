@@ -1,5 +1,8 @@
 package ar.edu.utn.frba.foody.ui.dataClasses
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import ar.edu.utn.frba.foody.ui.Classes.Order
 import android.annotation.SuppressLint
 import androidx.compose.runtime.*
@@ -7,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import ar.edu.utn.frba.foody.ui.Classes.OrderState
 import java.util.Calendar
 import ar.edu.utn.frba.foody.R
+import ar.edu.utn.frba.foody.ui.Classes.Order
 
 class OrderViewModel() : ViewModel() {
     private var order by mutableStateOf(Order())
@@ -17,6 +21,52 @@ class OrderViewModel() : ViewModel() {
 
     fun getPickedOrder(): Order {
         return order
+    }
+
+    fun getTotal(): Double {
+        return order.userOrders.sumOf { x -> x.items.sumOf { y -> y.quantity * y.dish.price } }
+    }
+
+    fun deleteItem(userOrderId: Int, userItemId: Int) {
+        val userOrderIndex = order.userOrders.indexOfFirst { it.userOrderId == userOrderId }
+
+        val userOrder = order.userOrders[userOrderIndex]
+
+        val updatedItems = userOrder.items.filter { it.id != userItemId }
+
+        val updatedUserOrder = userOrder.copy(items = updatedItems)
+
+        val updatedUserOrders = order.userOrders.toMutableList()
+        updatedUserOrders[userOrderIndex] = updatedUserOrder
+
+        order = order.copy(userOrders = updatedUserOrders.toList())
+    }
+
+    fun changeItemQuantity(userOrderId: Int, userItemId: Int, variation: Int) {
+        val userOrderIndex = order.userOrders.indexOfFirst { it.userOrderId == userOrderId }
+
+        var userOrder = order.userOrders[userOrderIndex]
+
+        val userItemIndex = userOrder.items.indexOfFirst { it.id == userItemId }
+
+        var userItem = userOrder.items[userItemIndex]
+
+        if(variation < 0 && userItem.quantity == 0)
+            return;
+
+        val newQuantity = userItem.quantity + variation
+
+        val updatedUserItem = userItem.copy(quantity = newQuantity)
+
+        val updatedUserItems = userOrder.items.toMutableList()
+        updatedUserItems[userItemIndex] = updatedUserItem
+
+        val updatedUserOrder = userOrder.copy(items = updatedUserItems)
+
+        val updatedUserOrders = order.userOrders.toMutableList()
+        updatedUserOrders[userOrderIndex] = updatedUserOrder
+
+        order = order.copy(userOrders = updatedUserOrders.toList())
     }
 
     val defaultOrderStates: List<OrderState> = listOf(
