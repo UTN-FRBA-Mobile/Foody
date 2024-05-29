@@ -1,16 +1,12 @@
 package ar.edu.utn.frba.foody.ui.dataClasses
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import ar.edu.utn.frba.foody.ui.Classes.Order
-import android.annotation.SuppressLint
 import androidx.compose.runtime.*
+import ar.edu.utn.frba.foody.ui.Classes.*
+import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
-import ar.edu.utn.frba.foody.ui.Classes.OrderState
 import java.util.Calendar
 import ar.edu.utn.frba.foody.R
-import ar.edu.utn.frba.foody.ui.Classes.Order
+
 
 class OrderViewModel() : ViewModel() {
     private var order by mutableStateOf(Order())
@@ -45,14 +41,14 @@ class OrderViewModel() : ViewModel() {
     fun changeItemQuantity(userOrderId: Int, userItemId: Int, variation: Int) {
         val userOrderIndex = order.userOrders.indexOfFirst { it.userOrderId == userOrderId }
 
-        var userOrder = order.userOrders[userOrderIndex]
+        val userOrder = order.userOrders[userOrderIndex]
 
         val userItemIndex = userOrder.items.indexOfFirst { it.id == userItemId }
 
-        var userItem = userOrder.items[userItemIndex]
+        val userItem = userOrder.items[userItemIndex]
 
         if(variation < 0 && userItem.quantity == 0)
-            return;
+            return
 
         val newQuantity = userItem.quantity + variation
 
