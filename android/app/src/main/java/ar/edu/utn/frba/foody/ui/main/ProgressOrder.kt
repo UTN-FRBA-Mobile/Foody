@@ -1,5 +1,4 @@
 package ar.edu.utn.frba.foody.ui.main
-
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -16,97 +15,49 @@ import androidx.compose.ui.unit.*
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
+import ar.edu.utn.frba.foody.ui.Classes.OrderState
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
-
-data class StateInterface(
-    val resourceId: Int,
-    val imageDescription: String,
-    val description: String,
-    val completed: Boolean,
-    val last: Boolean = false,
-)
 
 @Composable
 fun ProgressOrderScreen(navController: NavController, orderViewModel: OrderViewModel) {
     val order = orderViewModel.getPickedOrder()
-    val states = listOf(
-        StateInterface(
-            resourceId = R.drawable.order_icon,
-            imageDescription = "Order Icon",
-            description = "Recibimos tu pedido",
-            completed = true,
-            last = true
-        ),
-        StateInterface(
-            resourceId = R.drawable.store_icon,
-            imageDescription = "Store Icon",
-            description = "Estamos preparando tu pedido",
-            completed = true
-        ),
-        StateInterface(
-            resourceId = R.drawable.delivery_icon,
-            imageDescription = "Delivery Icon",
-            description = "Tu pedido está en camino",
-            completed = true
-        ),
-        StateInterface(
-            resourceId = R.drawable.finished_icon,
-            imageDescription = "Finished Icon",
-            description = "Entregamos tu pedido",
-            completed = false
-        ),
-    )
 
     AppScaffold(navController = navController,
         null,
         null,
         { TopGroupProgressOrder(navController = navController)}
     ) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = "Direccion",
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    fontSize = 24.sp
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(text = (order.estimatedHour).toString(),
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    fontSize = 24.sp
-                )
-                Spacer(modifier = Modifier.height(16.dp))
+        Box(modifier = Modifier.fillMaxHeight(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column {
+                TextInfo(text = "Direccion: " + order.direction)
+                TextInfo(text = "Hora estimada: " + order.estimatedHour)
                 Card(
                     modifier = Modifier
                         .padding(16.dp)
                         .fillMaxWidth()
-                        .height(250.dp),
+                        .height(300.dp),
                     elevation = 4.dp
                 ) {
                     Column(verticalArrangement = Arrangement.Center) {
-                        Text(text = "Estado",
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Center,
-                            fontSize = 24.sp
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(16.dp, 0.dp)) {
-                            states.forEach{
-                                PedidoLineaActiva(state = it.completed, last = it.last)
-                                PedidoEstado(image = it.resourceId, imageDescription = it.imageDescription, state = it.completed)
+                        TextInfo(text = "Estado", align = true)
+                        Row(verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(16.dp, 0.dp)
+                        ) {
+                            order.orderStates.forEach{
+                                StateProgressLine(state = it.completed,
+                                    last = it.firstState
+                                )
+                                StateIcon(image = it.resourceId,
+                                    imageDescription = it.imageDescription,
+                                    state = it.completed
+                                )
                             }
                         }
                         Spacer(modifier = Modifier.height(32.dp))
-                        Column(modifier = Modifier.padding(16.dp, 0.dp)) {
-                            states.forEach{
-                                Text(text = it.description, color = if (it.completed) Color.Black else Color.LightGray)
-                                Spacer(modifier = Modifier.height(8.dp))
-                            }
-                        }
+                        StateDescriptions(order.orderStates)
                     }
 
                 }
@@ -117,9 +68,76 @@ fun ProgressOrderScreen(navController: NavController, orderViewModel: OrderViewM
 }
 
 @Composable
-fun PedidoEstado(image: Int, imageDescription: String, state: Boolean) {
+fun StateDescriptions(states: List<OrderState>) {
+    Column(modifier = Modifier.padding(16.dp, 0.dp)) {
+        var textColor: Color
+        states.forEach{
+            textColor = if (it.current) {
+                Color.Black
+            } else if (it.completed) {
+                Color.DarkGray
+            } else {
+                Color.LightGray
+            }
+            Row(verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (it.completed) {
+                    CompletedStateDescription(textDescription = it.description, textColor = textColor)
+                } else {
+                    PendingStateDescription(textDescription = it.description, textColor = textColor)
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+}
+
+@Composable
+fun CompletedStateDescription(textDescription: String, textColor: Color) {
+    Image(
+        painter = painterResource(id = R.drawable.success_icon),
+        contentDescription = "Success Icon",
+        modifier = Modifier.size(18.dp),
+        contentScale = ContentScale.FillBounds,
+    )
+    Spacer(modifier = Modifier.width(8.dp))
+    Text(text = textDescription,
+        color = textColor
+    )
+}
+
+@Composable
+fun PendingStateDescription(textDescription: String, textColor: Color) {
+    Spacer(modifier = Modifier.width(3.dp))
+    Image(
+        painter = painterResource(id = R.drawable.dot_icon),
+        contentDescription = "Dot Icon",
+        modifier = Modifier.size(10.dp),
+        contentScale = ContentScale.FillBounds,
+    )
+    Spacer(modifier = Modifier.width(14.dp))
+    Text(text = textDescription,
+        color = textColor
+    )
+}
+
+@Composable
+fun TextInfo(text: String, align: Boolean = false) {
+    Text(text = text,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp),
+        fontSize = 24.sp,
+        textAlign = if (align) TextAlign.Center else TextAlign.Start
+    )
+    Spacer(modifier = Modifier.height(16.dp))
+}
+
+@Composable
+fun StateIcon(image: Int, imageDescription: String, state: Boolean) {
     Surface(
-        color = if (state) Color(0xFF00BB2D) else Color.LightGray,
+        color = if (state) Color.Green else Color.LightGray,
         shape = CircleShape,
     ) {
         Box(
@@ -140,13 +158,13 @@ fun PedidoEstado(image: Int, imageDescription: String, state: Boolean) {
 }
 
 @Composable
-fun PedidoLineaActiva(state: Boolean, last: Boolean) {
+fun StateProgressLine(state: Boolean, last: Boolean) {
     if (!last) {
         Box(
             modifier = Modifier
                 .width(64.dp)
                 .height(2.dp)
-                .background(if (state) Color(0xFF00BB2D) else Color.LightGray)
+                .background(if (state) Color.Green else Color.LightGray)
         )
     }
 }
