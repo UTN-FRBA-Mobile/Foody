@@ -110,7 +110,8 @@ fun OrderItem(navController: NavController, viewModel: OrderViewModel, order: Or
                         )
                     }
                     if (order.inProgress) {
-                        IconButton(onClick = { navController.navigate(AppScreens.Progress_Order_Screen.route) }) {
+                        IconButton(onClick = { viewModel.updateOrder(order)
+                            navController.navigate(AppScreens.Progress_Order_Screen.route) }) {
                             Image(
                                 painter = painterResource(id = R.drawable.order_progress_icon),
                                 contentDescription = "Order Progress Icon",
