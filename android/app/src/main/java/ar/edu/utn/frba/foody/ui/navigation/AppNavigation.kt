@@ -12,12 +12,16 @@ fun AppNavigation(viewModel: MainViewModel, orderViewModel: OrderViewModel){
         composable(route = AppScreens.Home_Screen.route){
             HomeScreen(navController = navController, viewModel = viewModel )
         }
-        composable(route = AppScreens.Login_Screen.route){
+        composable(route = AppScreens.Login_Screen.route) {
             LoginScreen(navController = navController)
         }
-        composable(route = AppScreens.Profile_Screen.route){
+        composable(route = AppScreens.SignUp_Screen.route){
+            SignUpScreen(navController = navController)
+        }
+        composable(route = AppScreens.Profile_Screen.route) {
 
         }
+
         composable(route = AppScreens.Cart_Screen.route){
             CartScreen(navController = navController, viewModel = orderViewModel)
         }
@@ -27,7 +31,7 @@ fun AppNavigation(viewModel: MainViewModel, orderViewModel: OrderViewModel){
         composable(route = AppScreens.Restaurant_Screen.route){
             RestaurantScreen(navController = navController, viewModel = viewModel)
         }
-        composable(route = AppScreens.Order_Screen.route){
+        composable(route = AppScreens.Order_Screen.route) {
 
         }
         composable(route = AppScreens.Progress_Order_Screen.route){
