@@ -37,5 +37,11 @@ fun AppNavigation(viewModel: MainViewModel, orderViewModel: OrderViewModel){
         composable(route = AppScreens.Progress_Order_Screen.route){
             ProgressOrderScreen(navController = navController, orderViewModel = orderViewModel)
         }
+        composable(route = AppScreens.Group_Screen.route) {
+
+        }
+        composable(route = AppScreens.Create_Group_Screen.route) {
+            CreateGroupScreen(navController = navController, orderViewModel = orderViewModel)
+        }
     }
 }
