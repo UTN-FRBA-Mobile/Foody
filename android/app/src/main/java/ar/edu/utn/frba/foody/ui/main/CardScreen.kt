@@ -31,11 +31,12 @@ import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 import ar.edu.utn.frba.foody.ui.Classes.*
+import ar.edu.utn.frba.foody.ui.dataClasses.CardViewModel
 import java.util.Calendar
 
 
 @Composable
-fun CardInfoScreen(navController: NavHostController) {
+fun CardInfoScreen(navController: NavHostController,viewModel: CardViewModel) {
     AppScaffold(navController, null,null,
         { TopGroupCard(navController)}){
         var cardInfo by remember { mutableStateOf(Card.CardInfo()) }
@@ -145,8 +146,11 @@ fun CardInfoScreen(navController: NavHostController) {
         // Save button
         Button(
             onClick = {
-                if(validator(cardInfo,context)==true)
-                navController.navigate("Restaurant") // Replace with your next screen navigation
+                if(validator(cardInfo,context)==true){
+                    viewModel.addCard(cardInfo)
+                    navController.popBackStack() // Replace with your next screen navigation
+                }
+
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -173,7 +177,7 @@ fun TopGroupCard(navController: NavController) {
         .background(MaterialTheme.colors.primarySurface),
         horizontalArrangement = Arrangement.SpaceBetween) {
         IconButton(
-            onClick = { navController.navigate(button_go_back.route) },
+            onClick = { navController.popBackStack() },
         ) {
             Image(
                 painter = painterResource(id = button_go_back.resourceId),
@@ -251,5 +255,6 @@ class ExpiryDateVisualTransformation : VisualTransformation {
 @Composable
 fun DefaultPreviewCardInfo() {
     val navController= rememberNavController()
-   CardInfoScreen(navController)
+    val cardViewModel= CardViewModel()
+   CardInfoScreen(navController,cardViewModel)
 }
