@@ -19,9 +19,9 @@ class MainComposeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val viewModel = viewModel<MainViewModel>()
-            val orderViewModel = viewModel<OrderViewModel>()
+            val orderViewModel = viewModel<OrderViewModel>(this)
             createTestData(orderViewModel)
-            AppNavigation(viewModel, orderViewModel)
+            AppNavigation(viewModel, orderViewModel, this)
         }
     }
 

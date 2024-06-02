@@ -1,5 +1,8 @@
 package ar.edu.utn.frba.foody.ui.main
 
+import android.content.Context
+import android.content.Intent
+import android.provider.Settings.System.getString
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,27 +22,41 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
+import java.util.UUID
 
 @Composable
-fun CreateGroupScreen(navController: NavController, orderViewModel: OrderViewModel) {
+fun CreateGroupScreen(navController: NavController, orderViewModel: OrderViewModel, context: Context) {
     val order = orderViewModel.getPickedOrder()
     var groupName by remember { mutableStateOf("") }
+    val baseUrl = context.getString(R.string.base_url)
+    val grupoId = UUID.randomUUID().toString();
+    val urlCompleta = "$baseUrl/$grupoId"
+
+    val shareIntent = remember {
+        Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, urlCompleta)
+        }
+    }
 
     AppScaffold(navController = navController,
         null,
@@ -89,7 +106,7 @@ fun CreateGroupScreen(navController: NavController, orderViewModel: OrderViewMod
             contentAlignment = Alignment.BottomCenter
         ) {
             Button(
-                onClick = { },
+                onClick = { context.startActivity(Intent.createChooser(shareIntent, null)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
@@ -135,7 +152,8 @@ fun TopGroupCreateGroup(navController: NavController) {
 @Preview
 @Composable
 fun CreateGroupPreview() {
+    val context = LocalContext.current
     val navController = rememberNavController()
     val orderViewModel = OrderViewModel()
-    CreateGroupScreen(navController = navController, orderViewModel = orderViewModel)
+    CreateGroupScreen(navController = navController, orderViewModel = orderViewModel, context = context)
 }
