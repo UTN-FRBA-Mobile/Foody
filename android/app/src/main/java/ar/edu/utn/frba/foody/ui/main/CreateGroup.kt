@@ -1,41 +1,18 @@
 package ar.edu.utn.frba.foody.ui.main
 
-import android.content.Context
-import android.content.Intent
-import android.provider.Settings.System.getString
+import android.content.*
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.Button
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCompositionContext
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat.startActivity
+import androidx.compose.ui.unit.*
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
@@ -48,13 +25,13 @@ fun CreateGroupScreen(navController: NavController, orderViewModel: OrderViewMod
     val order = orderViewModel.getPickedOrder()
     var groupName by remember { mutableStateOf("") }
     val baseUrl = context.getString(R.string.base_url)
-    val grupoId = UUID.randomUUID().toString();
-    val urlCompleta = "$baseUrl/$grupoId"
+    val groupId = UUID.randomUUID().toString()
+    val finalUrl = "$baseUrl/$groupId"
 
     val shareIntent = remember {
         Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, urlCompleta)
+            putExtra(Intent.EXTRA_TEXT, finalUrl)
         }
     }
 
