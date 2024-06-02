@@ -7,7 +7,7 @@ import ar.edu.utn.frba.foody.ui.dataClasses.*
 import ar.edu.utn.frba.foody.ui.main.*
 
 @Composable
-fun AppNavigation(viewModel: MainViewModel, orderViewModel: OrderViewModel, context: Context){
+fun AppNavigation(viewModel: MainViewModel, orderViewModel: OrderViewModel,cardViewModel: CardViewModel, context: Context){
     val navController= rememberNavController()
     NavHost(navController = navController , startDestination = AppScreens.Login_Screen.route) {
         composable(route = AppScreens.Home_Screen.route){
@@ -43,6 +43,12 @@ fun AppNavigation(viewModel: MainViewModel, orderViewModel: OrderViewModel, cont
         }
         composable(route = AppScreens.Create_Group_Screen.route) {
             CreateGroupScreen(navController = navController, orderViewModel = orderViewModel, context = context)
+        }
+        composable(route = AppScreens.Card_Screen.route){
+            CardInfoScreen(navController = navController,viewModel=cardViewModel)
+        }
+        composable(route = AppScreens.Payment.route){
+            PaymentScreen(navController = navController,viewModel= cardViewModel)
         }
     }
 }

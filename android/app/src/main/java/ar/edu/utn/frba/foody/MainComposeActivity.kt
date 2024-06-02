@@ -10,6 +10,7 @@ import ar.edu.utn.frba.foody.ui.Classes.OrderItemInfo
 import ar.edu.utn.frba.foody.ui.Classes.Restaurant
 import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.Classes.UserOrder
+import ar.edu.utn.frba.foody.ui.dataClasses.CardViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppNavigation
@@ -19,9 +20,10 @@ class MainComposeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val viewModel = viewModel<MainViewModel>()
-            val orderViewModel = viewModel<OrderViewModel>(this)
+            val orderViewModel = viewModel<OrderViewModel>()
+            val cardViewModel = viewModel<CardViewModel>()
             createTestData(orderViewModel)
-            AppNavigation(viewModel, orderViewModel, this)
+            AppNavigation(viewModel, orderViewModel,cardViewModel, this)
         }
     }
 
