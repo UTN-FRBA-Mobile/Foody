@@ -1,12 +1,13 @@
 package ar.edu.utn.frba.foody.ui.navigation
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.*
 import ar.edu.utn.frba.foody.ui.dataClasses.*
 import ar.edu.utn.frba.foody.ui.main.*
 
 @Composable
-fun AppNavigation(viewModel: MainViewModel, orderViewModel: OrderViewModel,cardViewModel: CardViewModel){
+fun AppNavigation(viewModel: MainViewModel, orderViewModel: OrderViewModel,cardViewModel: CardViewModel, context: Context){
     val navController= rememberNavController()
     NavHost(navController = navController , startDestination = AppScreens.Login_Screen.route) {
         composable(route = AppScreens.Home_Screen.route){
@@ -36,6 +37,12 @@ fun AppNavigation(viewModel: MainViewModel, orderViewModel: OrderViewModel,cardV
         }
         composable(route = AppScreens.Progress_Order_Screen.route){
             ProgressOrderScreen(navController = navController, orderViewModel = orderViewModel)
+        }
+        composable(route = AppScreens.Group_Screen.route) {
+
+        }
+        composable(route = AppScreens.Create_Group_Screen.route) {
+            CreateGroupScreen(navController = navController, orderViewModel = orderViewModel, context = context)
         }
         composable(route = AppScreens.Card_Screen.route){
             CardInfoScreen(navController = navController,viewModel=cardViewModel)

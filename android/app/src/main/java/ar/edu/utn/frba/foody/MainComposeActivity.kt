@@ -21,9 +21,9 @@ class MainComposeActivity : ComponentActivity() {
         setContent {
             val viewModel = viewModel<MainViewModel>()
             val orderViewModel = viewModel<OrderViewModel>()
-            val cardViewModel=viewModel<CardViewModel>()
+            val cardViewModel = viewModel<CardViewModel>()
             createTestData(orderViewModel)
-            AppNavigation(viewModel, orderViewModel,cardViewModel)
+            AppNavigation(viewModel, orderViewModel,cardViewModel, this)
         }
     }
 
