@@ -21,6 +21,9 @@ fun AppNavigation(viewModel: MainViewModel, orderViewModel: OrderViewModel,cardV
         composable(route = AppScreens.SignUp_Screen.route){
             SignUpScreen(navController = navController)
         }
+        composable(route = AppScreens.Location_Screen.route){
+            LocationScreen(navController = navController)
+        }
         composable(route = AppScreens.Profile_Screen.route) {
 
         }
