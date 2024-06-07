@@ -1,9 +1,7 @@
 package ar.edu.utn.frba.foody.ui.main
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,7 +27,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -40,12 +37,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.graphics.toColor
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
-import ar.edu.utn.frba.foody.ui.components.PaswordTextField
-import ar.edu.utn.frba.foody.ui.components.SimpleTextField
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
@@ -146,7 +140,9 @@ fun SignUpScreen(navController: NavController)
                         backgroundColor = Color.Transparent
                     )
                 )
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = {
+                    navController.navigate(AppScreens.Location_Screen.route)
+                }) {
                     Icon(
                         modifier = Modifier.size(36.dp),
                         painter = painterResource(id = R.drawable.address_add_location),
