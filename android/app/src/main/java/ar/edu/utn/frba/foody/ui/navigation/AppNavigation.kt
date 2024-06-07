@@ -1,20 +1,22 @@
 package ar.edu.utn.frba.foody.ui.navigation
 
-import android.content.Context
+import android.database.sqlite.SQLiteOpenHelper
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.*
+import ar.edu.utn.frba.foody.ui.dataBase.ConnectionClass
 import ar.edu.utn.frba.foody.ui.dataClasses.*
 import ar.edu.utn.frba.foody.ui.main.*
 
 @Composable
-fun AppNavigation(viewModel: MainViewModel, orderViewModel: OrderViewModel,cardViewModel: CardViewModel, context: Context){
+fun AppNavigation(viewModel: MainViewModel, orderViewModel: OrderViewModel,cardViewModel: CardViewModel,
+                  dbHelper:ConnectionClass){
     val navController= rememberNavController()
     NavHost(navController = navController , startDestination = AppScreens.Login_Screen.route) {
         composable(route = AppScreens.Home_Screen.route){
             HomeScreen(navController = navController, viewModel = viewModel )
         }
         composable(route = AppScreens.Login_Screen.route) {
-            LoginScreen(navController = navController)
+            LoginScreen(navController = navController,dbHelper=dbHelper)
         }
         composable(route = AppScreens.SignUp_Screen.route){
             SignUpScreen(navController = navController)
@@ -37,12 +39,6 @@ fun AppNavigation(viewModel: MainViewModel, orderViewModel: OrderViewModel,cardV
         }
         composable(route = AppScreens.Progress_Order_Screen.route){
             ProgressOrderScreen(navController = navController, orderViewModel = orderViewModel)
-        }
-        composable(route = AppScreens.Group_Screen.route) {
-
-        }
-        composable(route = AppScreens.Create_Group_Screen.route) {
-            CreateGroupScreen(navController = navController, orderViewModel = orderViewModel, context = context)
         }
         composable(route = AppScreens.Card_Screen.route){
             CardInfoScreen(navController = navController,viewModel=cardViewModel)

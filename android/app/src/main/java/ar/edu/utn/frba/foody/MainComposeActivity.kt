@@ -1,8 +1,11 @@
 package ar.edu.utn.frba.foody
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ar.edu.utn.frba.foody.ui.Classes.Dish
 import ar.edu.utn.frba.foody.ui.Classes.Order
@@ -10,21 +13,35 @@ import ar.edu.utn.frba.foody.ui.Classes.OrderItemInfo
 import ar.edu.utn.frba.foody.ui.Classes.Restaurant
 import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.Classes.UserOrder
+import ar.edu.utn.frba.foody.ui.dataBase.ConnectionClass
 import ar.edu.utn.frba.foody.ui.dataClasses.CardViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppNavigation
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.sql.Connection
+import java.sql.ResultSet
+import java.util.concurrent.Executors
+
 
 class MainComposeActivity : ComponentActivity() {
+    public lateinit var dbHelper: ConnectionClass
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        dbHelper = ConnectionClass(this)
+
         setContent {
             val viewModel = viewModel<MainViewModel>()
             val orderViewModel = viewModel<OrderViewModel>()
-            val cardViewModel = viewModel<CardViewModel>()
+            val cardViewModel=viewModel<CardViewModel>()
             createTestData(orderViewModel)
-            AppNavigation(viewModel, orderViewModel,cardViewModel, this)
+            AppNavigation(viewModel, orderViewModel,cardViewModel,dbHelper)
         }
+
+
     }
 
     fun createTestData(viewModel: OrderViewModel){
@@ -58,7 +75,7 @@ class MainComposeActivity : ComponentActivity() {
         val orderItems4 = listOf(OrderItemInfo(dish = dish1, quantity = 4, id = 4), OrderItemInfo(dish = dish2, quantity = 2, id = 1))
         val orderItems5 = listOf(OrderItemInfo(dish = dish1, quantity = 1, id = 5))
 
-        val user1 = User(userId = 1, userName = "Alice")
+     /*   val user1 = User(userId = 1, userName = "Alice")
         val user2 = User(userId = 2, userName = "Bob")
         val user3 = User(userId = 3, userName = "Charlie")
         val user4 = User(userId = 4, userName = "Dave")
@@ -70,6 +87,8 @@ class MainComposeActivity : ComponentActivity() {
         val userOrder4 = UserOrder(userOrderId = 4, items = orderItems4, user = user4)
         val userOrder5 = UserOrder(userOrderId = 5, items = orderItems5, user = user5)
 
+
+
         val order1 = Order(orderId = 123, name = "Sample Order", restaurant = restaurant, userOrders = listOf(userOrder1, userOrder2, userOrder3, userOrder4, userOrder5))
         viewModel.updateOrder(order1)
 
@@ -78,6 +97,9 @@ class MainComposeActivity : ComponentActivity() {
 
         val order3 = Order(orderId = 321, name = "Super Order", restaurant = restaurant, userOrders = listOf(userOrder1, userOrder2, userOrder3, userOrder5))
         viewModel.updateOrder(order3)
+
+      */
     }
+
 }
 

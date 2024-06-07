@@ -1,5 +1,7 @@
 package ar.edu.utn.frba.foody.ui.main
 
+import android.database.sqlite.SQLiteOpenHelper
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
@@ -18,13 +20,17 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import ar.edu.utn.frba.foody.MainComposeActivity
 import ar.edu.utn.frba.foody.R
+import ar.edu.utn.frba.foody.ui.Classes.User
+import ar.edu.utn.frba.foody.ui.dataBase.ConnectionClass
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
-fun LoginScreen(navController: NavHostController) {
+fun LoginScreen(navController: NavHostController,dbHelper: ConnectionClass) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var showError by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -86,9 +92,30 @@ fun LoginScreen(navController: NavHostController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            if (showError) {
+                Text(
+                    text = "Incorrect User or Password",
+                    color = MaterialTheme.colors.error,
+                    style = MaterialTheme.typography.body2
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+
             Button(
                 onClick = {
-                          navController.navigate(AppScreens.Payment.route)
+                    if(verifyexistence(dbHelper,email,password))
+                        navController.navigate(AppScreens.Home_Screen.route)
+                    else {
+                        showError = true
+                        email = ""
+                        password = ""
+                        Toast.makeText(
+                            navController.context,
+                            "Incorrect User or Password",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -124,9 +151,20 @@ fun LoginScreen(navController: NavHostController) {
     }
 }
 
+fun verifyexistence(dbHelper: ConnectionClass,email:String,password:String):Boolean{
+    val users:List<User> = dbHelper.getAllUsers()
+    val user:User? = users.find { userPred: User -> userPred.userName==email}
+    if( user!=null && user.userPassword==password){
+        return true
+    }
+    return false
+}
+/*
 @Preview
 @Composable
 fun DefaultPreviewLogin() {
     val navController= rememberNavController()
-    LoginScreen(navController)
+    LoginScreen(navController,dbHelper)
 }
+
+ */
