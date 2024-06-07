@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,6 +37,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,8 +52,14 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
 
 
 @Composable
@@ -60,7 +68,27 @@ fun LocationScreen(navController: NavController)
     val context = LocalContext.current
 
     var Direccion by remember { mutableStateOf("") }
-    var Altura by remember { mutableStateOf("") }
+    var Nro by remember { mutableStateOf("") }
+    var Localidad by remember { mutableStateOf("") }
+
+    var userLocation by remember { mutableStateOf(LatLng(0.toDouble(),0.toDouble())) }
+
+
+    var locationText by remember { mutableStateOf("No location obtained :(") }
+
+
+    RequestPermissions(context)
+
+
+    getLastUserLocation(
+        context,
+        onGetLastLocationSuccess = {
+            userLocation = LatLng(it.first,it.second)
+        },
+        onGetLastLocationFailed = { },
+        onGetLastLocationIsNull = { }
+    )
+
 
     Image(
         painter = painterResource(id = R.drawable.background_signup),
@@ -78,7 +106,78 @@ fun LocationScreen(navController: NavController)
         )
     }
 
-    Column(
+    LazyColumn (modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 20.dp, vertical = 50.dp),
+        verticalArrangement = Arrangement.Bottom)
+    {
+        item {
+            GoogleMap(
+                modifier = Modifier.height(550.dp),
+                //uiSettings = MapUiSettings(zoomControlsEnabled = false),
+                cameraPositionState = rememberCameraPositionState { position = CameraPosition.fromLatLngZoom(userLocation, 3f)}
+            ){
+                Marker(
+                    state = rememberMarkerState(position = userLocation),
+                    draggable = false,
+                    title = "Your position",
+                    snippet = "longitud:${userLocation.longitude}/latitud:${userLocation.latitude}"
+                )
+            }
+            Row (
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ){
+                TextField(
+                    modifier = Modifier.weight(2f),
+                    value = Direccion, onValueChange = { Direccion = it },
+                    label = { Text(text = "Direccion", modifier = Modifier.padding(start = 16.dp)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    singleLine = true,
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.Transparent
+                    )
+                )
+                TextField(
+                    modifier = Modifier.weight(1f),
+                    value = Nro, onValueChange = { Nro = it },
+                    label = { Text(text = "Nro", modifier = Modifier.padding(start = 16.dp)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    singleLine = true,
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.Transparent
+                    )
+                )
+            }
+
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = Localidad, onValueChange = { Localidad = it },
+                label = { Text(text = "Localidad", modifier = Modifier.padding(start = 16.dp)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                singleLine = true,
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = Color.Transparent
+                )
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Button(
+                onClick = {/*TODO*/},
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+            ) {
+                Text("Save & Continue", fontSize = 18.sp)
+            }
+        }
+    }
+
+    /*Column(
         Modifier.fillMaxSize(),
     ){
         GoogleMap(
@@ -120,45 +219,7 @@ fun LocationScreen(navController: NavController)
         ) {
             Text("Save & Continue", fontSize = 18.sp)
         }
-    }
-
-    /*LazyColumn (modifier = Modifier
-        .fillMaxSize()
-    ){
-        item {
-            GoogleMap(
-                modifier = Modifier.height(350.dp)
-            )
-        }
-        item {
-            Row (
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.Bottom
-            ){
-                TextField(
-                    modifier = Modifier.weight(2f),
-                    value = Direccion, onValueChange = { Direccion = it },
-                    label = { Text(text = "Direccion", modifier = Modifier.padding(start = 16.dp)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    singleLine = true,
-                    colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = Color.Transparent
-                    )
-                )
-                TextField(
-                    modifier = Modifier.weight(1f),
-                    value = Altura, onValueChange = { Altura = it },
-                    label = { Text(text = "Altura", modifier = Modifier.padding(start = 16.dp)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    singleLine = true,
-                    colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = Color.Transparent
-                    )
-                )
-            }
-        }
     }*/
-
 }
 
 @Preview
