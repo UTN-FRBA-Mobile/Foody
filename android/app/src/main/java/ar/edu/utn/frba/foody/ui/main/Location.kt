@@ -97,7 +97,7 @@ fun LocationScreen(navController: NavController)
         modifier = Modifier.fillMaxSize())
 
 
-    IconButton(onClick = { navController.navigate(AppScreens.Login_Screen.route) }) {
+    IconButton(onClick = { navController.navigate(AppScreens.SignUp_Screen.route) }) {
         Icon(
             modifier = Modifier.size(36.dp),
             painter = painterResource(id = R.drawable.go_back),
@@ -167,7 +167,7 @@ fun LocationScreen(navController: NavController)
             Spacer(modifier = Modifier.height(20.dp))
 
             Button(
-                onClick = {/*TODO*/},
+                onClick = {navController.navigate(AppScreens.SignUp_Screen.route)},
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
@@ -176,50 +176,6 @@ fun LocationScreen(navController: NavController)
             }
         }
     }
-
-    /*Column(
-        Modifier.fillMaxSize(),
-    ){
-        GoogleMap(
-            modifier = Modifier.height(650.dp)
-        )
-        Row (
-            modifier = Modifier.padding(vertical = 8.dp, horizontal = 30.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.Bottom
-        ){
-            TextField(
-                modifier = Modifier.weight(2f),
-                value = Direccion, onValueChange = { Direccion = it },
-                label = { Text(text = "Direccion", modifier = Modifier.padding(start = 16.dp)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                singleLine = true,
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.Transparent
-                )
-            )
-            TextField(
-                modifier = Modifier.weight(1f),
-                value = Altura, onValueChange = { Altura = it },
-                label = { Text(text = "Altura", modifier = Modifier.padding(start = 16.dp)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                singleLine = true,
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.Transparent
-                )
-            )
-        }
-
-        Button(
-            onClick = {/*TODO*/},
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-                .padding(horizontal = 30.dp)
-        ) {
-            Text("Save & Continue", fontSize = 18.sp)
-        }
-    }*/
 }
 
 @Preview

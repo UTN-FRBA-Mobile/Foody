@@ -58,7 +58,7 @@ fun SignUpScreen(navController: NavController)
         modifier = Modifier.fillMaxSize())
 
 
-    IconButton(onClick = { navController.navigate(AppScreens.Login_Screen.route) }) {
+    IconButton(onClick = { navController.navigate(AppScreens.SignUp_Screen.route) }) {
         Icon(
             modifier = Modifier.size(36.dp),
             painter = painterResource(id = R.drawable.go_back),
