@@ -14,12 +14,17 @@ import androidx.compose.ui.unit.*
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
-import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
+import ar.edu.utn.frba.foody.ui.Classes.User
+import ar.edu.utn.frba.foody.ui.dataClasses.*
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
-fun GroupScreen(navController: NavController, orderViewModel: OrderViewModel) {
-    val group = orderViewModel.getPickedOrder().group!!
+fun GroupScreen(
+    navController: NavController,
+    orderViewModel: OrderViewModel,
+    groupViewModel: GroupViewModel
+) {
+    val group = groupViewModel.getPickedGroup()
 
     AppScaffold(navController = navController,
         null,
@@ -59,8 +64,12 @@ fun GroupScreen(navController: NavController, orderViewModel: OrderViewModel) {
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                items(group.members.size) {
-                    index ->  UserRow(userName = group.members[index].userName)
+                items(group.members.size) { index ->
+                    UserRow(
+                        user = group.members[index],
+                        orderViewModel,
+                        groupViewModel = groupViewModel
+                    )
                 }
             }
         }
@@ -68,9 +77,17 @@ fun GroupScreen(navController: NavController, orderViewModel: OrderViewModel) {
 }
 
 @Composable
-fun UserRow(userName: String) {
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-        Row(horizontalArrangement = Arrangement.Start, modifier = Modifier.weight(0.8f), verticalAlignment = Alignment.CenterVertically) {
+fun UserRow(user: User, orderViewModel: OrderViewModel, groupViewModel: GroupViewModel) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier.weight(0.8f),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Image(
                 painter = painterResource(id = R.drawable.rouned_user_icon),
                 contentDescription = "User Icon",
@@ -79,7 +96,7 @@ fun UserRow(userName: String) {
                 alignment = Alignment.Center
             )
             Text(
-                text = userName,
+                text = user.userName,
                 style = MaterialTheme.typography.h5,
                 color = MaterialTheme.colors.primary,
                 textAlign = TextAlign.Center,
@@ -88,7 +105,10 @@ fun UserRow(userName: String) {
         }
         Row(horizontalArrangement = Arrangement.End, modifier = Modifier.weight(0.2f)) {
             IconButton(
-                onClick = {  },
+                onClick = {
+                    groupViewModel.deleteUser(user);
+                    orderViewModel.updateGroup(groupViewModel.getPickedGroup())
+                },
                 modifier = Modifier
                     .padding(vertical = 8.dp)
             ) {
@@ -127,5 +147,10 @@ fun TopGroup(navController: NavController) {
 fun GroupPreview() {
     val navController = rememberNavController()
     val orderViewModel = OrderViewModel()
-    GroupScreen(navController = navController, orderViewModel = orderViewModel)
+    val groupViewModel = GroupViewModel()
+    GroupScreen(
+        navController = navController,
+        orderViewModel = orderViewModel,
+        groupViewModel = groupViewModel
+    )
 }

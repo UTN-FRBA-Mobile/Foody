@@ -19,6 +19,10 @@ class OrderViewModel() : ViewModel() {
         return order
     }
 
+    fun updateGroup(newGroup: Group) {
+        order = order.copy(group = newGroup)
+    }
+
     fun getTotal(): Double {
         return order.userOrders.sumOf { x -> x.items.sumOf { y -> y.quantity * y.dish.price } }
     }
@@ -96,7 +100,7 @@ class OrderViewModel() : ViewModel() {
             inProgress = false,
             direction = "Dorrego 1352",
             estimatedHour = getCurrentTime(),
-            orderStates = defaultOrderStates
+            orderStates = defaultOrderStates,
         ),
         Order(
             orderId = 2,

@@ -18,12 +18,14 @@ import androidx.navigation.*
 import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.*
+import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
-fun CartScreen(navController: NavHostController, viewModel: OrderViewModel) {
+fun CartScreen(navController: NavHostController, viewModel: OrderViewModel, groupViewModel: GroupViewModel) {
     val order = viewModel.getPickedOrder()
+    groupViewModel.updateGroup(order.group!!)
     AppScaffold(navController, stringResource(id = R.string.label_titulo_carrito), {BottomGroupCart(navController, orderViewModel = viewModel, order = order)},
         { TopGroupCart(navController) }){
         OrdersGrid(navController = navController, viewModel, order.userOrders)
@@ -216,5 +218,6 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
 fun DefaultPreviewOrder() {
     val navController= rememberNavController()
     val viewModel = OrderViewModel()
-    CartScreen(navController, viewModel)
+    val groupViewModel = GroupViewModel()
+    CartScreen(navController, viewModel, groupViewModel)
 }
