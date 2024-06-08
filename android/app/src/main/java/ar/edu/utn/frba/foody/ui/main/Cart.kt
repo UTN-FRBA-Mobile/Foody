@@ -76,9 +76,9 @@ fun BottomGroupCart(navController: NavController,
             route = AppScreens.Profile_Screen.route,
         ),
         ButtonInterface(
-            resourceId = if (order.group) R.drawable.group_icon else R.drawable.create_group_icon,
+            resourceId = if (order.group != null) R.drawable.group_icon else R.drawable.create_group_icon,
             imageDescription = "Group Icon",
-            route = if (order.group) AppScreens.Group_Screen.route else AppScreens.Create_Group_Screen.route
+            route = if (order.group != null) AppScreens.Group_Screen.route else AppScreens.Create_Group_Screen.route
         )
     )
 

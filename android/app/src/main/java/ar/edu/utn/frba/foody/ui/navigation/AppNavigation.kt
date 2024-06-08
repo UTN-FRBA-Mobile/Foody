@@ -27,7 +27,6 @@ fun AppNavigation(viewModel: MainViewModel, orderViewModel: OrderViewModel,cardV
         composable(route = AppScreens.Profile_Screen.route) {
 
         }
-
         composable(route = AppScreens.Cart_Screen.route){
             CartScreen(navController = navController, viewModel = orderViewModel)
         }
@@ -42,6 +41,12 @@ fun AppNavigation(viewModel: MainViewModel, orderViewModel: OrderViewModel,cardV
         }
         composable(route = AppScreens.Progress_Order_Screen.route){
             ProgressOrderScreen(navController = navController, orderViewModel = orderViewModel)
+        }
+        composable(route = AppScreens.Group_Screen.route) {
+            GroupScreen(navController = navController, orderViewModel = orderViewModel)
+        }
+        composable(route = AppScreens.Create_Group_Screen.route) {
+            //CreateGroupScreen(navController = navController, orderViewModel = orderViewModel, context = context)
         }
         composable(route = AppScreens.Card_Screen.route){
             CardInfoScreen(navController = navController,viewModel=cardViewModel)
