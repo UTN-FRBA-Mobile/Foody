@@ -1,6 +1,5 @@
 package ar.edu.utn.frba.foody.ui.navigation
 
-import android.database.sqlite.SQLiteOpenHelper
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.*
 import ar.edu.utn.frba.foody.ui.dataBase.ConnectionClass
