@@ -169,7 +169,7 @@ fun SignUpScreen(navController: NavController)
             Spacer(modifier = Modifier.height(60.dp))
 
             Button(
-                onClick = {/*TODO*/},
+                onClick = {navController.navigate(AppScreens.Home_Screen.route)},
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
