@@ -15,9 +15,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.Card
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,23 +32,26 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.material.*
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Dish
+import ar.edu.utn.frba.foody.ui.Classes.OrderItemInfo
+import ar.edu.utn.frba.foody.ui.Classes.UserOrder
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
+import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 
-
 @Composable
-fun RestaurantScreen(navController: NavHostController, viewModel: MainViewModel) {
+fun RestaurantScreen(navController: NavHostController, viewModel: MainViewModel, orderViewModel: OrderViewModel) {
     var restaurant = viewModel.getPickedRestaurant()
+    val userOrder = orderViewModel.getUserOrder()
     AppScaffold(navController, restaurant.name, {BottomGroupRestaurant(navController)},
         { TopGroupRestaurant(navController, restaurant.name) }){
-        DishesGrid(navController = navController, restaurant.dishes)
+        DishesGrid(navController = navController, orderViewModel, restaurant.dishes, userOrder)
     }
 }
 
@@ -127,25 +135,25 @@ fun BottomGroupRestaurant(navController: NavController) {
 }
 
 @Composable
-fun DishesGrid(navController: NavController, dishes: List<Dish.DishInfo>) {
+fun DishesGrid(navController: NavController, viewModel: OrderViewModel, dishes: List<Dish.DishInfo>, userOrder: UserOrder) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(8.dp),
         modifier = Modifier.fillMaxSize()
     ) {
         items(dishes.size) { index ->
-            DishCard(navController, dishes[index])
+            DishCard(navController, viewModel, dishes[index], userOrder, userOrder.items.firstOrNull { x -> x.dish.dishId == dishes[index].dishId } )
         }
     }
 }
 
 @Composable
-fun DishCard(navController: NavController, dish: Dish.DishInfo) {
+fun DishCard(navController: NavController, viewModel: OrderViewModel, dish: Dish.DishInfo, userOrder: UserOrder, userOrderItemInfo: OrderItemInfo?) {
     Card(
         modifier = Modifier
             .padding(15.dp)
             .fillMaxWidth()
-            .height(200.dp),
+            .height(300.dp),
         elevation = 4.dp
     ) {
         Column(
@@ -171,6 +179,24 @@ fun DishCard(navController: NavController, dish: Dish.DishInfo) {
                 text = dish.description,
                 style = MaterialTheme.typography.body2
             )
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                IconButton(onClick = { viewModel.changeItemQuantityIfExists(userOrder.userOrderId, userOrderItemInfo, 1, dish) }) {
+                    Icon(imageVector = Icons.Default.KeyboardArrowUp, contentDescription = "Increase")
+                }
+
+                Text(text = (userOrderItemInfo?.quantity ?: 0).toString(), fontSize = 18.sp)
+
+                IconButton(onClick = { viewModel.changeItemQuantityIfExists(userOrder.userOrderId, userOrderItemInfo, -1, dish) }) {
+                    Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "Decrease")
+                }
+            }
         }
     }
 }
@@ -181,5 +207,5 @@ fun DishCard(navController: NavController, dish: Dish.DishInfo) {
 fun DefaultPreviewRestaurant() {
     val navController= rememberNavController()
     val viewModel = MainViewModel()
-    RestaurantScreen(navController, viewModel)
+    //RestaurantScreen(navController, viewModel) TODO: arreglar esto
 }

@@ -1,10 +1,26 @@
 package ar.edu.utn.frba.foody.ui.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.compose.*
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.ui.dataBase.ConnectionClass
-import ar.edu.utn.frba.foody.ui.dataClasses.*
-import ar.edu.utn.frba.foody.ui.main.*
+import ar.edu.utn.frba.foody.ui.dataClasses.CardViewModel
+import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
+import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
+import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
+import ar.edu.utn.frba.foody.ui.main.CardInfoScreen
+import ar.edu.utn.frba.foody.ui.main.CartScreen
+import ar.edu.utn.frba.foody.ui.main.CreateGroupScreen
+import ar.edu.utn.frba.foody.ui.main.GroupScreen
+import ar.edu.utn.frba.foody.ui.main.HomeScreen
+import ar.edu.utn.frba.foody.ui.main.LocationScreen
+import ar.edu.utn.frba.foody.ui.main.LoginScreen
+import ar.edu.utn.frba.foody.ui.main.OrdersScreen
+import ar.edu.utn.frba.foody.ui.main.PaymentScreen
+import ar.edu.utn.frba.foody.ui.main.ProgressOrderScreen
+import ar.edu.utn.frba.foody.ui.main.RestaurantScreen
+import ar.edu.utn.frba.foody.ui.main.SignUpScreen
 
 @Composable
 fun AppNavigation(
@@ -38,7 +54,7 @@ fun AppNavigation(
             OrdersScreen(navController = navController, orderViewModel)
         }
         composable(route = AppScreens.Restaurant_Screen.route) {
-            RestaurantScreen(navController = navController, viewModel = viewModel)
+            RestaurantScreen(navController = navController, viewModel = viewModel, orderViewModel =  orderViewModel)
         }
         composable(route = AppScreens.Order_Screen.route) {
 
