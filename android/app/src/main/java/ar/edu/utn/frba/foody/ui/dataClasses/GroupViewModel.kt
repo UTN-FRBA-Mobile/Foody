@@ -32,7 +32,9 @@ class GroupViewModel() : ViewModel() {
         context.startActivity(Intent.createChooser(intent, null))
     }
 
-    fun deleteUser(user: User) {
-        group = group.copy(members = group.members.filter { it != user })
+    fun deleteUser(user: User): Group {
+        val updatedGroup = group.copy(members = group.members.filter { it != user })
+        group = updatedGroup
+        return updatedGroup
     }
 }
