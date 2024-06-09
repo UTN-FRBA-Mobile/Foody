@@ -1,25 +1,18 @@
 package ar.edu.utn.frba.foody
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import ar.edu.utn.frba.foody.ui.Classes.*
-import ar.edu.utn.frba.foody.ui.dataBase.UserDataBase
+import ar.edu.utn.frba.foody.ui.Classes.Dish
+import ar.edu.utn.frba.foody.ui.Classes.Restaurant
 import ar.edu.utn.frba.foody.ui.dataBase.RestaurantDataBase
-
+import ar.edu.utn.frba.foody.ui.dataBase.UserDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.CardViewModel
-import ar.edu.utn.frba.foody.ui.dataClasses.*
+import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
+import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
+import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppNavigation
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import java.sql.Connection
-import java.sql.ResultSet
-import java.util.concurrent.Executors
 
 
 class MainComposeActivity : ComponentActivity() {
@@ -28,7 +21,10 @@ class MainComposeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         dbUserHelper = UserDataBase(this)
-        var dbRestaurantHelper = RestaurantDataBase()
+
+        val dbRestaurantHelper = RestaurantDataBase(this)
+        dbRestaurantHelper.deleteAndCreateTables(dbUserHelper)
+
         createTestData(dbRestaurantHelper)
         setContent {
             val viewModel = viewModel<MainViewModel>()
@@ -38,8 +34,6 @@ class MainComposeActivity : ComponentActivity() {
             AppNavigation(viewModel, orderViewModel,cardViewModel,groupViewModel,
                 dbUserHelper,dbRestaurantHelper)
         }
-
-
     }
 
     fun createTestData(dbRestaurantHelper:RestaurantDataBase){
