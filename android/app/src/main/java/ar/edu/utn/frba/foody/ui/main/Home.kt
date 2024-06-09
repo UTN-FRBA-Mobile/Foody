@@ -18,13 +18,18 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Restaurant
+import ar.edu.utn.frba.foody.ui.dataBase.RestaurantDataBase
+import ar.edu.utn.frba.foody.ui.dataBase.UserDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: MainViewModel) {
+    viewModel: MainViewModel,
+    restaurantDataBase: RestaurantDataBase?,
+    userDataBase:UserDataBase?
+) {
     AppScaffold(navController, null, { BottomGroupHome(navController) },{ TopGroupHome(navController)}) {
         Box(
             contentAlignment = Alignment.Center,
@@ -49,9 +54,11 @@ fun HomeScreen(
                     .fillMaxWidth()
                     .height(505.dp)
             ) {
-                for (restaurant in viewModel.restaurants) {
-                    item {
-                        RestaurantItem(navController = navController, viewModel = viewModel, restaurant = restaurant)
+                if (restaurantDataBase != null) {
+                    for (restaurant in restaurantDataBase.getAllRestaurants(userDataBase)) {
+                        item {
+                            RestaurantItem(navController = navController, viewModel = viewModel, restaurant = restaurant)
+                        }
                     }
                 }
             }
@@ -65,7 +72,7 @@ fun HomeScreen(
 }
 
 @Composable
-fun RestaurantItem(navController: NavController, viewModel: MainViewModel, restaurant: Restaurant.RestaurantInfo) {
+fun RestaurantItem(navController: NavController, viewModel: MainViewModel, restaurant: Restaurant) {
     Card(backgroundColor = MaterialTheme.colors.secondary) {
         Row (modifier = Modifier
             .fillMaxWidth()
@@ -161,5 +168,5 @@ fun TopGroupHome(navController: NavController) {
 fun DefaultPreview() {
     val navController= rememberNavController()
     val viewModel = MainViewModel()
-    HomeScreen(navController, viewModel)
+    HomeScreen(navController, viewModel,null,null)
 }

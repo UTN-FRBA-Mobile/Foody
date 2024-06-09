@@ -44,7 +44,7 @@ fun GroupScreen(
                     modifier = Modifier.weight(0.8f)
                 )
                 Text(
-                    text = group.members.size.toString() + "/" + group.limit.toString(),
+                    text = group.members.size.toString() + "/" + group.membersLimit.toString(),
                     style = MaterialTheme.typography.h5,
                     color = MaterialTheme.colors.primary,
                     textAlign = TextAlign.Center,

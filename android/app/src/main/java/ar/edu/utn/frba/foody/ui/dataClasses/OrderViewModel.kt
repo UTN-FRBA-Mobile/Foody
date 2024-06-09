@@ -81,7 +81,7 @@ class OrderViewModel() : ViewModel() {
         order = order.copy(userOrders = updatedUserOrders.toList())
     }
 
-    fun addItem(userOrderId: Int, quantity: Int, dish: Dish.DishInfo) {
+    fun addItem(userOrderId: Int, quantity: Int, dish: Dish) {
         val userOrderIndex = order.userOrders.indexOfFirst { it.userOrderId == userOrderId }
 
         val userOrder = order.userOrders[userOrderIndex]
@@ -99,7 +99,7 @@ class OrderViewModel() : ViewModel() {
         order = order.copy(userOrders = updatedUserOrders.toList())
     }
 
-    fun changeItemQuantityIfExists(userOrderId: Int, orderItem: OrderItemInfo?, variation: Int, dish: Dish.DishInfo) {
+    fun changeItemQuantityIfExists(userOrderId: Int, orderItem: OrderItemInfo?, variation: Int, dish: Dish) {
         if (orderItem == null) {
             if(variation > 0) {
                 addItem(userOrderId, variation, dish)
