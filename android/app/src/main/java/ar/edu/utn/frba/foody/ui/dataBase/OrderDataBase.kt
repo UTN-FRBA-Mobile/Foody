@@ -1,8 +1,10 @@
 package ar.edu.utn.frba.foody.ui.dataBase
 
+import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import ar.edu.utn.frba.foody.ui.Classes.Group
 
 class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
     DATABASE_NAME, null,
@@ -36,7 +38,36 @@ class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
     companion object {
         private const val DATABASE_NAME = "mydatabase.db"
         private const val DATABASE_VERSION = 1
-        
+
+        private const val TABLE_GROUPS = "groups"
+        private const val COLUMN_GROUPS_ID = "id"
+        private const val COLUMN_GROUPS_NAME = "name"
+        private const val COLUMN_GROUPS_MEMBERS_LIMIT = "membersLimit"
+
+        private const val TABLE_GROUPS_X_USERS = "groups_users"
+        private const val COLUMN_GROUPS_X_USERS_GROUP_ID = "groupId"
+        private const val COLUMN_GROUPS_X_USERS_USER_ID = "userId"
+
+        private const val TABLE_ORDERS = "orders"
+        private const val COLUMN_ORDERS_ID = "id"
+        private const val COLUMN_ORDERS_NAME = "name"
+        private const val COLUMN_ORDERS_IN_PROGRESS = "inProgress"
+        private const val COLUMN_ORDERS_DIRECTION = "direction"
+        private const val COLUMN_ORDERS_ESTIMATED_HOUR = "estimatedHour"
+        private const val COLUMN_ORDERS_RESTAURANT_ID = "restaurantId"
+        private const val COLUMN_ORDERS_GROUP_ID = "groupId"
+
+        private const val TABLE_USER_ORDERS = "userOrders"
+        private const val COLUMN_USER_ORDERS_ID = "id"
+        private const val COLUMN_USER_ORDERS_USER_ID = "userId"
+        private const val COLUMN_USER_ORDERS_ORDER_ID = "orderId"
+
+        private const val TABLE_ORDER_ITEMS = "orderItems"
+        private const val COLUMN_ORDER_ITEMS_ID = "id"
+        private const val COLUMN_ORDER_ITEMS_QUANTITY = "quantity"
+        private const val COLUMN_ORDER_ITEMS_USER_ORDER_ID = "userOrderId"
+        private const val COLUMN_ORDER_ITEMS_DISH_ID = "dishId"
+
         private const val SQL_CREATE_TABLE_GROUP = """
             CREATE TABLE groups (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -88,5 +119,76 @@ class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
                 FOREIGN KEY(dishId) REFERENCES dish("id")
             )
         """
+    }
+
+    //TODO: que no reciba UserDataBase
+    fun insertGroup(group: Group, userDataBase: UserDataBase): Long {
+        val db = userDataBase.writableDatabase
+        val values = ContentValues().apply {
+            put(COLUMN_GROUPS_NAME, group.name)
+            put(COLUMN_GROUPS_MEMBERS_LIMIT, group.membersLimit)
+        }
+        val restaurantId = db.insert(TABLE_GROUPS, null, values)
+
+        db.close()
+
+        return restaurantId
+    }
+
+    fun insertUserToGroup(groupId: Int, userId: Int, userDataBase: UserDataBase): Long {
+        val db = userDataBase.writableDatabase
+        val values = ContentValues().apply {
+            put(COLUMN_GROUPS_X_USERS_GROUP_ID, groupId)
+            put(COLUMN_GROUPS_X_USERS_USER_ID, userId)
+        }
+        val restaurantId = db.insert(TABLE_GROUPS_X_USERS, null, values)
+
+        db.close()
+
+        return restaurantId
+    }
+
+    fun insertOrder(name: String, inProgress: Int, direction: String?, estimatedHour: String?, restaurantId: Int?, groupId: Int?, userDataBase: UserDataBase): Long {
+        val db = userDataBase.writableDatabase
+        val values = ContentValues().apply {
+            put(COLUMN_ORDERS_NAME, name)
+            put(COLUMN_ORDERS_IN_PROGRESS, inProgress)
+            put(COLUMN_ORDERS_DIRECTION, direction)
+            put(COLUMN_ORDERS_ESTIMATED_HOUR, estimatedHour)
+            put(COLUMN_ORDERS_RESTAURANT_ID, restaurantId)
+            put(COLUMN_ORDERS_GROUP_ID, groupId)
+        }
+        val orderId = db.insert(TABLE_ORDERS, null, values)
+
+        db.close()
+
+        return orderId
+    }
+
+    fun insertUserOrder(userId: Int, orderId: Int, userDataBase: UserDataBase): Long {
+        val db = userDataBase.writableDatabase
+        val values = ContentValues().apply {
+            put(COLUMN_USER_ORDERS_USER_ID, userId)
+            put(COLUMN_USER_ORDERS_ORDER_ID, orderId)
+        }
+        val userOrderId = db.insert(TABLE_USER_ORDERS, null, values)
+
+        db.close()
+
+        return userOrderId
+    }
+
+    fun insertOrderItem(quantity: Int, userOrderId: Int, dishId: Int, userDataBase: UserDataBase): Long {
+        val db = userDataBase.writableDatabase
+        val values = ContentValues().apply {
+            put(COLUMN_ORDER_ITEMS_QUANTITY, quantity)
+            put(COLUMN_ORDER_ITEMS_USER_ORDER_ID, userOrderId)
+            put(COLUMN_ORDER_ITEMS_DISH_ID, dishId)
+        }
+        val orderItemId = db.insert(TABLE_ORDER_ITEMS, null, values)
+
+        db.close()
+
+        return orderItemId
     }
 }
