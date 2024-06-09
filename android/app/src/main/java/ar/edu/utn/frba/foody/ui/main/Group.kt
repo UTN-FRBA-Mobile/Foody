@@ -106,7 +106,7 @@ fun UserRow(user: User, orderViewModel: OrderViewModel, groupViewModel: GroupVie
         Row(horizontalArrangement = Arrangement.End, modifier = Modifier.weight(0.2f)) {
             IconButton(
                 onClick = {
-                    val updatedGroup = groupViewModel.deleteUser(user);
+                    val updatedGroup = groupViewModel.deleteUser(user)
                     orderViewModel.updateGroup(updatedGroup)
                 },
                 modifier = Modifier
