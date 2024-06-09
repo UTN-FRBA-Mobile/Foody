@@ -2,25 +2,23 @@ package ar.edu.utn.frba.foody.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.*
-import ar.edu.utn.frba.foody.ui.dataBase.ConnectionClass
+import ar.edu.utn.frba.foody.ui.dataBase.RestaurantDataBase
+import ar.edu.utn.frba.foody.ui.dataBase.UserDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.*
 import ar.edu.utn.frba.foody.ui.main.*
 
 @Composable
-fun AppNavigation(
-    viewModel: MainViewModel,
-    orderViewModel: OrderViewModel,
-    cardViewModel: CardViewModel,
-    groupViewModel: GroupViewModel,
-    dbHelper: ConnectionClass
-) {
-    val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = AppScreens.Login_Screen.route) {
-        composable(route = AppScreens.Home_Screen.route) {
-            HomeScreen(navController = navController, viewModel = viewModel)
+fun AppNavigation(viewModel: MainViewModel, orderViewModel: OrderViewModel, cardViewModel: CardViewModel,
+                  groupViewModel: GroupViewModel,
+                  dbUserHelper:UserDataBase, dbRestaurantHelper: RestaurantDataBase){
+    val navController= rememberNavController()
+    NavHost(navController = navController , startDestination = AppScreens.Login_Screen.route) {
+        composable(route = AppScreens.Home_Screen.route){
+            HomeScreen(navController = navController, viewModel = viewModel,
+                restaurantDataBase = dbRestaurantHelper, userDataBase = dbUserHelper )
         }
         composable(route = AppScreens.Login_Screen.route) {
-            LoginScreen(navController = navController, dbHelper = dbHelper)
+            LoginScreen(navController = navController,dbHelper=dbUserHelper)
         }
         composable(route = AppScreens.SignUp_Screen.route) {
             SignUpScreen(navController = navController)

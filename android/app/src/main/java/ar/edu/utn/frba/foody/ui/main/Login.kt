@@ -1,6 +1,5 @@
 package ar.edu.utn.frba.foody.ui.main
 
-import android.database.sqlite.SQLiteOpenHelper
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -17,17 +16,14 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import ar.edu.utn.frba.foody.MainComposeActivity
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.User
-import ar.edu.utn.frba.foody.ui.dataBase.ConnectionClass
+import ar.edu.utn.frba.foody.ui.dataBase.UserDataBase
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
-fun LoginScreen(navController: NavHostController,dbHelper: ConnectionClass) {
+fun LoginScreen(navController: NavHostController,dbHelper: UserDataBase) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
@@ -151,7 +147,7 @@ fun LoginScreen(navController: NavHostController,dbHelper: ConnectionClass) {
     }
 }
 
-fun verifyexistence(dbHelper: ConnectionClass,email:String,password:String):Boolean{
+fun verifyexistence(dbHelper: UserDataBase, email:String, password:String):Boolean{
     val users:List<User> = dbHelper.getAllUsers()
     val user:User? = users.find { userPred: User -> userPred.userName==email}
     if( user!=null && user.userPassword==password){

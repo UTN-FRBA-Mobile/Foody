@@ -127,7 +127,7 @@ fun BottomGroupRestaurant(navController: NavController) {
 }
 
 @Composable
-fun DishesGrid(navController: NavController, dishes: List<Dish.DishInfo>) {
+fun DishesGrid(navController: NavController, dishes: List<Dish>) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(8.dp),
@@ -140,7 +140,7 @@ fun DishesGrid(navController: NavController, dishes: List<Dish.DishInfo>) {
 }
 
 @Composable
-fun DishCard(navController: NavController, dish: Dish.DishInfo) {
+fun DishCard(navController: NavController, dish: Dish) {
     Card(
         modifier = Modifier
             .padding(15.dp)
