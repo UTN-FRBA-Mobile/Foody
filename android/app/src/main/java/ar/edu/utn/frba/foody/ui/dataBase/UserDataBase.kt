@@ -4,31 +4,22 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.util.Log
 import ar.edu.utn.frba.foody.ui.Classes.User
-import java.sql.Connection
-import java.sql.DriverManager
-import java.sql.ResultSet
-import java.sql.SQLException
-import java.sql.Statement
-import java.util.Properties
 
-class ConnectionClass (private var context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+class UserDataBase (private var context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     override fun onCreate(db: SQLiteDatabase) {
-        val createTableSQL = """
-            CREATE TABLE users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                password TEXT NOT NULL
-            )
-        """
-        db.execSQL(createTableSQL)
-        println("Conexión Exitosa")
+        db.execSQL(SQL_CREATE_TABLE_USERS)
+        db.execSQL(SQL_CREATE_TABLE_RESTAURANT)
+        db.execSQL(SQL_CREATE_TABLE_DISH)
+
     }
 
-    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        //
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        db.execSQL("DROP TABLE IF EXISTS users")
+        db.execSQL("DROP TABLE IF EXISTS dish")
+        db.execSQL("DROP TABLE IF EXISTS restaurant")
+        onCreate(db)
     }
 
     fun addUser(dbHelper: SQLiteOpenHelper, name:String, password:String){
@@ -62,7 +53,34 @@ class ConnectionClass (private var context: Context) : SQLiteOpenHelper(context,
         return users
     }
 
+
     companion object {
+        private const val SQL_CREATE_TABLE_USERS = """
+            CREATE TABLE users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                password TEXT NOT NULL
+            )
+        """
+        private const val SQL_CREATE_TABLE_RESTAURANT = """
+            CREATE TABLE restaurant (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                imageDescription TEXT,
+                image INTEGER
+            )
+        """
+
+        private const val SQL_CREATE_TABLE_DISH = """
+            CREATE TABLE dish (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                description TEXT,
+                price DOUBLE,
+                imageId INTEGER,
+                FOREIGN KEY(restaurantId) REFERENCES restaurant("id")
+            )
+        """
         private const val DATABASE_NAME = "mydatabase.db"
         private const val DATABASE_VERSION = 1
         private const val TABLE_NAME = "users"
@@ -70,6 +88,4 @@ class ConnectionClass (private var context: Context) : SQLiteOpenHelper(context,
         private const val COLUMN_NAME = "name"
         private const val COLUMN_PASSWORD = "password"
     }
-
-
 }
