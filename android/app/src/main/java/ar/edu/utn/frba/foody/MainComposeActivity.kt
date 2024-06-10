@@ -41,83 +41,182 @@ class MainComposeActivity : ComponentActivity() {
         }
     }
 
-    fun createTestData(dbRestaurantHelper:RestaurantDataBase){
-        val dish1 = Dish(
-            dishId = 1,
-            name = "Spaghetti Carbonara",
-            description = "Classic Italian pasta",
-            imageResourceId = R.drawable.spaghetti_carbonara,
-            price = 5000.0,
-            restaurantId = 0
-        )
-
-        val dish2 = Dish(
-            dishId = 2,
-            name = "Margherita Pizza",
-            description = "Pizza with tomatoes, mozzarella, and basil",
-            imageResourceId = R.drawable.peperoni_pizza,
-            price = 8000.0,
-            restaurantId = 0
-        )
-
-        val restaurant = Restaurant(
+    fun createTestData(dbRestaurantHelper: RestaurantDataBase) {
+        val restaurant1 = Restaurant(
             name = "La Bella Italia",
             imageDescription = "A cozy Italian restaurant",
             image = R.drawable.italian_restaurant,
-            dishes = listOf(dish1, dish2)
-        )
-        dbRestaurantHelper.insertRestaurant(restaurant, dbUserHelper)
-        /*
-               val orderItems1 = listOf(OrderItemInfo(dish = dish1, quantity = 2, id = 1), OrderItemInfo(dish = dish2, quantity = 1, id = 2))
-               val orderItems2 = listOf(OrderItemInfo(dish = dish2, quantity = 3, id = 2), OrderItemInfo(dish = dish1, quantity = 1, id = 3))
-               val orderItems3 = listOf(OrderItemInfo(dish = dish2, quantity = 2, id = 3))
-               val orderItems4 = listOf(OrderItemInfo(dish = dish1, quantity = 4, id = 4), OrderItemInfo(dish = dish2, quantity = 2, id = 1))
-               val orderItems5 = listOf(OrderItemInfo(dish = dish1, quantity = 1, id = 5))
-
-            val user1 = User(userId = 1, userName = "Alice")
-               val user2 = User(userId = 2, userName = "Bob")
-               val user3 = User(userId = 3, userName = "Charlie")
-               val user4 = User(userId = 4, userName = "Dave")
-               val user5 = User(userId = 5, userName = "Eve")
-
-               val userOrder1 = UserOrder(userOrderId = 1, items = orderItems1, user = user1)
-               val userOrder2 = UserOrder(userOrderId = 2, items = orderItems2, user = user2)
-               val userOrder3 = UserOrder(userOrderId = 3, items = orderItems3, user = user3)
-               val userOrder4 = UserOrder(userOrderId = 4, items = orderItems4, user = user4)
-               val userOrder5 = UserOrder(userOrderId = 5, items = orderItems5, user = user5)
-
-        val group = Group(
-            groupId = 0,
-            name = "Los Movileros",
-            members = mutableListOf(
-                User(
-                    userId = 0,
-                    userName = "Zeke",
-                    userPassword = "SeQueL"
+            dishes = listOf(
+                Dish(
+                    dishId = 1,
+                    name = "Spaghetti Carbonara",
+                    description = "Classic Italian pasta",
+                    imageResourceId = R.drawable.spaghetti_carbonara,
+                    price = 5000.0,
+                    restaurantId = 1
                 ),
-                User(
-                    userId = 1,
-                    userName = "Walter",
-                    userPassword = "1234"
+                Dish(
+                    dishId = 2,
+                    name = "Margherita Pizza",
+                    description = "Pizza with tomatoes, mozzarella, and basil",
+                    imageResourceId = R.drawable.peperoni_pizza,
+                    price = 8000.0,
+                    restaurantId = 1
                 )
-            ),
-            limit = 10,
+            )
         )
 
-
-               val order1 = Order(orderId = 123, name = "Sample Order", restaurant = restaurant, userOrders = listOf(userOrder1, userOrder2, userOrder3, userOrder4, userOrder5))
-               viewModel.updateOrder(order1)
-        val order1 = Order(
-            orderId = 123,
-            name = "Sample Order",
-            restaurant = restaurant,
-            userOrders = listOf(userOrder1, userOrder2, userOrder3, userOrder4, userOrder5),
-            group = group
+        val restaurant2 = Restaurant(
+            name = "Sushi World",
+            imageDescription = "Fresh sushi and sashimi",
+            image = R.drawable.sushi_restaurant,
+            dishes = listOf(
+                Dish(
+                    dishId = 3,
+                    name = "Salmon Nigiri",
+                    description = "Fresh salmon on sushi rice",
+                    imageResourceId = R.drawable.salmon_nigiri,
+                    price = 5000.0,
+                    restaurantId = 2
+                ),
+                Dish(
+                    dishId = 4,
+                    name = "Tuna Roll",
+                    description = "Tuna roll with avocado",
+                    imageResourceId = R.drawable.tuna_roll,
+                    price = 5000.0,
+                    restaurantId = 2
+                )
+            )
         )
-        viewModel.updateOrder(order1)
 
-         */
+        val restaurant3 = Restaurant(
+            name = "Curry House",
+            imageDescription = "Parrilla 'El Argentino'",
+            image = R.drawable.argentinian_restaurant,
+            dishes = listOf(
+                Dish(
+                    dishId = 5,
+                    name = "Tira de asado",
+                    description = "Tira de asado con sal",
+                    imageResourceId = R.drawable.tira_asado,
+                    price = 5000.0,
+                    restaurantId = 3
+                ),
+                Dish(
+                    dishId = 6,
+                    name = "Vacío a la provenzal",
+                    description = "Vacío a la provenzal",
+                    imageResourceId = R.drawable.vacio,
+                    price = 5000.0,
+                    restaurantId = 3
+                )
+            )
+        )
 
+        val restaurant4 = Restaurant(
+            name = "Taco Fiesta",
+            imageDescription = "Mexican street food",
+            image = R.drawable.taco_restaurant,
+            dishes = listOf(
+                Dish(
+                    dishId = 7,
+                    name = "Carne Asada Tacos",
+                    description = "Grilled beef tacos",
+                    imageResourceId = R.drawable.carne_asada_tacos,
+                    price = 5000.0,
+                    restaurantId = 4
+                ),
+                Dish(
+                    dishId = 8,
+                    name = "Guacamole and Chips",
+                    description = "Fresh guacamole with tortilla chips",
+                    imageResourceId = R.drawable.guacamole_and_chips,
+                    price = 5000.0,
+                    restaurantId = 4
+                )
+            )
+        )
+
+        val restaurant5 = Restaurant(
+            name = "Burger Haven",
+            imageDescription = "Gourmet burgers and fries",
+            image = R.drawable.burger_restaurant,
+            dishes = listOf(
+                Dish(
+                    dishId = 9,
+                    name = "Cheeseburger",
+                    description = "Beef burger with cheese, lettuce, and tomato",
+                    imageResourceId = R.drawable.cheeseburger,
+                    price = 5000.0,
+                    restaurantId = 5
+                ),
+                Dish(
+                    dishId = 10,
+                    name = "Sweet Potato Fries",
+                    description = "Crispy sweet potato fries",
+                    imageResourceId = R.drawable.sweet_potato_fries,
+                    price = 5000.0,
+                    restaurantId = 5
+                )
+            )
+        )
+
+        dbRestaurantHelper.insertRestaurant(restaurant1, dbUserHelper)
+        dbRestaurantHelper.insertRestaurant(restaurant2, dbUserHelper)
+        dbRestaurantHelper.insertRestaurant(restaurant3, dbUserHelper)
+        dbRestaurantHelper.insertRestaurant(restaurant4, dbUserHelper)
+        dbRestaurantHelper.insertRestaurant(restaurant5, dbUserHelper)
     }
 
+    /*
+           val orderItems1 = listOf(OrderItemInfo(dish = dish1, quantity = 2, id = 1), OrderItemInfo(dish = dish2, quantity = 1, id = 2))
+           val orderItems2 = listOf(OrderItemInfo(dish = dish2, quantity = 3, id = 2), OrderItemInfo(dish = dish1, quantity = 1, id = 3))
+           val orderItems3 = listOf(OrderItemInfo(dish = dish2, quantity = 2, id = 3))
+           val orderItems4 = listOf(OrderItemInfo(dish = dish1, quantity = 4, id = 4), OrderItemInfo(dish = dish2, quantity = 2, id = 1))
+           val orderItems5 = listOf(OrderItemInfo(dish = dish1, quantity = 1, id = 5))
+
+        val user1 = User(userId = 1, userName = "Alice")
+           val user2 = User(userId = 2, userName = "Bob")
+           val user3 = User(userId = 3, userName = "Charlie")
+           val user4 = User(userId = 4, userName = "Dave")
+           val user5 = User(userId = 5, userName = "Eve")
+
+           val userOrder1 = UserOrder(userOrderId = 1, items = orderItems1, user = user1)
+           val userOrder2 = UserOrder(userOrderId = 2, items = orderItems2, user = user2)
+           val userOrder3 = UserOrder(userOrderId = 3, items = orderItems3, user = user3)
+           val userOrder4 = UserOrder(userOrderId = 4, items = orderItems4, user = user4)
+           val userOrder5 = UserOrder(userOrderId = 5, items = orderItems5, user = user5)
+
+    val group = Group(
+        groupId = 0,
+        name = "Los Movileros",
+        members = mutableListOf(
+            User(
+                userId = 0,
+                userName = "Zeke",
+                userPassword = "SeQueL"
+            ),
+            User(
+                userId = 1,
+                userName = "Walter",
+                userPassword = "1234"
+            )
+        ),
+        limit = 10,
+    )
+
+
+           val order1 = Order(orderId = 123, name = "Sample Order", restaurant = restaurant, userOrders = listOf(userOrder1, userOrder2, userOrder3, userOrder4, userOrder5))
+           viewModel.updateOrder(order1)
+    val order1 = Order(
+        orderId = 123,
+        name = "Sample Order",
+        restaurant = restaurant,
+        userOrders = listOf(userOrder1, userOrder2, userOrder3, userOrder4, userOrder5),
+        group = group
+    )
+    viewModel.updateOrder(order1)
+
+     */
 }
