@@ -207,6 +207,16 @@ class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
         return orderItemId
     }
 
+    fun updateQuantityOrderItem(orderItemId: Int, newQuantity: Int) {
+        val db = this.readableDatabase
+        val values = ContentValues().apply {
+            put(COLUMN_ORDER_ITEMS_QUANTITY, newQuantity)
+        }
+        db.update(TABLE_ORDER_ITEMS, values, "$COLUMN_ORDER_ITEMS_ID = ?", arrayOf(orderItemId.toString()))
+
+        db.close()
+    }
+
     fun getGroups(groupId: Int?): List<Group> {
         val db = this.readableDatabase
 

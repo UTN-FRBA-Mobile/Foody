@@ -95,6 +95,8 @@ class OrderViewModel() : ViewModel() {
 
         val newQuantity = userItem.quantity + variation
 
+        orderDataBase?.updateQuantityOrderItem(orderItemId = userItemId, newQuantity = newQuantity)
+
         val updatedUserItem = userItem.copy(quantity = newQuantity)
 
         val updatedUserItems = userOrder.items.toMutableList()
@@ -113,7 +115,11 @@ class OrderViewModel() : ViewModel() {
 
         val userOrder = order.userOrders[userOrderIndex]
 
-        val newOrderItem = OrderItemInfo(12, dish, quantity)  //TODO el id debe generarse solo
+        var newOrderItem = OrderItemInfo(-1, dish, quantity)
+
+        val orderItemId = orderDataBase?.insertOrderItem(newOrderItem, userOrderId)?.toInt() ?: 0
+
+        newOrderItem.id = orderItemId
 
         val updatedUserItems = userOrder.items.toMutableList()
         updatedUserItems.add(newOrderItem)

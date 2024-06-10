@@ -153,7 +153,7 @@ fun DishCard(navController: NavController, viewModel: OrderViewModel, dish: Dish
         modifier = Modifier
             .padding(15.dp)
             .fillMaxWidth()
-            .height(300.dp),
+            .height(250.dp),
         elevation = 4.dp
     ) {
         Column(
