@@ -2,17 +2,14 @@ package ar.edu.utn.frba.foody.ui.dataBase
 
 import android.content.ContentValues
 import android.content.Context
-import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.service.autofill.UserData
-import ar.edu.utn.frba.foody.ui.Classes.Dish
 import ar.edu.utn.frba.foody.ui.Classes.Group
 import ar.edu.utn.frba.foody.ui.Classes.Order
 import ar.edu.utn.frba.foody.ui.Classes.OrderItemInfo
+import ar.edu.utn.frba.foody.ui.Classes.OrderState
 import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.Classes.UserOrder
-import ar.edu.utn.frba.foody.ui.main.OrderItem
 
 class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
     DATABASE_NAME, null,
@@ -44,10 +41,13 @@ class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
         onCreate(db)
     }
 
-    fun deleteAndCreateTables(userDataBase: UserDataBase) {
+    fun deleteAndCreateTables() {
         val db = userDataBase.writableDatabase
-        db.execSQL("DROP TABLE IF EXISTS dish")
-        db.execSQL("DROP TABLE IF EXISTS restaurant")
+        db.execSQL("DROP TABLE IF EXISTS orderItems")
+        db.execSQL("DROP TABLE IF EXISTS userOrders")
+        db.execSQL("DROP TABLE IF EXISTS orders")
+        db.execSQL("DROP TABLE IF EXISTS groups_users")
+        db.execSQL("DROP TABLE IF EXISTS groups")
         onCreate(db)
     }
 
@@ -94,8 +94,8 @@ class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
 
         private const val SQL_CREATE_TABLE_GROUP_X_USER = """
             CREATE TABLE groups_users (
-                groupId INTEGER PRIMARY KEY,
-                userId INTEGER PRIMARY KEY,
+                groupId INTEGER,
+                userId INTEGER,
                 FOREIGN KEY(groupId) REFERENCES groups("id"),
                 FOREIGN KEY(userId) REFERENCES users("id")
             )
@@ -118,8 +118,8 @@ class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
         private const val SQL_CREATE_TABLE_USER_ORDER = """
             CREATE TABLE userOrders (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                userId INTEGER PRIMARY KEY,
-                orderId INTEGER PRIMARY KEY,
+                userId INTEGER,
+                orderId INTEGER,
                 FOREIGN KEY(userId) REFERENCES users("id"),
                 FOREIGN KEY(orderId) REFERENCES orders("id")
             )
@@ -129,8 +129,8 @@ class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
             CREATE TABLE orderItems (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 quantity INTEGER NOT NULL,
-                userOrderId INTEGER PRIMARY KEY,
-                dishId INTEGER PRIMARY KEY,
+                userOrderId INTEGER,
+                dishId INTEGER,
                 FOREIGN KEY(userOrderId) REFERENCES userOrders("id"),
                 FOREIGN KEY(dishId) REFERENCES dish("id")
             )
@@ -238,14 +238,14 @@ class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
         return groups
     }
 
-    fun getUsersGroup(groupId: Int?): List<User> {
+    fun getUsersGroup(groupId: Int): List<User> {
         val db = this.readableDatabase
 
         val cursor = db.rawQuery("SELECT gu.*"
-                + "FROM ${TABLE_GROUPS_X_USERS} gu"
-                + "INNER JOIN ${UserDataBase.TABLE_NAME} u ON gu.${COLUMN_GROUPS_X_USERS_USER_ID} = u.${UserDataBase.COLUMN_ID}"
-                + "WHERE ${COLUMN_GROUPS_X_USERS_GROUP_ID} = ?"
-            , arrayOf(groupId.toString()))
+                + "FROM $TABLE_GROUPS_X_USERS gu"
+                + "INNER JOIN ${UserDataBase.TABLE_NAME} u ON gu.$COLUMN_GROUPS_X_USERS_USER_ID = u.${UserDataBase.COLUMN_ID}"
+                + "WHERE $COLUMN_GROUPS_X_USERS_GROUP_ID = $groupId"
+            , null)
 
         val users = mutableListOf<User>()
 
@@ -279,7 +279,6 @@ class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
                 val restaurantId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_RESTAURANT_ID))
                 val groupId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_GROUP_ID))
 
-                // Obtén los userOrders relacionados con esta orden
                 val userOrdersCursor = db.rawQuery(
                     "SELECT * FROM $TABLE_USER_ORDERS WHERE $COLUMN_USER_ORDERS_ORDER_ID = ?",
                     arrayOf(orderId.toString())
@@ -291,7 +290,6 @@ class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
                         val userOrderId = userOrdersCursor.getInt(userOrdersCursor.getColumnIndexOrThrow(COLUMN_USER_ORDERS_ID))
                         val userId = userOrdersCursor.getInt(userOrdersCursor.getColumnIndexOrThrow(COLUMN_USER_ORDERS_USER_ID))
 
-                        // Obtén los elementos de la orden relacionados con este userOrder
                         val orderItemsCursor = db.rawQuery(
                             "SELECT * FROM $TABLE_ORDER_ITEMS WHERE $COLUMN_ORDER_ITEMS_USER_ORDER_ID = ?",
                             arrayOf(userOrderId.toString())
@@ -304,7 +302,6 @@ class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
                                 val quantity = orderItemsCursor.getInt(orderItemsCursor.getColumnIndexOrThrow(COLUMN_ORDER_ITEMS_QUANTITY))
                                 val dishId = orderItemsCursor.getInt(orderItemsCursor.getColumnIndexOrThrow(COLUMN_ORDER_ITEMS_DISH_ID))
 
-                                // Obtén el dish correspondiente a este orderItem
                                 val dishCursor = db.rawQuery(
                                     "SELECT * FROM $RestaurantDataBase.TABLE_DISH WHERE $RestaurantDataBase.COLUMN_DISH_ID = ?",
                                     arrayOf(dishId.toString())
@@ -331,8 +328,11 @@ class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
                 val inProgressMapeado = if (inProgress == 1) true else false;
 
                 val group = getGroups(groupId).first()
-                
-                orders.add(Order(orderId, restaurant, name, inProgressMapeado, userOrders, direction, estimatedHour, restaurantId, group))
+
+                //TODO: traer la lista real
+                val orderStates = mutableListOf<OrderState>()
+
+                orders.add(Order(orderId, restaurant, name, inProgressMapeado, userOrders, direction, estimatedHour, orderStates, group))
             } while (cursor.moveToNext())
         }
         cursor.close()
