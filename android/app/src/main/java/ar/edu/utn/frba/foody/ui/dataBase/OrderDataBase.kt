@@ -217,6 +217,14 @@ class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
         db.close()
     }
 
+    fun deleteOrderItem(orderItemId: Int) {
+        val db = this.readableDatabase
+
+        db.delete(TABLE_ORDER_ITEMS, "$COLUMN_ORDER_ITEMS_ID = ?", arrayOf(orderItemId.toString()))
+
+        db.close()
+    }
+
     fun getGroups(groupId: Int?): List<Group> {
         val db = this.readableDatabase
 

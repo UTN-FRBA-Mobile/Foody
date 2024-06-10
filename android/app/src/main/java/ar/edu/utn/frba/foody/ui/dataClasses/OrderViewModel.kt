@@ -67,6 +67,8 @@ class OrderViewModel() : ViewModel() {
     }
 
     fun deleteItem(userOrderId: Int, userItemId: Int) {
+        orderDataBase?.deleteOrderItem(userOrderId)
+
         val userOrderIndex = order.userOrders.indexOfFirst { it.userOrderId == userOrderId }
 
         val userOrder = order.userOrders[userOrderIndex]
