@@ -44,22 +44,26 @@ class OrderViewModel() : ViewModel() {
 
     fun getUserOrder(restaurant: Restaurant): UserOrder {
         if(order.orderId == -1){
-            var createdOrder = Order(0, restaurant)
-
-            createdOrder.orderId  = orderDataBase?.insertOrder(createdOrder, null)?.toInt() ?: 0
-
-            val userOrderId = orderDataBase?.insertUserOrder(user.userId, createdOrder.orderId)
-                ?.toInt() ?: 0
-
-            val userOrder = UserOrder(userOrderId, mutableListOf(), user)
-
-            val userOrders = mutableListOf<UserOrder>()
-
-            userOrders.add(userOrder)
-
-            this.order = createdOrder.copy(userOrders = userOrders)
+            createOrder(restaurant)
         }
         return order.userOrders.first { x -> x.user.userId == 1 }
+    }
+
+    fun createOrder(restaurant: Restaurant) {
+        var createdOrder = Order(0, restaurant)
+
+        createdOrder.orderId  = orderDataBase?.insertOrder(createdOrder, null)?.toInt() ?: 0
+
+        val userOrderId = orderDataBase?.insertUserOrder(user.userId, createdOrder.orderId)
+            ?.toInt() ?: 0
+
+        val userOrder = UserOrder(userOrderId, mutableListOf(), user)
+
+        val userOrders = mutableListOf<UserOrder>()
+
+        userOrders.add(userOrder)
+
+        this.order = createdOrder.copy(userOrders = userOrders)
     }
 
     fun getTotal(): Double {
@@ -113,7 +117,7 @@ class OrderViewModel() : ViewModel() {
     }
 
     fun addItem(userOrderId: Int, quantity: Int, dish: Dish) {
-        val userOrderIndex = order.userOrders.indexOfFirst { it.userOrderId == userOrderId }
+        val userOrderIndex = order.userOrders.indexOfFirst { it.user.userId == user.userId }
 
         val userOrder = order.userOrders[userOrderIndex]
 
@@ -134,7 +138,10 @@ class OrderViewModel() : ViewModel() {
         order = order.copy(userOrders = updatedUserOrders.toList())
     }
 
-    fun changeItemQuantityIfExists(userOrderId: Int, orderItem: OrderItemInfo?, variation: Int, dish: Dish) {
+    fun changeItemQuantityIfExists(userOrderId: Int, orderItem: OrderItemInfo?, variation: Int, dish: Dish, restaurant: Restaurant) {
+        if(orderItem == null && order.restaurant.restaurantId != restaurant.restaurantId) {
+            createOrder(restaurant)
+        }
         if (orderItem == null) {
             if(variation > 0) {
                 addItem(userOrderId, variation, dish)
@@ -143,6 +150,10 @@ class OrderViewModel() : ViewModel() {
         else {
             changeItemQuantity(userOrderId, orderItem.id, variation)
         }
+    }
+
+    fun getAllOrders(): List<Order> {
+        return orderDataBase?.getAllOrders()!!
     }
 
     val defaultOrderStates: List<OrderState> = listOf(

@@ -39,6 +39,7 @@ import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Dish
 import ar.edu.utn.frba.foody.ui.Classes.OrderItemInfo
+import ar.edu.utn.frba.foody.ui.Classes.Restaurant
 import ar.edu.utn.frba.foody.ui.Classes.UserOrder
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
@@ -51,7 +52,7 @@ fun RestaurantScreen(navController: NavHostController, viewModel: MainViewModel,
     val userOrder = orderViewModel.getUserOrder(restaurant)
     AppScaffold(navController, restaurant.name, {BottomGroupRestaurant(navController)},
         { TopGroupRestaurant(navController, restaurant.name) }){
-        DishesGrid(navController = navController, orderViewModel, restaurant.dishes, userOrder)
+        DishesGrid(orderViewModel, restaurant.dishes, userOrder, restaurant)
     }
 }
 
@@ -135,20 +136,20 @@ fun BottomGroupRestaurant(navController: NavController) {
 }
 
 @Composable
-fun DishesGrid(navController: NavController, viewModel: OrderViewModel, dishes: List<Dish>, userOrder: UserOrder) {
+fun DishesGrid(viewModel: OrderViewModel, dishes: List<Dish>, userOrder: UserOrder, restaurant: Restaurant) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(8.dp),
         modifier = Modifier.fillMaxSize()
     ) {
         items(dishes.size) { index ->
-            DishCard(navController, viewModel, dishes[index], userOrder, userOrder.items.firstOrNull { x -> x.dish.dishId == dishes[index].dishId } )
+            DishCard(viewModel, dishes[index], userOrder, userOrder.items.firstOrNull { x -> x.dish.dishId == dishes[index].dishId }, restaurant )
         }
     }
 }
 
 @Composable
-fun DishCard(navController: NavController, viewModel: OrderViewModel, dish: Dish, userOrder: UserOrder, userOrderItemInfo: OrderItemInfo?) {
+fun DishCard(viewModel: OrderViewModel, dish: Dish, userOrder: UserOrder, userOrderItemInfo: OrderItemInfo?, restaurant: Restaurant) {
     Card(
         modifier = Modifier
             .padding(15.dp)
@@ -187,13 +188,13 @@ fun DishCard(navController: NavController, viewModel: OrderViewModel, dish: Dish
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ){
-                IconButton(onClick = { viewModel.changeItemQuantityIfExists(userOrder.userOrderId, userOrderItemInfo, 1, dish) }) {
+                IconButton(onClick = { viewModel.changeItemQuantityIfExists(userOrder.userOrderId, userOrderItemInfo, 1, dish, restaurant) }) {
                     Icon(imageVector = Icons.Default.KeyboardArrowUp, contentDescription = "Increase")
                 }
 
                 Text(text = (userOrderItemInfo?.quantity ?: 0).toString(), fontSize = 18.sp)
 
-                IconButton(onClick = { viewModel.changeItemQuantityIfExists(userOrder.userOrderId, userOrderItemInfo, -1, dish) }) {
+                IconButton(onClick = { viewModel.changeItemQuantityIfExists(userOrder.userOrderId, userOrderItemInfo, -1, dish, restaurant) }) {
                     Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "Decrease")
                 }
             }

@@ -152,29 +152,6 @@ companion object {
         return mutableListOf()
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     fun getDishFromCursor(dishCursor: Cursor, dishId: Int): Dish {
         val dishName = dishCursor.getString(dishCursor.getColumnIndexOrThrow(COLUMN_DISH_NAME))
         val dishDescription = dishCursor.getString(dishCursor.getColumnIndexOrThrow(COLUMN_DISH_DESCRIPTION))
