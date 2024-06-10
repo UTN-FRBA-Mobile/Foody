@@ -1,7 +1,6 @@
 package ar.edu.utn.frba.foody.ui.dataBase
 
 import android.content.Context
-import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import ar.edu.utn.frba.foody.ui.Classes.User
@@ -31,9 +30,19 @@ class UserDataBase (private var context: Context) : SQLiteOpenHelper(context, DA
         return db.delete(TABLE_NAME, "$COLUMN_NAME = ?", arrayOf(name))
     }
     fun getAllUsers(): List<User> {
-        val users = mutableListOf<User>()
+        return getUsers(null)
+    }
+
+    fun getUsers(userId: Int?): List<User> {
         val db = this.readableDatabase
-        val cursor: Cursor = db.rawQuery("SELECT * FROM $TABLE_NAME", null)
+
+        val cursor = if(userId != null) {
+            db.rawQuery("SELECT * FROM $TABLE_NAME WHERE ${COLUMN_ID} = ?", arrayOf(userId.toString()))
+        } else {
+            db.rawQuery("SELECT * FROM $TABLE_NAME", null)
+        }
+
+        val users = mutableListOf<User>()
 
         if (cursor.moveToFirst()) {
             do {
@@ -46,6 +55,7 @@ class UserDataBase (private var context: Context) : SQLiteOpenHelper(context, DA
 
         cursor.close()
         db.close()
+
         return users
     }
 
@@ -61,9 +71,9 @@ class UserDataBase (private var context: Context) : SQLiteOpenHelper(context, DA
 
         private const val DATABASE_NAME = "mydatabase.db"
         private const val DATABASE_VERSION = 1
-        private const val TABLE_NAME = "users"
-        private const val COLUMN_ID = "id"
-        private const val COLUMN_NAME = "name"
-        private const val COLUMN_PASSWORD = "password"
+        const val TABLE_NAME = "users"
+        const val COLUMN_ID = "id"
+        const val COLUMN_NAME = "name"
+        const val COLUMN_PASSWORD = "password"
     }
 }
