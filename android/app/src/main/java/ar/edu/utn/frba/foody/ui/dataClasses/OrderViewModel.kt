@@ -11,13 +11,24 @@ import ar.edu.utn.frba.foody.ui.Classes.Group
 import ar.edu.utn.frba.foody.ui.Classes.Order
 import ar.edu.utn.frba.foody.ui.Classes.OrderItemInfo
 import ar.edu.utn.frba.foody.ui.Classes.OrderState
+import ar.edu.utn.frba.foody.ui.Classes.Restaurant
+import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.Classes.UserOrder
+import ar.edu.utn.frba.foody.ui.dataBase.OrderDataBase
 import java.util.Calendar
 
 
 class OrderViewModel() : ViewModel() {
-    private var order by mutableStateOf(Order())
-    private var userId by mutableStateOf(Int)
+    private var order by mutableStateOf(Order(-1))
+
+    var orderDataBase: OrderDataBase? = null
+
+    //TODO: cambiar por el usuario de la sesión
+     val user = User(1)
+
+    fun setDatabase(orderDataBase: OrderDataBase) {
+        this.orderDataBase = orderDataBase
+    }
 
     fun updateOrder(newOrder: Order) {
         order = newOrder
@@ -31,8 +42,24 @@ class OrderViewModel() : ViewModel() {
         order = order.copy(group = newGroup)
     }
 
-    fun getUserOrder(): UserOrder {
-        return order.userOrders.first { x -> x.user.userId == 1 }  //TODO CAMBIAR POR EL ID DEL USUARIO EN LA SESIÓN
+    fun getUserOrder(restaurant: Restaurant): UserOrder {
+        if(order.orderId == -1){
+            var createdOrder = Order(0, restaurant)
+
+            createdOrder.orderId  = orderDataBase?.insertOrder(createdOrder, null)?.toInt() ?: 0
+
+            val userOrderId = orderDataBase?.insertUserOrder(user.userId, createdOrder.orderId)
+                ?.toInt() ?: 0
+
+            val userOrder = UserOrder(userOrderId, mutableListOf(), user)
+
+            val userOrders = mutableListOf<UserOrder>()
+
+            userOrders.add(userOrder)
+
+            this.order = createdOrder.copy(userOrders = userOrders)
+        }
+        return order.userOrders.first { x -> x.user.userId == 1 }
     }
 
     fun getTotal(): Double {

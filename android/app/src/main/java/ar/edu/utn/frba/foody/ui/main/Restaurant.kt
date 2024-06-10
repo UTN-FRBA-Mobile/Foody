@@ -48,7 +48,7 @@ import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 @Composable
 fun RestaurantScreen(navController: NavHostController, viewModel: MainViewModel, orderViewModel: OrderViewModel) {
     var restaurant = viewModel.getPickedRestaurant()
-    val userOrder = orderViewModel.getUserOrder()
+    val userOrder = orderViewModel.getUserOrder(restaurant)
     AppScaffold(navController, restaurant.name, {BottomGroupRestaurant(navController)},
         { TopGroupRestaurant(navController, restaurant.name) }){
         DishesGrid(navController = navController, orderViewModel, restaurant.dishes, userOrder)

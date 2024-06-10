@@ -33,6 +33,7 @@ class MainComposeActivity : ComponentActivity() {
         setContent {
             val viewModel = viewModel<MainViewModel>()
             val orderViewModel = viewModel<OrderViewModel>()
+            orderViewModel.setDatabase(dbOrderHelper)
             val cardViewModel=viewModel<CardViewModel>()
             val groupViewModel = viewModel<GroupViewModel>()
             AppNavigation(viewModel, orderViewModel,cardViewModel,groupViewModel,
