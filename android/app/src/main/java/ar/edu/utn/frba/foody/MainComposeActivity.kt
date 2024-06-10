@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ar.edu.utn.frba.foody.ui.Classes.Dish
 import ar.edu.utn.frba.foody.ui.Classes.Restaurant
+import ar.edu.utn.frba.foody.ui.dataBase.OrderDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.RestaurantDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.UserDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.CardViewModel
@@ -25,10 +26,14 @@ class MainComposeActivity : ComponentActivity() {
         val dbRestaurantHelper = RestaurantDataBase(this)
         dbRestaurantHelper.deleteAndCreateTables(dbUserHelper)
 
+        val dbOrderHelper = OrderDataBase(this)
+        dbOrderHelper.deleteAndCreateTables()
+
         createTestData(dbRestaurantHelper)
         setContent {
             val viewModel = viewModel<MainViewModel>()
             val orderViewModel = viewModel<OrderViewModel>()
+            orderViewModel.setDatabase(dbOrderHelper)
             val cardViewModel=viewModel<CardViewModel>()
             val groupViewModel = viewModel<GroupViewModel>()
             AppNavigation(viewModel, orderViewModel,cardViewModel,groupViewModel,
