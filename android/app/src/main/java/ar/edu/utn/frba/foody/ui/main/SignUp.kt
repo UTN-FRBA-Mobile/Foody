@@ -141,7 +141,7 @@ fun SignUpScreen(navController: NavController)
                     )
                 )
                 IconButton(onClick = {
-                    navController.navigate(AppScreens.Location_Screen.route)
+                    navController.navigate(AppScreens.Location2_Screen.route)
                 }) {
                     Icon(
                         modifier = Modifier.size(36.dp),
