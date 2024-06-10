@@ -1,5 +1,6 @@
 package ar.edu.utn.frba.foody.ui.navigation
 
+import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -15,6 +16,7 @@ import ar.edu.utn.frba.foody.ui.main.CartScreen
 import ar.edu.utn.frba.foody.ui.main.CreateGroupScreen
 import ar.edu.utn.frba.foody.ui.main.GroupScreen
 import ar.edu.utn.frba.foody.ui.main.HomeScreen
+import ar.edu.utn.frba.foody.ui.main.LocationGoogleScreen
 import ar.edu.utn.frba.foody.ui.main.LocationScreen
 import ar.edu.utn.frba.foody.ui.main.LoginScreen
 import ar.edu.utn.frba.foody.ui.main.OrdersScreen
@@ -24,7 +26,7 @@ import ar.edu.utn.frba.foody.ui.main.RestaurantScreen
 import ar.edu.utn.frba.foody.ui.main.SignUpScreen
 
 @Composable
-fun AppNavigation(viewModel: MainViewModel, orderViewModel: OrderViewModel, cardViewModel: CardViewModel,
+fun AppNavigation(context:ComponentActivity,viewModel: MainViewModel, orderViewModel: OrderViewModel, cardViewModel: CardViewModel,
                   groupViewModel: GroupViewModel,
                   dbUserHelper:UserDataBase, dbRestaurantHelper: RestaurantDataBase){
     val navController= rememberNavController()
@@ -71,6 +73,9 @@ fun AppNavigation(viewModel: MainViewModel, orderViewModel: OrderViewModel, card
         }
         composable(route = AppScreens.Payment.route) {
             PaymentScreen(navController = navController, viewModel = cardViewModel)
+        }
+        composable(route = AppScreens.Location2_Screen.route) {
+            LocationGoogleScreen(context = context,navController)
         }
     }
 }
