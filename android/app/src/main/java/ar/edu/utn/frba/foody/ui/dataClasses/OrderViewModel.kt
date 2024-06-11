@@ -23,8 +23,10 @@ class OrderViewModel() : ViewModel() {
 
     var orderDataBase: OrderDataBase? = null
 
-    //TODO: cambiar por el usuario de la sesión
-     val user = User(1)
+     var user = User()
+         set(value) {
+             field = value
+         }
 
     fun setDatabase(orderDataBase: OrderDataBase) {
         this.orderDataBase = orderDataBase
@@ -46,7 +48,7 @@ class OrderViewModel() : ViewModel() {
         if(order.orderId == -1){
             createOrder(restaurant)
         }
-        return order.userOrders.first { x -> x.user.userId == 1 }
+        return order.userOrders.first { x -> x.user.userId == this.user.userId }
     }
 
     fun createOrder(restaurant: Restaurant) {

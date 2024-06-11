@@ -36,7 +36,7 @@ fun AppNavigation(context:ComponentActivity,viewModel: MainViewModel, orderViewM
                 restaurantDataBase = dbRestaurantHelper, userDataBase = dbUserHelper )
         }
         composable(route = AppScreens.Login_Screen.route) {
-            LoginScreen(navController = navController,dbHelper=dbUserHelper)
+            LoginScreen(navController = navController,dbHelper=dbUserHelper, orderViewModel)
         }
         composable(route = AppScreens.SignUp_Screen.route) {
             SignUpScreen(navController = navController)
