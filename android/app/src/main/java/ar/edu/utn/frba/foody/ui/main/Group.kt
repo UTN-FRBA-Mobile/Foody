@@ -106,7 +106,7 @@ fun UserRow(user: User, orderViewModel: OrderViewModel, groupViewModel: GroupVie
                 alignment = Alignment.Center
             )
             Text(
-                text = user.userName,
+                text = user.email,
                 style = MaterialTheme.typography.h5,
                 color = MaterialTheme.colors.primary,
                 textAlign = TextAlign.Center,

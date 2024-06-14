@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.viewmodel.compose.viewModel
+import ar.edu.utn.frba.foody.ui.dataClasses.AddressViewModel
 import ar.edu.utn.frba.foody.ui.Classes.Dish
 import ar.edu.utn.frba.foody.ui.Classes.Restaurant
 import ar.edu.utn.frba.foody.ui.dataBase.OrderDataBase
@@ -22,22 +23,25 @@ class MainComposeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         dbUserHelper = UserDataBase(this)
+        dbUserHelper.createDataBase(dbUserHelper)
 
         val dbRestaurantHelper = RestaurantDataBase(this)
-        dbRestaurantHelper.deleteAndCreateTables(dbUserHelper)
+        //dbRestaurantHelper.deleteAndCreateTables(dbUserHelper)
 
         val dbOrderHelper = OrderDataBase(this)
-        dbOrderHelper.deleteAndCreateTables()
+        //dbOrderHelper.deleteAndCreateTables()
+        //dbUserHelper.addUser(dbUserHelper,"juanma","contra")
 
-        createTestData(dbRestaurantHelper)
+        //createTestData(dbRestaurantHelper)
         setContent {
             val viewModel = viewModel<MainViewModel>()
             val orderViewModel = viewModel<OrderViewModel>()
             orderViewModel.setDatabase(dbOrderHelper)
             val cardViewModel=viewModel<CardViewModel>()
             val groupViewModel = viewModel<GroupViewModel>()
+            val addressViewModel=viewModel<AddressViewModel>()
             AppNavigation(this,viewModel, orderViewModel,cardViewModel,groupViewModel,
-                dbUserHelper,dbRestaurantHelper)
+                addressViewModel,dbUserHelper,dbRestaurantHelper)
         }
     }
 

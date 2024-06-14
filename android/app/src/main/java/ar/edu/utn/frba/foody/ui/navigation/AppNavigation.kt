@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import ar.edu.utn.frba.foody.ui.dataClasses.AddressViewModel
 import ar.edu.utn.frba.foody.ui.dataBase.RestaurantDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.UserDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.CardViewModel
@@ -17,7 +18,6 @@ import ar.edu.utn.frba.foody.ui.main.CreateGroupScreen
 import ar.edu.utn.frba.foody.ui.main.GroupScreen
 import ar.edu.utn.frba.foody.ui.main.HomeScreen
 import ar.edu.utn.frba.foody.ui.main.LocationGoogleScreen
-import ar.edu.utn.frba.foody.ui.main.LocationScreen
 import ar.edu.utn.frba.foody.ui.main.LoginScreen
 import ar.edu.utn.frba.foody.ui.main.OrdersScreen
 import ar.edu.utn.frba.foody.ui.main.PaymentScreen
@@ -26,8 +26,8 @@ import ar.edu.utn.frba.foody.ui.main.RestaurantScreen
 import ar.edu.utn.frba.foody.ui.main.SignUpScreen
 
 @Composable
-fun AppNavigation(context:ComponentActivity,viewModel: MainViewModel, orderViewModel: OrderViewModel, cardViewModel: CardViewModel,
-                  groupViewModel: GroupViewModel,
+fun AppNavigation(context:ComponentActivity, viewModel: MainViewModel, orderViewModel: OrderViewModel, cardViewModel: CardViewModel,
+                  groupViewModel: GroupViewModel, addressViewModel: AddressViewModel,
                   dbUserHelper:UserDataBase, dbRestaurantHelper: RestaurantDataBase){
     val navController= rememberNavController()
     NavHost(navController = navController , startDestination = AppScreens.Login_Screen.route) {
@@ -39,10 +39,7 @@ fun AppNavigation(context:ComponentActivity,viewModel: MainViewModel, orderViewM
             LoginScreen(navController = navController,dbHelper=dbUserHelper, orderViewModel)
         }
         composable(route = AppScreens.SignUp_Screen.route) {
-            SignUpScreen(navController = navController)
-        }
-        composable(route = AppScreens.Location_Screen.route) {
-            LocationScreen(navController = navController)
+                SignUpScreen(navController = navController, viewModel = addressViewModel,dbUserHelper)
         }
         composable(route = AppScreens.Profile_Screen.route) {
 
@@ -74,8 +71,8 @@ fun AppNavigation(context:ComponentActivity,viewModel: MainViewModel, orderViewM
         composable(route = AppScreens.Payment.route) {
             PaymentScreen(navController = navController, viewModel = cardViewModel)
         }
-        composable(route = AppScreens.Location2_Screen.route) {
-            LocationGoogleScreen(context = context,navController)
+        composable(route = AppScreens.Location_Screen.route) {
+            LocationGoogleScreen(context = context,navController,addressViewModel)
         }
     }
 }

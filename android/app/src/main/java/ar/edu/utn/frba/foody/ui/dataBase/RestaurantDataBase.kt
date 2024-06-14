@@ -25,8 +25,8 @@ class RestaurantDataBase (private var context: Context) : SQLiteOpenHelper(conte
     }
     fun deleteAndCreateTables(userDataBase: UserDataBase) {
         val db = userDataBase.writableDatabase
-        db.execSQL("DROP TABLE IF EXISTS dish")
-        db.execSQL("DROP TABLE IF EXISTS restaurant")
+        //db.execSQL("DROP TABLE IF EXISTS dish")
+        //db.execSQL("DROP TABLE IF EXISTS restaurant")
         onCreate(db)
     }
 

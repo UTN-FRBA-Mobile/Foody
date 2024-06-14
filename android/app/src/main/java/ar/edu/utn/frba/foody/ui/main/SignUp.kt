@@ -1,5 +1,7 @@
 package ar.edu.utn.frba.foody.ui.main
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -29,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
@@ -40,16 +43,20 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
+import ar.edu.utn.frba.foody.ui.Classes.Address
+import ar.edu.utn.frba.foody.ui.dataClasses.AddressViewModel
+import ar.edu.utn.frba.foody.ui.Classes.User
+import ar.edu.utn.frba.foody.ui.dataBase.UserDataBase
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
-fun SignUpScreen(navController: NavController)
+fun SignUpScreen(navController: NavController, viewModel: AddressViewModel, dbUserDataBase: UserDataBase?)
 {
-    var Nombre by remember { mutableStateOf("") }
-    var Email by remember { mutableStateOf("") }
-    var Pass by remember { mutableStateOf("") }
-    var Direc by remember { mutableStateOf("") }
-    var Numero by remember { mutableStateOf("") }
+    var user=User()
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var numero by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     Image(
         painter = painterResource(id = R.drawable.background_signup),
@@ -58,7 +65,7 @@ fun SignUpScreen(navController: NavController)
         modifier = Modifier.fillMaxSize())
 
 
-    IconButton(onClick = { navController.navigate(AppScreens.SignUp_Screen.route) }) {
+    IconButton(onClick = { navController.navigate(AppScreens.Login_Screen.route) }) {
         Icon(
             modifier = Modifier.size(36.dp),
             painter = painterResource(id = R.drawable.go_back),
@@ -83,23 +90,9 @@ fun SignUpScreen(navController: NavController)
             )
 
             TextField(
-                value = Nombre, onValueChange = { Nombre = it },
-                label = { Text(text = "Nombre", modifier = Modifier.padding(start = 16.dp)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                singleLine = true,
-                maxLines = 1,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.Transparent
-                )
-            )
-
-            TextField(
-                value = Email, onValueChange = { Email = it },
+                value = email, onValueChange = { email = it },
                 label = { Text(text = "Email", modifier = Modifier.padding(start = 16.dp)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 singleLine = true,
                 maxLines = 1,
                 modifier = Modifier
@@ -111,7 +104,7 @@ fun SignUpScreen(navController: NavController)
             )
 
             TextField(
-                value = Pass, onValueChange = { Pass = it },
+                value = password, onValueChange = { password = it },
                 label = { Text(text = "Password", modifier = Modifier.padding(start = 16.dp)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 singleLine = true,
@@ -124,24 +117,41 @@ fun SignUpScreen(navController: NavController)
                 ),
                 visualTransformation = PasswordVisualTransformation(),
             )
-
+            TextField(
+                value = numero, onValueChange = { numero = it },
+                label = { Text(text = "Numero Contacto", modifier = Modifier.padding(start = 16.dp)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                singleLine = true,
+                maxLines = 1,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = Color.Transparent
+                )
+            )
             Row (
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp)
             ){
+                val direccionText = viewModel.getPickedAddress()?.let { "${it.calle} ${it.numero}, ${it.localidad}, ${it.region}" } ?: ""
+
                 TextField(
-                    value = Direc, onValueChange = { Direc = it },
+                    value = direccionText,
+                    // Mostrar la dirección si está disponible, de lo contrario, vacío
+                    onValueChange = {},  // No permitir cambios en el texto
                     label = { Text(text = "Direccion", modifier = Modifier.padding(start = 16.dp)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     singleLine = true,
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = Color.Transparent
-                    )
+                    ),
+                    enabled = false  // Deshabilitar la edición del TextField
                 )
                 IconButton(onClick = {
-                    navController.navigate(AppScreens.Location2_Screen.route)
+                    navController.navigate(AppScreens.Location_Screen.route)
                 }) {
                     Icon(
                         modifier = Modifier.size(36.dp),
@@ -152,24 +162,31 @@ fun SignUpScreen(navController: NavController)
                 }
             }
 
-            TextField(
-                value = Numero, onValueChange = { Numero = it },
-                label = { Text(text = "Numero Contacto", modifier = Modifier.padding(start = 16.dp)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                singleLine = true,
-                maxLines = 1,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.Transparent
-                )
-            )
 
             Spacer(modifier = Modifier.height(60.dp))
 
             Button(
-                onClick = {navController.navigate(AppScreens.Home_Screen.route)},
+                onClick = {
+                    user.email=email
+                    user.password=password
+                    user.numeroContacto=numero.toInt()
+                    if(validateAnyUserEmpty(user,viewModel.getPickedAddress(),context)) {
+                        val addressId =
+                            dbUserDataBase?.addAddress(dbUserDataBase, viewModel.getPickedAddress())
+
+                        dbUserDataBase?.addUser(
+                            dbUserDataBase,
+                            user.email,
+                            user.password,
+                            addressId,
+                            user.numeroContacto
+                        )
+                        navController.navigate(AppScreens.Login_Screen.route)
+                    }
+                    else {navController.navigate(AppScreens.SignUp_Screen.route)}
+
+
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
@@ -198,10 +215,34 @@ fun SignUpScreen(navController: NavController)
     }
 }
 
+fun validateAnyUserEmpty(user:User,direccion:Address.AddressInfo,context: Context):Boolean{
+    if(direccion.calle=="" || direccion.region=="" || direccion.localidad==""
+        || direccion.numero==0 || direccion.latitud==0.0 || direccion.longitud==0.0){
+        Toast.makeText(context, "Dirección Invalida.", Toast.LENGTH_SHORT).show()
+        return false
+    }
+    if (user.email=="") {
+        Toast.makeText(context, "Falta completar el email.", Toast.LENGTH_SHORT).show()
+        return false
+    }
+    if (user.password==""){
+        Toast.makeText(context, "Falta completar la contraseña.", Toast.LENGTH_SHORT).show()
+        return false
+    }
+    if (user.numeroContacto==0){
+        Toast.makeText(context, "Falta completar el numero de contacto.", Toast.LENGTH_SHORT).show()
+        return false
+    }
+
+    return true
+}
+
 
 @Preview
 @Composable
 fun DefaultPreviewSignUp(){
     val navController = rememberNavController()
-    SignUpScreen(navController = navController)
+    val addressViewModel= AddressViewModel()
+
+    SignUpScreen(navController = navController,addressViewModel,null)
 }

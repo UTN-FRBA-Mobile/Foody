@@ -1,14 +1,20 @@
 package ar.edu.utn.frba.foody.ui.dataBase
 
+import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import ar.edu.utn.frba.foody.ui.Classes.Address
 import ar.edu.utn.frba.foody.ui.Classes.User
 
 class UserDataBase (private var context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     override fun onCreate(db: SQLiteDatabase) {
+        db.execSQL("DROP TABLE IF EXISTS users")
+        db.execSQL("DROP TABLE IF EXISTS direccion")
+
         db.execSQL(SQL_CREATE_TABLE_USERS)
+        db.execSQL(SQL_CREATE_TABLE_DIRECCION)
 
     }
 
@@ -16,18 +22,24 @@ class UserDataBase (private var context: Context) : SQLiteOpenHelper(context, DA
         db.execSQL("DROP TABLE IF EXISTS users")
         onCreate(db)
     }
-
-    fun addUser(dbHelper: SQLiteOpenHelper, name:String, password:String){
-        val db = dbHelper.writableDatabase
-        val sql = "INSERT INTO users (name, password) VALUES (?, ?)"
-        val stmt = db.compileStatement(sql)
-        stmt.bindString(1, name)
-        stmt.bindString(2, password)
-        stmt.executeInsert()
+    fun createDataBase(dataBase: UserDataBase){
+        onCreate(dataBase.writableDatabase)
     }
-    fun deleteUser(name: String):Int{
+    fun addUser(dbHelper: UserDataBase, email:String, password:String,direccionId:Int?,numeroContacto:Int){
+        val db = dbHelper.writableDatabase
+
+        val values = ContentValues().apply {
+            put("email",email)
+            put("password", password)
+            put("direccionId",direccionId)
+            put("numeroContacto",numeroContacto)
+
+        }
+        db.insert("users", null, values)
+    }
+    fun deleteUser(email: String):Int{
         val db = this.writableDatabase
-        return db.delete(TABLE_NAME, "$COLUMN_NAME = ?", arrayOf(name))
+        return db.delete(TABLE_NAME, "$COLUMN_NAME = ?", arrayOf(email))
     }
     fun getAllUsers(): List<User> {
         return getUsers(null)
@@ -47,9 +59,13 @@ class UserDataBase (private var context: Context) : SQLiteOpenHelper(context, DA
         if (cursor.moveToFirst()) {
             do {
                 val id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID))
-                val name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME))
-                val password = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PASSWORD))
-                users.add(User(id, name, password))
+                val email = cursor.getString(cursor.getColumnIndexOrThrow("email"))
+                val password = cursor.getString(cursor.getColumnIndexOrThrow("password"))
+                val direccionId = cursor.getInt(cursor.getColumnIndexOrThrow("direccionId"))
+                val numeroContacto = cursor.getInt(cursor.getColumnIndexOrThrow("numeroContacto"))
+
+
+                users.add(User(id, email, password,direccionId,numeroContacto))
             } while (cursor.moveToNext())
         }
 
@@ -59,15 +75,68 @@ class UserDataBase (private var context: Context) : SQLiteOpenHelper(context, DA
         return users
     }
 
+    fun addAddress(dbHelper: UserDataBase?, address:Address.AddressInfo): Int?{
+        val db = dbHelper?.writableDatabase
+        val values = ContentValues().apply {
+            put("calle",address.calle)
+            put("numero", address.numero)
+            put("localidad",address.localidad)
+            put("region",address.region)
+            put("latitud",address.latitud)
+            put("longitud",address.longitud)
+        }
+        return db?.insert("direccion", null, values)?.toInt()
+
+    }
+    fun getAddress(addressId:Int):Address.AddressInfo?{
+        val db = this.readableDatabase
+
+        val cursor = if(addressId != 0) {
+            db.rawQuery(
+                "SELECT * FROM direccion WHERE id = ${addressId}",
+                arrayOf(addressId.toString())
+            )
+        } else {
+            db.rawQuery("SELECT * FROM direccion", null)
+        }
+        if (cursor.moveToFirst()) {
+            val id = cursor.getInt(cursor.getColumnIndexOrThrow("id"))
+            val calle = cursor.getString(cursor.getColumnIndexOrThrow("calle"))
+            val numero = cursor.getInt(cursor.getColumnIndexOrThrow("numero"))
+            val localidad = cursor.getString(cursor.getColumnIndexOrThrow("localidad"))
+            val region = cursor.getString(cursor.getColumnIndexOrThrow("region"))
+            val latitud = cursor.getDouble(cursor.getColumnIndexOrThrow("latitud"))
+            val longitud = cursor.getDouble(cursor.getColumnIndexOrThrow("longitud"))
+            return Address.AddressInfo(calle,numero,localidad,region,latitud,longitud)
+        }
+        return null
+    }
+
 
     companion object {
+        private const val SQL_CREATE_TABLE_DIRECCION = """
+            CREATE TABLE direccion (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                calle TEXT NOT NULL,
+                numero INTEGER NOT NULL,
+                localidad TEXT NOT NULL,
+                region TEXT NOT NULL,
+                latitud DOUBLE NOT NULL,
+                longitud DOUBLE NOT NULL
+            )
+        """
         private const val SQL_CREATE_TABLE_USERS = """
             CREATE TABLE users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                password TEXT NOT NULL
+                email TEXT NOT NULL,
+                password TEXT NOT NULL,
+                direccionId INTEGER,
+                numeroContacto INTEGER,
+                FOREIGN KEY(direccionId) REFERENCES direccion("id")
             )
         """
+
+
 
         private const val DATABASE_NAME = "mydatabase.db"
         private const val DATABASE_VERSION = 1

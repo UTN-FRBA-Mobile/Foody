@@ -15,5 +15,4 @@ sealed class AppScreens(val route: String) {
     object Create_Group_Screen: AppScreens("Create Group")
     object Card_Screen: AppScreens("Card")
     object Payment: AppScreens("Payment")
-    object Location2_Screen: AppScreens("Location2")
 }

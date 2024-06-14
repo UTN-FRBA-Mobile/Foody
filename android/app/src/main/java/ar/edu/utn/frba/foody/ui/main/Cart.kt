@@ -173,7 +173,7 @@ fun OrderCard(navController: NavController, viewModel: OrderViewModel, userOrder
         ) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = userOrder.user.userName,
+                text = userOrder.user.email,
                 style = MaterialTheme.typography.h6,
                 modifier = Modifier.padding(vertical = 4.dp)
             )
