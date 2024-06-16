@@ -122,6 +122,7 @@ fun LoginScreen(navController: NavHostController,dbHelper: UserDataBase, orderVi
                     if(user != null) {
                         navController.navigate(AppScreens.Home_Screen.route)
                         orderViewModel.user = user
+                        orderViewModel.removeOrderFromSession()
                     }
                     else {
                         showError = true

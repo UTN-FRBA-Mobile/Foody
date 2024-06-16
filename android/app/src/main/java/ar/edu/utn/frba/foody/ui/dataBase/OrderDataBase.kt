@@ -193,6 +193,14 @@ class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
         return userOrderId
     }
 
+    fun deleteUserOrder(userOrderId: Int) {
+        val db = this.readableDatabase
+
+        db.delete(TABLE_USER_ORDERS, "$COLUMN_USER_ORDERS_ID = ?", arrayOf(userOrderId.toString()))
+
+        db.close()
+    }
+
     fun insertOrderItem(orderItem: OrderItemInfo, userOrderId: Int): Long {
         val db = this.readableDatabase
         val values = ContentValues().apply {

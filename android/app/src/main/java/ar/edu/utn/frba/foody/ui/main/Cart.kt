@@ -91,11 +91,6 @@ fun BottomGroupCart(navController: NavController,
 ) {
     val buttons = listOf(
         ButtonInterface(
-            resourceId = R.drawable.empty_cart_icon,
-            imageDescription = "Empty Cart Icon",
-            route = AppScreens.Profile_Screen.route,
-        ),
-        ButtonInterface(
             resourceId = R.drawable.payment_icon,
             imageDescription = "Payment Icon",
             route = AppScreens.Profile_Screen.route,
@@ -124,6 +119,22 @@ fun BottomGroupCart(navController: NavController,
         )
 
         Spacer(modifier = Modifier.width(8.dp))
+
+        IconButton(
+            onClick = { orderViewModel.emptyUserOrder() },
+            modifier = Modifier
+                .weight(1f)
+                .padding(vertical = 8.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.empty_cart_icon),
+                contentDescription = "Empty Cart Icon",
+                modifier = Modifier.size(24.dp),
+                contentScale = ContentScale.FillBounds
+            )
+        }
+
+
 
         // Buttons
         buttons.forEach { button ->

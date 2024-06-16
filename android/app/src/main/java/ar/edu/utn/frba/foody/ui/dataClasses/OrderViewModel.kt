@@ -48,15 +48,31 @@ class OrderViewModel() : ViewModel() {
         if(order.orderId == -1){
             createOrder(restaurant)
         }
-        return order.userOrders.first { x -> x.user.userId == this.user.userId }
+        return getAssignedUserOrder()
+    }
+
+    fun getAssignedUserOrder(): UserOrder {
+        val userOrder = order.userOrders.firstOrNull() { x -> x.user.userId == this.user.userId }
+        if(userOrder == null) {
+            return createUserOrder(order)
+        }
+        return userOrder
+    }
+
+    fun removeOrderFromSession() {
+        order = Order(-1)
     }
 
     fun createOrder(restaurant: Restaurant) {
-        var createdOrder = Order(0, restaurant)
+        val createdOrder = Order(0, restaurant)
 
         createdOrder.orderId  = orderDataBase?.insertOrder(createdOrder, null)?.toInt() ?: 0
 
-        val userOrderId = orderDataBase?.insertUserOrder(user.userId, createdOrder.orderId)
+        createUserOrder(createdOrder)
+    }
+
+    fun createUserOrder(newOrder: Order): UserOrder {
+        val userOrderId = orderDataBase?.insertUserOrder(user.userId, newOrder.orderId)
             ?.toInt() ?: 0
 
         val userOrder = UserOrder(userOrderId, mutableListOf(), user)
@@ -65,7 +81,9 @@ class OrderViewModel() : ViewModel() {
 
         userOrders.add(userOrder)
 
-        this.order = createdOrder.copy(userOrders = userOrders)
+        this.order = newOrder.copy(userOrders = userOrders)
+
+        return userOrder;
     }
 
     fun getTotal(): Double {
@@ -156,6 +174,17 @@ class OrderViewModel() : ViewModel() {
 
     fun getAllOrders(): List<Order> {
         return orderDataBase?.getAllOrders()!!
+    }
+
+    fun emptyUserOrder() {
+        val userOrder = getAssignedUserOrder()
+        userOrder.items.forEach {
+            orderDataBase?.deleteOrderItem(it.id)
+        }
+        orderDataBase?.deleteUserOrder(userOrder.userOrderId)
+
+        val userOrders = order.userOrders.filter { x -> x.user != user }
+        order = order.copy(userOrders = userOrders)
     }
 
     val defaultOrderStates: List<OrderState> = listOf(
