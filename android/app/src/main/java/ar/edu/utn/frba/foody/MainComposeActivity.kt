@@ -26,11 +26,10 @@ class MainComposeActivity : ComponentActivity() {
         dbUserHelper.createDataBase(dbUserHelper)
 
         val dbRestaurantHelper = RestaurantDataBase(this)
-        //dbRestaurantHelper.deleteAndCreateTables(dbUserHelper)
+        dbRestaurantHelper.deleteAndCreateTables(dbUserHelper)
 
         val dbOrderHelper = OrderDataBase(this)
-        //dbOrderHelper.deleteAndCreateTables()
-        //dbUserHelper.addUser(dbUserHelper,"juanma","contra")
+        dbOrderHelper.deleteAndCreateTables()
 
         createTestData(dbRestaurantHelper)
         setContent {

@@ -23,6 +23,7 @@ class UserDataBase (private var context: Context) : SQLiteOpenHelper(context, DA
         onCreate(db)
     }
     fun createDataBase(dataBase: UserDataBase){
+        dataBase.writableDatabase.execSQL("DROP TABLE IF EXISTS users")
         onCreate(dataBase.writableDatabase)
     }
     fun addUser(dbHelper: UserDataBase, email:String, password:String,direccionId:Int?,numeroContacto:Int){

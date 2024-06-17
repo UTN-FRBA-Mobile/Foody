@@ -217,7 +217,7 @@ fun LocationGoogleScreen(context: ComponentActivity,
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
             Text("Your location ${currentLocation.latitude}/${currentLocation.longitude}")
-            Button(onClick = {
+            /*Button(onClick = {
                 if (permissions.all {
                         ContextCompat.checkSelfPermission(context, it) ==
                                 PackageManager.PERMISSION_GRANTED
@@ -231,6 +231,8 @@ fun LocationGoogleScreen(context: ComponentActivity,
             }) {
                 Text("Get your location")
             }
+
+             */
             }
             Row (
                 verticalAlignment = Alignment.CenterVertically,
