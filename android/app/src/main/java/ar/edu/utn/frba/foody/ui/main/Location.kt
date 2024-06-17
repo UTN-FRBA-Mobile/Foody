@@ -73,7 +73,8 @@ import kotlinx.coroutines.withContext
 fun LocationGoogleScreen(context: ComponentActivity,
                          navController:NavController,
                          viewModel: AddressViewModel,
-                         origin: String
+                         origin: String,
+                         id: String
 ) {
     val permissions = arrayOf(
         android.Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -330,6 +331,9 @@ fun LocationGoogleScreen(context: ComponentActivity,
                             Log.d("LocationGoogleScreen", "Número: ${address.numero}")
                             Log.d("LocationGoogleScreen", "Localidad: ${address.localidad}")
                             Log.d("LocationGoogleScreen", "Región: ${address.region}")
+                            if( origin=="profile"){
+                                address.id=id.toInt()
+                            }
                             // Guardar la dirección en la variable
                             viewModel.updateAddress(address)
 

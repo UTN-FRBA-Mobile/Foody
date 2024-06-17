@@ -23,15 +23,15 @@ class MainComposeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         dbUserHelper = UserDataBase(this)
-        dbUserHelper.createDataBase(dbUserHelper)
+       // dbUserHelper.createDataBase(dbUserHelper)
 
         val dbRestaurantHelper = RestaurantDataBase(this)
-        dbRestaurantHelper.deleteAndCreateTables(dbUserHelper)
+        //dbRestaurantHelper.deleteAndCreateTables(dbUserHelper)
 
         val dbOrderHelper = OrderDataBase(this)
-        dbOrderHelper.deleteAndCreateTables()
+        //dbOrderHelper.deleteAndCreateTables()
 
-        createTestData(dbRestaurantHelper)
+        //createTestData(dbRestaurantHelper)
         setContent {
             val viewModel = viewModel<MainViewModel>()
             val orderViewModel = viewModel<OrderViewModel>()

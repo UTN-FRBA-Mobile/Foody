@@ -5,8 +5,8 @@ sealed class AppScreens(val route: String) {
     object Login_Screen: AppScreens("Login")
     object SignUp_Screen: AppScreens("SignUp")
     //object Location_Screen: AppScreens("Location")
-    object Location_Screen : AppScreens("location_screen/{origin}") {
-        fun createRoute(origin: String) = "location_screen/$origin"
+    object Location_Screen : AppScreens("location_screen/{origin}/{id}") {
+        fun createRoute(origin: String,id:String) = "location_screen/$origin/$id"
     }
     object Profile_Screen: AppScreens("Profile")
     object Cart_Screen: AppScreens("Cart")

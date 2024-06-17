@@ -55,9 +55,9 @@ fun ProfileScreen(navController: NavController, viewModel: AddressViewModel,
                   dbUserDataBase: UserDataBase?,orderViewModel: OrderViewModel)
 {
     var user=orderViewModel.user
-    var email= user.email
-    var password= user.password
-    var numero = user.numeroContacto
+    var email by remember { mutableStateOf(user.email) }
+    var password by remember { mutableStateOf(user.password) }
+    var numero by remember { mutableStateOf(user.numeroContacto.toString()) }
     var direccion = viewModel.getPickedAddress()
     val context = LocalContext.current
 
@@ -92,7 +92,6 @@ fun ProfileScreen(navController: NavController, viewModel: AddressViewModel,
                     .fillMaxWidth()
                     .padding(vertical = 20.dp)
             )
-
             TextField(
                 value = email, onValueChange = { email = it },
                 label = { Text(text = "Email", modifier = Modifier.padding(start = 16.dp)) },
@@ -106,7 +105,6 @@ fun ProfileScreen(navController: NavController, viewModel: AddressViewModel,
                     backgroundColor = Color.Transparent
                 )
             )
-
             TextField(
                 value = password, onValueChange = { password = it },
                 label = { Text(text = "Password", modifier = Modifier.padding(start = 16.dp)) },
@@ -122,7 +120,7 @@ fun ProfileScreen(navController: NavController, viewModel: AddressViewModel,
                 visualTransformation = PasswordVisualTransformation(),
             )
             TextField(
-                value = numero.toString(), onValueChange = { numero = it.toInt() },
+                value = numero, onValueChange = { numero = it },
                 label = { Text(text = "Numero Contacto", modifier = Modifier.padding(start = 16.dp)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
@@ -154,7 +152,8 @@ fun ProfileScreen(navController: NavController, viewModel: AddressViewModel,
                     enabled = false  // Deshabilitar la edición del TextField
                 )
                 IconButton(onClick = {
-                    navController.navigate(AppScreens.Location_Screen.createRoute("profile"))
+                    navController.navigate(AppScreens.Location_Screen.createRoute("profile",
+                        viewModel.getPickedAddress().id.toString()))
                 }) {
                     Icon(
                         modifier = Modifier.size(36.dp),

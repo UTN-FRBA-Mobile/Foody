@@ -46,8 +46,10 @@ class UserDataBase (private var context: Context) : SQLiteOpenHelper(context, DA
             put("direccionId",newUser.direccion)
             put("numeroContacto",newUser.numeroContacto)
         }
-        db.update("users",values,"id = "+newUser.userId,null)
-
+        val whereClause= "id = ?"
+        val whereArgs= arrayOf(newUser.userId.toString())
+        db.update("users",values,whereClause,whereArgs)
+        db.close()
     }
     fun deleteUser(email: String):Int{
         val db = this.writableDatabase
@@ -110,8 +112,11 @@ class UserDataBase (private var context: Context) : SQLiteOpenHelper(context, DA
             put("latitud",address.latitud)
             put("longitud",address.longitud)
         }
-        db.update("direccion",values,"id = "+address.id,null)
-        return address.id
+        val whereClause= "id = ?"
+        val whereArgs= arrayOf(address.id.toString())
+        val id= db.update("direccion",values,whereClause,whereArgs)
+        db.close()
+        return id
     }
     fun getAddress(addressId:Int):Address.AddressInfo?{
         val db = this.readableDatabase

@@ -151,7 +151,7 @@ fun SignUpScreen(navController: NavController, viewModel: AddressViewModel, dbUs
                     enabled = false  // Deshabilitar la edición del TextField
                 )
                 IconButton(onClick = {
-                    navController.navigate(AppScreens.Location_Screen.createRoute("sign_up"))
+                    navController.navigate(AppScreens.Location_Screen.createRoute("sign_up","0"))
                 }) {
                     Icon(
                         modifier = Modifier.size(36.dp),

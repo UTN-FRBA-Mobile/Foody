@@ -77,16 +77,13 @@ fun AppNavigation(context:ComponentActivity, viewModel: MainViewModel, orderView
             PaymentScreen(navController = navController, viewModel = cardViewModel)
         }
         composable(route = AppScreens.Location_Screen.route,
-            arguments = listOf(navArgument("origin") { type = NavType.StringType })
+            arguments = listOf(navArgument("origin") { type = NavType.StringType },
+                navArgument("id") { type = NavType.StringType })
         ) { backStackEntry ->
             LocationGoogleScreen(context, navController,addressViewModel,
-                origin = backStackEntry.arguments?.getString("origin") ?: "unknown"
+                origin = backStackEntry.arguments?.getString("origin") ?: "unknown",
+                id = backStackEntry.arguments?.getString("id") ?: "unknown"
             )
         }
-       /* composable(route = AppScreens.Location_Screen.route) {
-            LocationGoogleScreen(context = context,navController,addressViewModel)
-        }
-
-        */
     }
 }
