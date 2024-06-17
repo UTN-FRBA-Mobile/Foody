@@ -100,12 +100,25 @@ class UserDataBase (private var context: Context) : SQLiteOpenHelper(context, DA
         return db?.insert("direccion", null, values)?.toInt()
 
     }
+    fun updateAddress(dbHelper: UserDataBase,address: Address.AddressInfo):Int{
+        val db=dbHelper.writableDatabase
+        val values = ContentValues().apply {
+            put("calle",address.calle)
+            put("numero", address.numero)
+            put("localidad",address.localidad)
+            put("region",address.region)
+            put("latitud",address.latitud)
+            put("longitud",address.longitud)
+        }
+        db.update("direccion",values,"id = "+address.id,null)
+        return address.id
+    }
     fun getAddress(addressId:Int):Address.AddressInfo?{
         val db = this.readableDatabase
 
         val cursor = if(addressId != 0) {
             db.rawQuery(
-                "SELECT * FROM direccion WHERE id = ${addressId}",
+                "SELECT * FROM direccion WHERE id =?",
                 arrayOf(addressId.toString())
             )
         } else {
@@ -119,8 +132,12 @@ class UserDataBase (private var context: Context) : SQLiteOpenHelper(context, DA
             val region = cursor.getString(cursor.getColumnIndexOrThrow("region"))
             val latitud = cursor.getDouble(cursor.getColumnIndexOrThrow("latitud"))
             val longitud = cursor.getDouble(cursor.getColumnIndexOrThrow("longitud"))
-            return Address.AddressInfo(calle,numero,localidad,region,latitud,longitud)
+            cursor.close()
+            db.close()
+            return Address.AddressInfo(id,calle,numero,localidad,region,latitud,longitud)
         }
+        cursor.close()
+        db.close()
         return null
     }
 

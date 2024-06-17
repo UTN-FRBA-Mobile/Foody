@@ -37,11 +37,13 @@ import androidx.navigation.NavHostController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.dataBase.UserDataBase
+import ar.edu.utn.frba.foody.ui.dataClasses.AddressViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
-fun LoginScreen(navController: NavHostController,dbHelper: UserDataBase, orderViewModel: OrderViewModel) {
+fun LoginScreen(navController: NavHostController,dbHelper: UserDataBase, orderViewModel: OrderViewModel,
+                addressViewModel: AddressViewModel) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
@@ -122,6 +124,8 @@ fun LoginScreen(navController: NavHostController,dbHelper: UserDataBase, orderVi
                     if(user != null) {
                         orderViewModel.user = user
                         orderViewModel.removeOrderFromSession()
+                        dbHelper.getAddress(user.direccion)
+                            ?.let { addressViewModel.updateAddress(it) }
                         navController.navigate(AppScreens.Home_Screen.route)
                     }
                     else {

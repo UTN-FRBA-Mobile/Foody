@@ -3,6 +3,7 @@ package ar.edu.utn.frba.foody.ui.Classes
 
 class Address {
     data class AddressInfo(
+        val id: Int =0,
         val calle: String="",
         val numero: Int=0,
         val localidad: String="",
