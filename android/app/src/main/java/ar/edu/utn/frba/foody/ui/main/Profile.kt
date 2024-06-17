@@ -47,15 +47,18 @@ import ar.edu.utn.frba.foody.ui.Classes.Address
 import ar.edu.utn.frba.foody.ui.dataClasses.AddressViewModel
 import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.dataBase.UserDataBase
+import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
-fun SignUpScreen(navController: NavController, viewModel: AddressViewModel, dbUserDataBase: UserDataBase?)
+fun ProfileScreen(navController: NavController, viewModel: AddressViewModel,
+                  dbUserDataBase: UserDataBase?,orderViewModel: OrderViewModel)
 {
-    var user=User()
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var numero by remember { mutableStateOf("") }
+    var user=orderViewModel.user
+    var email= user.email
+    var password= user.password
+    var numero = user.numeroContacto
+    var direccion = dbUserDataBase?.getAddress(user.direccion)
     val context = LocalContext.current
 
     Image(
@@ -65,7 +68,7 @@ fun SignUpScreen(navController: NavController, viewModel: AddressViewModel, dbUs
         modifier = Modifier.fillMaxSize())
 
 
-    IconButton(onClick = { navController.navigate(AppScreens.Login_Screen.route) }) {
+    IconButton(onClick = { navController.navigate(AppScreens.Home_Screen.route) }) {
         Icon(
             modifier = Modifier.size(36.dp),
             painter = painterResource(id = R.drawable.go_back),
@@ -80,7 +83,7 @@ fun SignUpScreen(navController: NavController, viewModel: AddressViewModel, dbUs
         item {
 
             Text(
-                text = "Create an Account",
+                text = "Edit Your Information",
                 style = MaterialTheme.typography.h5,
                 color = MaterialTheme.colors.primary,
                 textAlign = TextAlign.Center,
@@ -118,7 +121,7 @@ fun SignUpScreen(navController: NavController, viewModel: AddressViewModel, dbUs
                 visualTransformation = PasswordVisualTransformation(),
             )
             TextField(
-                value = numero, onValueChange = { numero = it },
+                value = numero.toString(), onValueChange = { numero = it.toInt() },
                 label = { Text(text = "Numero Contacto", modifier = Modifier.padding(start = 16.dp)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
@@ -136,12 +139,11 @@ fun SignUpScreen(navController: NavController, viewModel: AddressViewModel, dbUs
                     .fillMaxWidth()
                     .padding(top = 16.dp)
             ){
-                val direccionText = viewModel.getPickedAddress()?.let { "${it.calle} ${it.numero}, ${it.localidad}, ${it.region}" } ?: ""
+                val direccionText = direccion?.let { "${it.calle} ${it.numero}, ${it.localidad}, ${it.region}" } ?: ""
 
                 TextField(
                     value = direccionText,
-                    // Mostrar la dirección si está disponible, de lo contrario, vacío
-                    onValueChange = {},  // No permitir cambios en el texto
+                    onValueChange = {},
                     label = { Text(text = "Direccion", modifier = Modifier.padding(start = 16.dp)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     singleLine = true,
@@ -151,7 +153,7 @@ fun SignUpScreen(navController: NavController, viewModel: AddressViewModel, dbUs
                     enabled = false  // Deshabilitar la edición del TextField
                 )
                 IconButton(onClick = {
-                    navController.navigate(AppScreens.Location_Screen.createRoute("sign_up"))
+                    navController.navigate(AppScreens.Location_Screen.createRoute("profile"))
                 }) {
                     Icon(
                         modifier = Modifier.size(36.dp),
@@ -172,14 +174,13 @@ fun SignUpScreen(navController: NavController, viewModel: AddressViewModel, dbUs
                     user.numeroContacto=numero.toInt()
                     if(validateAnyUserEmpty(user,viewModel.getPickedAddress(),context)) {
                         val addressId =
-                            dbUserDataBase?.addAddress(dbUserDataBase, viewModel.getPickedAddress())
-
-                        dbUserDataBase?.addUser(
+                            dbUserDataBase?.addAddress(dbUserDataBase, viewModel.getPickedAddress())//UPDATE ADDRESS
+                        if (addressId != null) {
+                            user.direccion=addressId
+                        }
+                        dbUserDataBase?.updateUser(
                             dbUserDataBase,
-                            user.email,
-                            user.password,
-                            addressId,
-                            user.numeroContacto
+                           user
                         )
                         navController.navigate(AppScreens.Login_Screen.route)
                     }
@@ -215,7 +216,7 @@ fun SignUpScreen(navController: NavController, viewModel: AddressViewModel, dbUs
     }
 }
 
-fun validateAnyUserEmpty(user:User,direccion:Address.AddressInfo,context: Context):Boolean{
+fun validateAnyUserEmptyProf(user:User,direccion:Address.AddressInfo,context: Context):Boolean{
     if(direccion.calle=="" || direccion.region=="" || direccion.localidad==""
         || direccion.numero==0 || direccion.latitud==0.0 || direccion.longitud==0.0){
         Toast.makeText(context, "Dirección Invalida.", Toast.LENGTH_SHORT).show()
@@ -240,7 +241,7 @@ fun validateAnyUserEmpty(user:User,direccion:Address.AddressInfo,context: Contex
 
 @Preview
 @Composable
-fun DefaultPreviewSignUp(){
+fun DefaultPreviewProfile(){
     val navController = rememberNavController()
     val addressViewModel= AddressViewModel()
 

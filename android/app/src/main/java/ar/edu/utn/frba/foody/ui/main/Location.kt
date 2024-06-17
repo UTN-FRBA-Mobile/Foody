@@ -72,7 +72,8 @@ import kotlinx.coroutines.withContext
 @Composable
 fun LocationGoogleScreen(context: ComponentActivity,
                          navController:NavController,
-                         viewModel: AddressViewModel
+                         viewModel: AddressViewModel,
+                         origin: String
 ) {
     val permissions = arrayOf(
         android.Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -177,7 +178,12 @@ fun LocationGoogleScreen(context: ComponentActivity,
         contentDescription = null,
         contentScale = ContentScale.Crop,
         modifier = Modifier.fillMaxSize())
-    IconButton(onClick = { navController.navigate(AppScreens.SignUp_Screen.route) }) {
+    IconButton(onClick = {
+        when (origin) {
+            "sign_up" -> navController.navigate(AppScreens.SignUp_Screen.route)
+            "profile" -> navController.navigate(AppScreens.Profile_Screen.route)
+        }
+    }) {
         Icon(
             modifier = Modifier.size(36.dp),
             painter = painterResource(id = R.drawable.go_back),
@@ -325,7 +331,10 @@ fun LocationGoogleScreen(context: ComponentActivity,
                             viewModel.updateAddress(address)
 
                             // Navegar a SignUpScreen
-                            navController.navigate(AppScreens.SignUp_Screen.route) {
+                            when (origin) {
+                                "sign_up" -> navController.navigate(AppScreens.SignUp_Screen.route)
+                                "profile" -> navController.navigate(AppScreens.Profile_Screen.route)
+                                // add other cases if needed
                             }
                         }
                     }

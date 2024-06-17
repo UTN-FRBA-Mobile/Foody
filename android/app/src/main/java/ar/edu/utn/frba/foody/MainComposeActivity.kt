@@ -32,7 +32,7 @@ class MainComposeActivity : ComponentActivity() {
         //dbOrderHelper.deleteAndCreateTables()
         //dbUserHelper.addUser(dbUserHelper,"juanma","contra")
 
-        //createTestData(dbRestaurantHelper)
+        createTestData(dbRestaurantHelper)
         setContent {
             val viewModel = viewModel<MainViewModel>()
             val orderViewModel = viewModel<OrderViewModel>()
@@ -180,11 +180,6 @@ class MainComposeActivity : ComponentActivity() {
            val orderItems4 = listOf(OrderItemInfo(dish = dish1, quantity = 4, id = 4), OrderItemInfo(dish = dish2, quantity = 2, id = 1))
            val orderItems5 = listOf(OrderItemInfo(dish = dish1, quantity = 1, id = 5))
 
-        val user1 = User(userId = 1, userName = "Alice")
-           val user2 = User(userId = 2, userName = "Bob")
-           val user3 = User(userId = 3, userName = "Charlie")
-           val user4 = User(userId = 4, userName = "Dave")
-           val user5 = User(userId = 5, userName = "Eve")
 
            val userOrder1 = UserOrder(userOrderId = 1, items = orderItems1, user = user1)
            val userOrder2 = UserOrder(userOrderId = 2, items = orderItems2, user = user2)

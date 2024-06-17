@@ -120,9 +120,9 @@ fun LoginScreen(navController: NavHostController,dbHelper: UserDataBase, orderVi
                 onClick = {
                     val user = verifyexistence(dbHelper,email,password)
                     if(user != null) {
-                        navController.navigate(AppScreens.Home_Screen.route)
                         orderViewModel.user = user
                         orderViewModel.removeOrderFromSession()
+                        navController.navigate(AppScreens.Home_Screen.route)
                     }
                     else {
                         showError = true

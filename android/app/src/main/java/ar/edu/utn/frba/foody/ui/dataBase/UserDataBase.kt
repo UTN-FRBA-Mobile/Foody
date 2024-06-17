@@ -37,6 +37,17 @@ class UserDataBase (private var context: Context) : SQLiteOpenHelper(context, DA
         }
         db.insert("users", null, values)
     }
+    fun updateUser(dbHelper: UserDataBase,newUser: User){
+        val db=dbHelper.writableDatabase
+        val values = ContentValues().apply {
+            put("email",newUser.email)
+            put("password", newUser.password)
+            put("direccionId",newUser.direccion)
+            put("numeroContacto",newUser.numeroContacto)
+        }
+        db.update("users",values,"id = "+newUser.userId,null)
+
+    }
     fun deleteUser(email: String):Int{
         val db = this.writableDatabase
         return db.delete(TABLE_NAME, "$COLUMN_NAME = ?", arrayOf(email))

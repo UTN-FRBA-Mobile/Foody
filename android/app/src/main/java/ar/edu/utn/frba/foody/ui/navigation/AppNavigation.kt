@@ -2,9 +2,11 @@ package ar.edu.utn.frba.foody.ui.navigation
 
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import ar.edu.utn.frba.foody.ui.dataClasses.AddressViewModel
 import ar.edu.utn.frba.foody.ui.dataBase.RestaurantDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.UserDataBase
@@ -21,6 +23,7 @@ import ar.edu.utn.frba.foody.ui.main.LocationGoogleScreen
 import ar.edu.utn.frba.foody.ui.main.LoginScreen
 import ar.edu.utn.frba.foody.ui.main.OrdersScreen
 import ar.edu.utn.frba.foody.ui.main.PaymentScreen
+import ar.edu.utn.frba.foody.ui.main.ProfileScreen
 import ar.edu.utn.frba.foody.ui.main.ProgressOrderScreen
 import ar.edu.utn.frba.foody.ui.main.RestaurantScreen
 import ar.edu.utn.frba.foody.ui.main.SignUpScreen
@@ -42,7 +45,8 @@ fun AppNavigation(context:ComponentActivity, viewModel: MainViewModel, orderView
                 SignUpScreen(navController = navController, viewModel = addressViewModel,dbUserHelper)
         }
         composable(route = AppScreens.Profile_Screen.route) {
-
+            ProfileScreen(navController = navController, viewModel = addressViewModel,
+                dbUserDataBase = dbUserHelper,orderViewModel)
         }
         composable(route = AppScreens.Cart_Screen.route) {
             CartScreen(navController = navController, viewModel = orderViewModel, groupViewModel = groupViewModel)
@@ -71,8 +75,17 @@ fun AppNavigation(context:ComponentActivity, viewModel: MainViewModel, orderView
         composable(route = AppScreens.Payment.route) {
             PaymentScreen(navController = navController, viewModel = cardViewModel)
         }
-        composable(route = AppScreens.Location_Screen.route) {
+        composable(route = AppScreens.Location_Screen.route,
+            arguments = listOf(navArgument("origin") { type = NavType.StringType })
+        ) { backStackEntry ->
+            LocationGoogleScreen(context, navController,addressViewModel,
+                origin = backStackEntry.arguments?.getString("origin") ?: "unknown"
+            )
+        }
+       /* composable(route = AppScreens.Location_Screen.route) {
             LocationGoogleScreen(context = context,navController,addressViewModel)
         }
+
+        */
     }
 }
