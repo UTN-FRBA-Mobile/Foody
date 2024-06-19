@@ -4,9 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.ui.dataClasses.AddressViewModel
 import ar.edu.utn.frba.foody.ui.Classes.Dish
 import ar.edu.utn.frba.foody.ui.Classes.Restaurant
+import ar.edu.utn.frba.foody.ui.dataBase.GroupDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.OrderDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.RestaurantDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.UserDataBase
@@ -19,6 +21,7 @@ import ar.edu.utn.frba.foody.ui.navigation.AppNavigation
 
 class MainComposeActivity : ComponentActivity() {
     public lateinit var dbUserHelper: UserDataBase
+    lateinit var  dbGroupHelper: GroupDataBase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,16 +34,21 @@ class MainComposeActivity : ComponentActivity() {
         val dbOrderHelper = OrderDataBase(this)
         dbOrderHelper.deleteAndCreateTables()
 
+        dbGroupHelper = GroupDataBase(this)
+        dbGroupHelper.createDataBase(dbGroupHelper)
+
         createTestData(dbRestaurantHelper)
+
         setContent {
+            val navController = rememberNavController()
             val viewModel = viewModel<MainViewModel>()
             val orderViewModel = viewModel<OrderViewModel>()
             orderViewModel.setDatabase(dbOrderHelper)
             val cardViewModel=viewModel<CardViewModel>()
             val groupViewModel = viewModel<GroupViewModel>()
             val addressViewModel=viewModel<AddressViewModel>()
-            AppNavigation(this,viewModel, orderViewModel,cardViewModel,groupViewModel,
-                addressViewModel,dbUserHelper,dbRestaurantHelper)
+            AppNavigation(this, navController ,viewModel, orderViewModel,cardViewModel,groupViewModel,
+                addressViewModel,dbUserHelper,dbRestaurantHelper, dbGroupHelper, dbOrderHelper)
         }
     }
 

@@ -11,10 +11,11 @@ import ar.edu.utn.frba.foody.ui.Classes.OrderState
 import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.Classes.UserOrder
 
-class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
+class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
+    context,
     DATABASE_NAME, null,
     DATABASE_VERSION
-){
+) {
     private val restaurantDataBase: RestaurantDataBase by lazy {
         RestaurantDataBase(context)
     }
@@ -58,6 +59,7 @@ class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
         private const val TABLE_GROUPS = "groups"
         private const val COLUMN_GROUPS_ID = "id"
         private const val COLUMN_GROUPS_NAME = "name"
+        private const val COLUMN_GROUPS_PASSWORD = "password"
         private const val COLUMN_GROUPS_MEMBERS_LIMIT = "membersLimit"
 
         private const val TABLE_GROUPS_X_USERS = "groups_users"
@@ -141,6 +143,7 @@ class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
         val db = this.readableDatabase
         val values = ContentValues().apply {
             put(COLUMN_GROUPS_NAME, group.name)
+            put(COLUMN_GROUPS_PASSWORD, group.password)
             put(COLUMN_GROUPS_MEMBERS_LIMIT, group.membersLimit)
         }
         val restaurantId = db.insert(TABLE_GROUPS, null, values)
@@ -220,7 +223,12 @@ class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
         val values = ContentValues().apply {
             put(COLUMN_ORDER_ITEMS_QUANTITY, newQuantity)
         }
-        db.update(TABLE_ORDER_ITEMS, values, "$COLUMN_ORDER_ITEMS_ID = ?", arrayOf(orderItemId.toString()))
+        db.update(
+            TABLE_ORDER_ITEMS,
+            values,
+            "$COLUMN_ORDER_ITEMS_ID = ?",
+            arrayOf(orderItemId.toString())
+        )
 
         db.close()
     }
@@ -236,8 +244,11 @@ class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
     fun getGroups(groupId: Int?): List<Group> {
         val db = this.readableDatabase
 
-        val cursor = if(groupId != null) {
-            db.rawQuery("SELECT * FROM ${TABLE_GROUPS} WHERE ${COLUMN_GROUPS_ID} = ?", arrayOf(groupId.toString()))
+        val cursor = if (groupId != null) {
+            db.rawQuery(
+                "SELECT * FROM ${TABLE_GROUPS} WHERE ${COLUMN_GROUPS_ID} = ?",
+                arrayOf(groupId.toString())
+            )
         } else {
             db.rawQuery("SELECT * FROM ${TABLE_GROUPS}", null)
         }
@@ -248,11 +259,14 @@ class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
             do {
                 val id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_GROUPS_ID))
                 val name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_GROUPS_NAME))
-                val membersLimit = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_GROUPS_MEMBERS_LIMIT))
+                val password =
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_GROUPS_PASSWORD))
+                val membersLimit =
+                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_GROUPS_MEMBERS_LIMIT))
 
                 val users = getUsersGroup(id)
 
-                val group = Group(id, name, users, membersLimit)
+                val group = Group(id, name, password, users, membersLimit)
 
                 groups.add(group)
             } while (cursor.moveToNext())
@@ -267,11 +281,12 @@ class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
     fun getUsersGroup(groupId: Int): List<User> {
         val db = this.readableDatabase
 
-        val cursor = db.rawQuery("SELECT gu.*"
-                + "FROM $TABLE_GROUPS_X_USERS gu"
-                + "INNER JOIN ${UserDataBase.TABLE_NAME} u ON gu.$COLUMN_GROUPS_X_USERS_USER_ID = u.${UserDataBase.COLUMN_ID}"
-                + "WHERE $COLUMN_GROUPS_X_USERS_GROUP_ID = $groupId"
-            , null)
+        val cursor = db.rawQuery(
+            "SELECT gu.*"
+                    + "FROM $TABLE_GROUPS_X_USERS gu"
+                    + "INNER JOIN ${UserDataBase.TABLE_NAME} u ON gu.$COLUMN_GROUPS_X_USERS_USER_ID = u.${UserDataBase.COLUMN_ID}"
+                    + "WHERE $COLUMN_GROUPS_X_USERS_GROUP_ID = $groupId", null
+        )
 
         val users = mutableListOf<User>()
 
@@ -279,7 +294,8 @@ class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
             do {
                 val id = cursor.getInt(cursor.getColumnIndexOrThrow(UserDataBase.COLUMN_ID))
                 val name = cursor.getString(cursor.getColumnIndexOrThrow(UserDataBase.COLUMN_NAME))
-                val password = cursor.getString(cursor.getColumnIndexOrThrow(UserDataBase.COLUMN_PASSWORD))
+                val password =
+                    cursor.getString(cursor.getColumnIndexOrThrow(UserDataBase.COLUMN_PASSWORD))
                 users.add(User(id, name, password))
             } while (cursor.moveToNext())
         }
@@ -299,10 +315,14 @@ class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
             do {
                 val orderId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_ID))
                 val name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_NAME))
-                val inProgress = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_IN_PROGRESS))
-                val direction = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_DIRECTION))
-                val estimatedHour = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_ESTIMATED_HOUR))
-                val restaurantId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_RESTAURANT_ID))
+                val inProgress =
+                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_IN_PROGRESS))
+                val direction =
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_DIRECTION))
+                val estimatedHour =
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_ESTIMATED_HOUR))
+                val restaurantId =
+                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_RESTAURANT_ID))
                 val groupId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_GROUP_ID))
 
                 val userOrdersCursor = db.rawQuery(
@@ -313,8 +333,12 @@ class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
 
                 if (userOrdersCursor.moveToFirst()) {
                     do {
-                        val userOrderId = userOrdersCursor.getInt(userOrdersCursor.getColumnIndexOrThrow(COLUMN_USER_ORDERS_ID))
-                        val userId = userOrdersCursor.getInt(userOrdersCursor.getColumnIndexOrThrow(COLUMN_USER_ORDERS_USER_ID))
+                        val userOrderId = userOrdersCursor.getInt(
+                            userOrdersCursor.getColumnIndexOrThrow(COLUMN_USER_ORDERS_ID)
+                        )
+                        val userId = userOrdersCursor.getInt(
+                            userOrdersCursor.getColumnIndexOrThrow(COLUMN_USER_ORDERS_USER_ID)
+                        )
 
                         val orderItemsCursor = db.rawQuery(
                             "SELECT * FROM $TABLE_ORDER_ITEMS WHERE $COLUMN_ORDER_ITEMS_USER_ORDER_ID = ?",
@@ -324,9 +348,19 @@ class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
 
                         if (orderItemsCursor.moveToFirst()) {
                             do {
-                                val orderItemId = orderItemsCursor.getInt(orderItemsCursor.getColumnIndexOrThrow(COLUMN_ORDER_ITEMS_ID))
-                                val quantity = orderItemsCursor.getInt(orderItemsCursor.getColumnIndexOrThrow(COLUMN_ORDER_ITEMS_QUANTITY))
-                                val dishId = orderItemsCursor.getInt(orderItemsCursor.getColumnIndexOrThrow(COLUMN_ORDER_ITEMS_DISH_ID))
+                                val orderItemId = orderItemsCursor.getInt(
+                                    orderItemsCursor.getColumnIndexOrThrow(COLUMN_ORDER_ITEMS_ID)
+                                )
+                                val quantity = orderItemsCursor.getInt(
+                                    orderItemsCursor.getColumnIndexOrThrow(
+                                        COLUMN_ORDER_ITEMS_QUANTITY
+                                    )
+                                )
+                                val dishId = orderItemsCursor.getInt(
+                                    orderItemsCursor.getColumnIndexOrThrow(
+                                        COLUMN_ORDER_ITEMS_DISH_ID
+                                    )
+                                )
 
                                 val dishCursor = db.rawQuery(
                                     "SELECT * FROM $RestaurantDataBase.TABLE_DISH WHERE $RestaurantDataBase.COLUMN_DISH_ID = ?",
@@ -349,7 +383,8 @@ class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
                 }
                 userOrdersCursor.close()
 
-                val restaurant = restaurantDataBase.getRestaurants(userDataBase, restaurantId).first()
+                val restaurant =
+                    restaurantDataBase.getRestaurants(userDataBase, restaurantId).first()
 
                 val inProgressMapeado = if (inProgress == 1) true else false;
 
@@ -358,11 +393,128 @@ class OrderDataBase (private var context: Context) : SQLiteOpenHelper(context,
                 //TODO: traer la lista real
                 val orderStates = mutableListOf<OrderState>()
 
-                orders.add(Order(orderId, restaurant, name, inProgressMapeado, userOrders, direction, estimatedHour, orderStates, group))
+                orders.add(
+                    Order(
+                        orderId,
+                        restaurant,
+                        name,
+                        inProgressMapeado,
+                        userOrders,
+                        direction,
+                        estimatedHour,
+                        orderStates,
+                        group
+                    )
+                )
             } while (cursor.moveToNext())
         }
         cursor.close()
         db.close()
         return orders
+    }
+
+    fun getOrder(groupId: Int): Order {
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM $TABLE_ORDERS", null)
+        val order = Order()
+
+        if (cursor.moveToFirst()) {
+            do {
+                val groupOrderId =
+                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_GROUP_ID))
+
+                if (groupOrderId == groupId) {
+                    val orderId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_ID))
+                    val name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_NAME))
+                    val inProgress =
+                        cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_IN_PROGRESS))
+                    val direction =
+                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_DIRECTION))
+                    val estimatedHour =
+                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_ESTIMATED_HOUR))
+                    val restaurantId =
+                        cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_RESTAURANT_ID))
+                    val restaurant = restaurantDataBase.getRestaurant(userDataBase, restaurantId)
+                    val inProgressMapeado = if (inProgress == 1) true else false;
+
+                    val userOrdersCursor = db.rawQuery(
+                        "SELECT * FROM $TABLE_USER_ORDERS WHERE $COLUMN_USER_ORDERS_ORDER_ID = ?",
+                        arrayOf(orderId.toString())
+                    )
+                    val userOrders = mutableListOf<UserOrder>()
+
+                    if (userOrdersCursor.moveToFirst()) {
+                        do {
+                            val userOrderId = userOrdersCursor.getInt(
+                                userOrdersCursor.getColumnIndexOrThrow(COLUMN_USER_ORDERS_ID)
+                            )
+                            val userId = userOrdersCursor.getInt(
+                                userOrdersCursor.getColumnIndexOrThrow(COLUMN_USER_ORDERS_USER_ID)
+                            )
+
+                            val orderItemsCursor = db.rawQuery(
+                                "SELECT * FROM $TABLE_ORDER_ITEMS WHERE $COLUMN_ORDER_ITEMS_USER_ORDER_ID = ?",
+                                arrayOf(userOrderId.toString())
+                            )
+                            val orderItems = mutableListOf<OrderItemInfo>()
+
+                            if (orderItemsCursor.moveToFirst()) {
+                                do {
+                                    val orderItemId = orderItemsCursor.getInt(
+                                        orderItemsCursor.getColumnIndexOrThrow(COLUMN_ORDER_ITEMS_ID)
+                                    )
+                                    val quantity = orderItemsCursor.getInt(
+                                        orderItemsCursor.getColumnIndexOrThrow(
+                                            COLUMN_ORDER_ITEMS_QUANTITY
+                                        )
+                                    )
+                                    val dishId = orderItemsCursor.getInt(
+                                        orderItemsCursor.getColumnIndexOrThrow(
+                                            COLUMN_ORDER_ITEMS_DISH_ID
+                                        )
+                                    )
+
+                                    val dishCursor = db.rawQuery(
+                                        "SELECT * FROM $RestaurantDataBase.TABLE_DISH WHERE $RestaurantDataBase.COLUMN_DISH_ID = ?",
+                                        arrayOf(dishId.toString())
+                                    )
+
+                                    val dish =
+                                        restaurantDataBase.getDishFromCursor(dishCursor, dishId)
+
+                                    dishCursor.close()
+
+                                    orderItems.add(OrderItemInfo(orderItemId, dish, quantity))
+                                } while (orderItemsCursor.moveToNext())
+                            }
+                            orderItemsCursor.close()
+
+                            val user = userDataBase.getUsers(userId).first()
+
+                            userOrders.add(UserOrder(userOrderId, orderItems, user))
+                        } while (userOrdersCursor.moveToNext())
+                    }
+                    userOrdersCursor.close()
+                    val group = getGroups(groupId).first()
+
+                    //TODO: traer la lista real
+                    val orderStates = mutableListOf<OrderState>()
+
+                    return Order(
+                        orderId,
+                        restaurant!!,
+                        name,
+                        inProgressMapeado,
+                        userOrders,
+                        direction,
+                        estimatedHour,
+                        orderStates,
+                        group
+                    )
+                }
+            } while (cursor.moveToNext())
+        }
+
+        return order
     }
 }

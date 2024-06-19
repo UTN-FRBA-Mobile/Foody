@@ -1,46 +1,36 @@
 package ar.edu.utn.frba.foody.ui.main
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.Button
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.*
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.*
 import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
-import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
-import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
+import ar.edu.utn.frba.foody.ui.Classes.Group
+import ar.edu.utn.frba.foody.ui.dataBase.GroupDataBase
+import ar.edu.utn.frba.foody.ui.dataClasses.*
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
-fun CreateGroupScreen(navController: NavController, orderViewModel: OrderViewModel, groupViewModel: GroupViewModel) {
+fun CreateGroupScreen(
+    navController: NavController,
+    orderViewModel: OrderViewModel,
+    groupViewModel: GroupViewModel,
+    groupDataBase: GroupDataBase
+) {
     val order = orderViewModel.getPickedOrder()
+    var group = Group()
     var groupName by remember { mutableStateOf("") }
-    val context = LocalContext.current
+    var password by remember {
+        mutableStateOf("")
+    }
 
     AppScaffold(navController = navController,
         null,
@@ -77,6 +67,19 @@ fun CreateGroupScreen(navController: NavController, orderViewModel: OrderViewMod
                         backgroundColor = Color.Transparent
                     )
                 )
+                TextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = {
+                        Text(text = "Group Password")
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 20.dp),
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.Transparent
+                    )
+                )
                 CustomText(text = order.restaurant.name)
                 CustomText(text = order.direction)
                 CustomText(text = "(You pay the total)")
@@ -90,7 +93,14 @@ fun CreateGroupScreen(navController: NavController, orderViewModel: OrderViewMod
             contentAlignment = Alignment.BottomCenter
         ) {
             Button(
-                onClick = { groupViewModel.createLink(context)},
+                onClick = {
+                    group.name = groupName
+                    group.password = password
+                    groupDataBase.insertGroup(dbHelper = groupDataBase, group = group)
+                    orderViewModel.updateGroup(group)
+                    groupViewModel.updateGroup(group)
+                    navController.navigate(AppScreens.Cart_Screen.route)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)

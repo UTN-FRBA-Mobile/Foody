@@ -41,7 +41,11 @@ import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
-fun LoginScreen(navController: NavHostController,dbHelper: UserDataBase, orderViewModel: OrderViewModel) {
+fun LoginScreen(
+    navController: NavHostController,
+    dbHelper: UserDataBase,
+    orderViewModel: OrderViewModel
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
@@ -118,13 +122,12 @@ fun LoginScreen(navController: NavHostController,dbHelper: UserDataBase, orderVi
 
             Button(
                 onClick = {
-                    val user = verifyexistence(dbHelper,email,password)
-                    if(user != null) {
+                    val user = verifyexistence(dbHelper, email, password)
+                    if (user != null) {
                         orderViewModel.user = user
                         orderViewModel.removeOrderFromSession()
                         navController.navigate(AppScreens.Home_Screen.route)
-                    }
-                    else {
+                    } else {
                         showError = true
                         email = ""
                         password = ""
@@ -169,14 +172,15 @@ fun LoginScreen(navController: NavHostController,dbHelper: UserDataBase, orderVi
     }
 }
 
-fun verifyexistence(dbHelper: UserDataBase, email:String, password:String): User?{
-    val users:List<User> = dbHelper.getAllUsers()
-    val user:User? = users.find { userPred: User -> userPred.email==email}
-    if( user!=null && user.password==password){
+fun verifyexistence(dbHelper: UserDataBase, email: String, password: String): User? {
+    val users: List<User> = dbHelper.getAllUsers()
+    val user: User? = users.find { userPred: User -> userPred.email == email }
+    if (user != null && user.password == password) {
         return user
     }
     return null
 }
+
 /*
 @Preview
 @Composable

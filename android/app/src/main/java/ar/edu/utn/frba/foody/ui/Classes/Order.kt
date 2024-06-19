@@ -9,5 +9,5 @@ data class Order(
     val direction: String = "",
     val estimatedHour: String = "",
     val orderStates: List<OrderState> = emptyList(),
-    var group: Group? = Group(),
+    var group: Group? = null,
 )

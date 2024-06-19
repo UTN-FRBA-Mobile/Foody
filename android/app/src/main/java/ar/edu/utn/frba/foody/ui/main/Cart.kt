@@ -46,11 +46,15 @@ import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
-fun CartScreen(navController: NavHostController, viewModel: OrderViewModel, groupViewModel: GroupViewModel) {
+fun CartScreen(
+    navController: NavHostController,
+    viewModel: OrderViewModel
+) {
     val order = viewModel.getPickedOrder()
-    groupViewModel.updateGroup(order.group!!)
-    AppScaffold(navController, stringResource(id = R.string.label_titulo_carrito), {BottomGroupCart(navController, orderViewModel = viewModel, order = order)},
-        { TopGroupCart(navController) }){
+    AppScaffold(navController,
+        stringResource(id = R.string.label_titulo_carrito),
+        { BottomGroupCart(navController, orderViewModel = viewModel, order = order) },
+        { TopGroupCart(navController) }) {
         OrdersGrid(navController = navController, viewModel, order.userOrders)
     }
 }
@@ -62,11 +66,13 @@ fun TopGroupCart(navController: NavController) {
             resourceId = R.drawable.go_back,
             imageDescription = "Go Back Icon",
             route = AppScreens.Home_Screen.route
-            )
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .background(MaterialTheme.colors.primarySurface),
-        horizontalArrangement = Arrangement.SpaceBetween) {
+        )
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colors.primarySurface),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
         IconButton(
             onClick = { navController.navigate(button_go_back.route) },
         ) {
@@ -77,17 +83,20 @@ fun TopGroupCart(navController: NavController) {
                 contentScale = ContentScale.FillBounds
             )
         }
-        Text(stringResource(id = R.string.label_titulo_carrito),
+        Text(
+            stringResource(id = R.string.label_titulo_carrito),
             Modifier
-            .align(Alignment.CenterVertically),
-            textAlign = TextAlign.Center)
+                .align(Alignment.CenterVertically),
+            textAlign = TextAlign.Center
+        )
     }
 }
 
 @Composable
-fun BottomGroupCart(navController: NavController,
-                    orderViewModel: OrderViewModel,
-                    order: Order
+fun BottomGroupCart(
+    navController: NavController,
+    orderViewModel: OrderViewModel,
+    order: Order
 ) {
     val buttons = listOf(
         ButtonInterface(
@@ -135,7 +144,6 @@ fun BottomGroupCart(navController: NavController,
         }
 
 
-
         // Buttons
         buttons.forEach { button ->
             IconButton(
@@ -156,13 +164,17 @@ fun BottomGroupCart(navController: NavController,
 }
 
 @Composable
-fun OrdersGrid(navController: NavController, viewModel: OrderViewModel, userOrders: List<UserOrder>) {
+fun OrdersGrid(
+    navController: NavController,
+    viewModel: OrderViewModel,
+    userOrders: List<UserOrder>
+) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(1),
         contentPadding = PaddingValues(8.dp),
         modifier = Modifier.fillMaxSize(),
 
-    ) {
+        ) {
         items(userOrders.size) { index ->
             OrderCard(navController, viewModel, userOrders[index])
         }
@@ -199,7 +211,8 @@ fun OrderCard(navController: NavController, viewModel: OrderViewModel, userOrder
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Total: $" + userOrder.items.sumOf { x -> x.quantity * x.dish.price }.toString(),
+                text = "Total: $" + userOrder.items.sumOf { x -> x.quantity * x.dish.price }
+                    .toString(),
                 style = MaterialTheme.typography.h6,
                 modifier = Modifier.padding(vertical = 4.dp)
             )
@@ -223,7 +236,12 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { viewModel.deleteItem(userOrderId = userOrder.userOrderId, userItemId = orderItem.id) }) {
+            IconButton(onClick = {
+                viewModel.deleteItem(
+                    userOrderId = userOrder.userOrderId,
+                    userItemId = orderItem.id
+                )
+            }) {
                 Icon(imageVector = Icons.Default.Clear, contentDescription = "Remove")
             }
 
@@ -233,13 +251,25 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            IconButton(onClick = { viewModel.changeItemQuantity(userOrder.userOrderId, orderItem.id, 1) }) {
+            IconButton(onClick = {
+                viewModel.changeItemQuantity(
+                    userOrder.userOrderId,
+                    orderItem.id,
+                    1
+                )
+            }) {
                 Icon(imageVector = Icons.Default.KeyboardArrowUp, contentDescription = "Increase")
             }
 
             Text(text = orderItem.quantity.toString(), fontSize = 18.sp)
 
-            IconButton(onClick = { viewModel.changeItemQuantity(userOrder.userOrderId, orderItem.id, -1) }) {
+            IconButton(onClick = {
+                viewModel.changeItemQuantity(
+                    userOrder.userOrderId,
+                    orderItem.id,
+                    -1
+                )
+            }) {
                 Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "Decrease")
             }
         }
