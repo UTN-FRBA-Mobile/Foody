@@ -20,6 +20,8 @@ import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppNavigation
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -85,6 +87,15 @@ class MainComposeActivity : ComponentActivity() {
                 )
             }
         })
+
+        //Empty user table
+        /*ref.removeValue()
+            .addOnSuccessListener(OnSuccessListener<Void?> { // Operación de eliminación exitosa
+                Log.d("Firebase", "Nodo vaciado correctamente")
+            })
+            .addOnFailureListener(OnFailureListener { e -> // Manejo de errores
+                Log.e("Firebase", "Error al vaciar el nodo", e)
+            })*/
 
         setContent {
             val navController = rememberNavController()
