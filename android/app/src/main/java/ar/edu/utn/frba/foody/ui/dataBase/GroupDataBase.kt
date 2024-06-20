@@ -35,10 +35,9 @@ class GroupDataBase(private var context: Context) : SQLiteOpenHelper(
     }
 
     fun insertGroup(
-        dbHelper: GroupDataBase,
         group: Group
     ) {
-        val db = dbHelper.writableDatabase
+        val db = this.writableDatabase
 
         val groupValues = ContentValues().apply {
             put(COLUMN_GROUP_NAME, group.name)
@@ -54,72 +53,95 @@ class GroupDataBase(private var context: Context) : SQLiteOpenHelper(
                 put(COLUMN_USER_EMAIL, user.email)
                 put(COLUMN_USER_PASSWORD, user.password)
                 put(COLUMN_USER_DIRECCION_ID, user.direccion)
+                put(COLUMN_USER_ADMIN, user.admin)
                 put(COLUMN_USER_GROUP_ID, groupId)
             }
             db.insert(TABLE_USER, null, userValues)
         }
     }
 
-    fun getAllGroups(groupDataBase: GroupDataBase?): List<Group> {
-        return getGroups(groupDataBase, null)
+    fun updateGroup(group: Group) {
+        val db = this.writableDatabase
+        val contentValues = ContentValues().apply {
+            put(COLUMN_GROUP_NAME, group.name)
+            put(COLUMN_GROUP_PASSWORD, group.password)
+            put(COLUMN_GROUP_MEMBERS_LIMIT, group.membersLimit)
+
+            group.members.forEach { user: User ->
+                val userValues = ContentValues().apply {
+                    put(COLUMN_USER_EMAIL, user.email)
+                    put(COLUMN_USER_PASSWORD, user.password)
+                    put(COLUMN_USER_DIRECCION_ID, user.direccion)
+                    put(COLUMN_USER_ADMIN, user.admin)
+                    put(COLUMN_USER_GROUP_ID, group.groupId)
+                }
+
+                db.update(
+                    TABLE_USER,
+                    userValues,
+                    "${COLUMN_USER_ID} = ?",
+                    arrayOf(user.userId.toString())
+                )
+            }
+        }
+
+        db.update(
+            TABLE_GROUP,
+            contentValues,
+            "${COLUMN_GROUP_ID} = ?",
+            arrayOf(group.groupId.toString())
+        )
+
+        db.close()
     }
 
-    private fun getGroups(groupDataBase: GroupDataBase?, groupId: Int?): List<Group> {
-        if (groupDataBase != null) {
-            val db = groupDataBase.readableDatabase
+    fun getGroups(): List<Group> {
+        val db = this.readableDatabase
 
-            val cursor = if (groupId != null) {
-                db.rawQuery(
-                    "SELECT * FROM $TABLE_GROUP WHERE $COLUMN_GROUP_ID = ?",
+        val cursor =
+            db.rawQuery("SELECT * FROM $TABLE_GROUP", null)
+
+        val groups = mutableListOf<Group>()
+
+        if (cursor.moveToFirst()) {
+            do {
+                val groupId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_GROUP_ID))
+                val name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_GROUP_NAME))
+                val password = cursor.getString(
+                    cursor.getColumnIndexOrThrow(COLUMN_GROUP_PASSWORD)
+                )
+                val membersLimit =
+                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_GROUP_MEMBERS_LIMIT))
+
+                val userCursor = db.rawQuery(
+                    "SELECT * FROM $TABLE_USER WHERE $COLUMN_USER_GROUP_ID = ?",
                     arrayOf(groupId.toString())
                 )
-            } else {
-                db.rawQuery("SELECT * FROM $TABLE_GROUP", null)
-            }
+                val users = mutableListOf<User>()
 
-            val groups = mutableListOf<Group>()
+                if (userCursor.moveToFirst()) {
+                    do {
 
-            if (cursor.moveToFirst()) {
-                do {
-                    val groupId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_GROUP_ID))
-                    val name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_GROUP_NAME))
-                    val password = cursor.getString(
-                        cursor.getColumnIndexOrThrow(COLUMN_GROUP_PASSWORD)
-                    )
-                    val membersLimit =
-                        cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_GROUP_MEMBERS_LIMIT))
-
-                    val userCursor = db.rawQuery(
-                        "SELECT * FROM $TABLE_USER WHERE $COLUMN_USER_GROUP_ID = ?",
-                        arrayOf(groupId.toString())
-                    )
-                    val users = mutableListOf<User>()
-
-                    if (userCursor.moveToFirst()) {
-                        do {
-
-                            val userId =
-                                userCursor.getInt(
-                                    userCursor.getColumnIndexOrThrow(
-                                        COLUMN_USER_ID
-                                    )
+                        val userId =
+                            userCursor.getInt(
+                                userCursor.getColumnIndexOrThrow(
+                                    COLUMN_USER_ID
                                 )
+                            )
 
-                            val user = getUserFromCursor(userCursor, userId)
+                        val user = getUserFromCursor(userCursor, userId)
 
-                            users.add(user)
-                        } while (userCursor.moveToNext())
-                    }
-                    userCursor.close()
+                        users.add(user)
+                    } while (userCursor.moveToNext())
+                }
+                userCursor.close()
 
-                    groups.add(Group(groupId, name, password, users, membersLimit))
-                } while (cursor.moveToNext())
-            }
-            cursor.close()
-            db.close()
-            return groups
+                groups.add(Group(groupId, name, password, users, membersLimit))
+            } while (cursor.moveToNext())
         }
-        return mutableListOf()
+        cursor.close()
+        db.close()
+        return groups
     }
 
     fun getUserFromCursor(userCursor: Cursor, userId: Int): User {
@@ -156,6 +178,7 @@ class GroupDataBase(private var context: Context) : SQLiteOpenHelper(
                 direccionId INTEGER,
                 numeroContacto INTEGER,
                 groupId INTEGER,
+                admin BOOLEAN,
                 FOREIGN KEY(groupId) REFERENCES groups("id")
             )
         """
@@ -175,5 +198,6 @@ class GroupDataBase(private var context: Context) : SQLiteOpenHelper(
         const val COLUMN_USER_PASSWORD = "password"
         const val COLUMN_USER_DIRECCION_ID = "direccionId"
         const val COLUMN_USER_GROUP_ID = "groupId"
+        const val COLUMN_USER_ADMIN = "admin"
     }
 }

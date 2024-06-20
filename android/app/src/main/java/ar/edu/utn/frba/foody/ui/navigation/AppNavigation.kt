@@ -106,7 +106,8 @@ fun AppNavigation(
                 navController = navController,
                 dbHelper = dbGroupHelper,
                 dbOrderHelper = dbOrderHelper,
-                orderViewModel = orderViewModel
+                orderViewModel = orderViewModel,
+                groupViewModel = groupViewModel
             )
         }
         composable(route = AppScreens.Card_Screen.route) {

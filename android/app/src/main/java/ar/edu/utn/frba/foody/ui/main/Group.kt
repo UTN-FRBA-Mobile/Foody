@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -106,28 +107,33 @@ fun UserRow(user: User, orderViewModel: OrderViewModel, groupViewModel: GroupVie
                 alignment = Alignment.Center
             )
             Text(
-                text = user.email,
+                text = if (user.admin) user.email + " (Admin)" else user.email,
                 style = MaterialTheme.typography.h5,
                 color = MaterialTheme.colors.primary,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
         }
-        Row(horizontalArrangement = Arrangement.End, modifier = Modifier.weight(0.2f)) {
-            IconButton(
-                onClick = {
-                    val updatedGroup = groupViewModel.deleteUser(user)
-                    orderViewModel.updateGroup(updatedGroup)
-                },
-                modifier = Modifier
-                    .padding(vertical = 8.dp)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.cross_icon),
-                    contentDescription = "Cross Icon",
-                    modifier = Modifier.size(16.dp),
-                    contentScale = ContentScale.FillBounds
-                )
+        if (orderViewModel.user.admin) {
+            if (user != orderViewModel.user) {
+                Row(horizontalArrangement = Arrangement.End, modifier = Modifier.weight(0.2f)) {
+                    IconButton(
+                        onClick = {
+                            val updatedGroup = groupViewModel.deleteUser(user)
+                            orderViewModel.updateGroup(updatedGroup)
+                        },
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.cross_icon),
+                            contentDescription = "Cross Icon",
+                            modifier = Modifier.size(16.dp),
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     }

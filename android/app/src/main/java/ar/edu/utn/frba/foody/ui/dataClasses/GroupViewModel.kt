@@ -4,10 +4,18 @@ import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import ar.edu.utn.frba.foody.ui.Classes.Group
 import ar.edu.utn.frba.foody.ui.Classes.User
+import ar.edu.utn.frba.foody.ui.dataBase.GroupDataBase
+import ar.edu.utn.frba.foody.ui.dataBase.OrderDataBase
 
 
 class GroupViewModel() : ViewModel() {
     private var group by mutableStateOf(Group())
+
+    var groupDataBase: GroupDataBase? = null
+
+    fun setDatabase(groupDataBase: GroupDataBase) {
+        this.groupDataBase = groupDataBase
+    }
 
     fun updateGroup(newGroup: Group) {
         group = newGroup
@@ -17,6 +25,12 @@ class GroupViewModel() : ViewModel() {
         return group
     }
 
+    fun createGroup(newGroup: Group, admin: User) {
+        this.updateGroup(newGroup)
+        this.addUser(admin)
+        groupDataBase?.insertGroup(newGroup)
+    }
+
     fun addUser(user: User) {
         val mutableList = group.members.toMutableList()
         mutableList.add(user)
@@ -24,9 +38,21 @@ class GroupViewModel() : ViewModel() {
         group = updatedGroup
     }
 
+    fun updateUser(user: User) {
+        this.addUser(user)
+        groupDataBase?.updateGroup(group)
+    }
+
     fun deleteUser(user: User): Group {
         val updatedGroup = group.copy(members = group.members.filter { it != user })
         group = updatedGroup
         return updatedGroup
+    }
+
+    fun getGroups(): List<Group> {
+        if (groupDataBase != null) {
+            return groupDataBase!!.getGroups()
+        }
+       return emptyList()
     }
 }

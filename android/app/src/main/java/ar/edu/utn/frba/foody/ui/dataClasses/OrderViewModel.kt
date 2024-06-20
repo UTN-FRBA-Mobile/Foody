@@ -40,8 +40,14 @@ class OrderViewModel() : ViewModel() {
         return order
     }
 
+    fun createGroup(newGroup: Group) {
+        user.admin = true
+        this.updateGroup(newGroup)
+    }
+
     fun updateGroup(newGroup: Group) {
         order = order.copy(group = newGroup)
+        orderDataBase?.updateGroup(newGroup.groupId, order.orderId)
     }
 
     fun getUserOrder(restaurant: Restaurant): UserOrder {

@@ -96,9 +96,8 @@ fun CreateGroupScreen(
                 onClick = {
                     group.name = groupName
                     group.password = password
-                    groupDataBase.insertGroup(dbHelper = groupDataBase, group = group)
-                    orderViewModel.updateGroup(group)
-                    groupViewModel.updateGroup(group)
+                    orderViewModel.createGroup(group)
+                    groupViewModel.createGroup(group, orderViewModel.user)
                     navController.navigate(AppScreens.Cart_Screen.route)
                 },
                 modifier = Modifier

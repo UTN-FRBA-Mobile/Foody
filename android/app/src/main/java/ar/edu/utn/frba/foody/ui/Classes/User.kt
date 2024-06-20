@@ -6,5 +6,6 @@ data class User(
     var password: String = "",
     var direccion: Int = 0,
     var numeroContacto: Int = 0,
-    var groupId: Int = 0
+    var groupId: Int = 0,
+    var admin: Boolean = false
 )

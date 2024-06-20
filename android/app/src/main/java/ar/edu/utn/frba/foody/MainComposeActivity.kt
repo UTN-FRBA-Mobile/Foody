@@ -21,7 +21,6 @@ import ar.edu.utn.frba.foody.ui.navigation.AppNavigation
 
 class MainComposeActivity : ComponentActivity() {
     public lateinit var dbUserHelper: UserDataBase
-    lateinit var  dbGroupHelper: GroupDataBase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +33,7 @@ class MainComposeActivity : ComponentActivity() {
         val dbOrderHelper = OrderDataBase(this)
         dbOrderHelper.deleteAndCreateTables()
 
-        dbGroupHelper = GroupDataBase(this)
+        val dbGroupHelper = GroupDataBase(this)
         dbGroupHelper.createDataBase(dbGroupHelper)
 
         createTestData(dbRestaurantHelper)
@@ -43,10 +42,11 @@ class MainComposeActivity : ComponentActivity() {
             val navController = rememberNavController()
             val viewModel = viewModel<MainViewModel>()
             val orderViewModel = viewModel<OrderViewModel>()
-            orderViewModel.setDatabase(dbOrderHelper)
             val cardViewModel=viewModel<CardViewModel>()
             val groupViewModel = viewModel<GroupViewModel>()
             val addressViewModel=viewModel<AddressViewModel>()
+            orderViewModel.setDatabase(dbOrderHelper)
+            groupViewModel.setDatabase(dbGroupHelper)
             AppNavigation(this, navController ,viewModel, orderViewModel,cardViewModel,groupViewModel,
                 addressViewModel,dbUserHelper,dbRestaurantHelper, dbGroupHelper, dbOrderHelper)
         }

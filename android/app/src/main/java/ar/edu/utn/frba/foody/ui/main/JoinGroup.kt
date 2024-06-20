@@ -18,6 +18,7 @@ import androidx.navigation.NavHostController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Group
 import ar.edu.utn.frba.foody.ui.dataBase.*
+import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
@@ -26,7 +27,8 @@ fun JoinGroupScreen(
     navController: NavHostController,
     dbHelper: GroupDataBase,
     dbOrderHelper: OrderDataBase,
-    orderViewModel: OrderViewModel
+    orderViewModel: OrderViewModel,
+    groupViewModel: GroupViewModel
 ) {
     var name by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -94,10 +96,11 @@ fun JoinGroupScreen(
 
                 Button(
                     onClick = {
-                        val group = verifyGroupExist(dbHelper, name, password)
+                        val group = verifyGroupExist(groupViewModel, name, password)
                         if (group != null) {
                             orderViewModel.removeOrderFromSession()
                             orderViewModel.updateGroup(group)
+                            groupViewModel.updateUser(orderViewModel.user)
                             navController.navigate(AppScreens.Home_Screen.route)
                         } else {
                             showError = true
@@ -143,8 +146,8 @@ fun TopGroupJoinGroup(navController: NavController) {
     )
 }
 
-fun verifyGroupExist(dbHelper: GroupDataBase, name: String, password: String): Group? {
-    val groups: List<Group> = dbHelper.getAllGroups(groupDataBase = dbHelper)
+fun verifyGroupExist(groupViewModel: GroupViewModel, name: String, password: String): Group? {
+    val groups: List<Group> = groupViewModel.getGroups()
     val group: Group? = groups.find { groupPred: Group -> groupPred.name == name }
     if (group != null && group.password == password) {
         return group

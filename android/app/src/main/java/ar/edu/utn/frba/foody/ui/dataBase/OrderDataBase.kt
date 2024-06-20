@@ -139,18 +139,15 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
         """
     }
 
-    fun insertGroup(group: Group): Long {
-        val db = this.readableDatabase
-        val values = ContentValues().apply {
-            put(COLUMN_GROUPS_NAME, group.name)
-            put(COLUMN_GROUPS_PASSWORD, group.password)
-            put(COLUMN_GROUPS_MEMBERS_LIMIT, group.membersLimit)
+    fun updateGroup(groupId: Int, orderId: Int) {
+        val db = this.writableDatabase
+        val contentValues = ContentValues().apply {
+            put(COLUMN_ORDERS_GROUP_ID, groupId)
         }
-        val restaurantId = db.insert(TABLE_GROUPS, null, values)
+
+        db.update(TABLE_ORDERS, contentValues, "$COLUMN_ORDERS_ID = ?", arrayOf(orderId.toString()))
 
         db.close()
-
-        return restaurantId
     }
 
     fun insertUserToGroup(groupId: Int, userId: Int): Long {
