@@ -1,20 +1,31 @@
 package ar.edu.utn.frba.foody
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.NonNull
 import androidx.lifecycle.viewmodel.compose.viewModel
-import ar.edu.utn.frba.foody.ui.dataClasses.AddressViewModel
+import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.ui.Classes.Dish
 import ar.edu.utn.frba.foody.ui.Classes.Restaurant
+import ar.edu.utn.frba.foody.ui.Classes.User
+import ar.edu.utn.frba.foody.ui.dataBase.GroupDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.OrderDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.RestaurantDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.UserDataBase
+import ar.edu.utn.frba.foody.ui.dataClasses.AddressViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.CardViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppNavigation
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 
 class MainComposeActivity : ComponentActivity() {
@@ -32,15 +43,74 @@ class MainComposeActivity : ComponentActivity() {
         //dbOrderHelper.deleteAndCreateTables()
 
         //createTestData(dbRestaurantHelper)
+        val dbGroupHelper = GroupDataBase(this)
+        dbGroupHelper.createDataBase(dbGroupHelper)
+
+        createTestData(dbRestaurantHelper)
+
+        //Create instance
+        val database = FirebaseDatabase.getInstance()
+
+        //Get reference of table users
+        val ref = database.getReference("users")
+
+        val userExample = User(userId = 0, email = "example@.gmail.com")
+        val userExample1 = User(userId = 1, email = "johndoe@.gmail.com")
+
+        //Insert users
+        ref.child(userExample.userId.toString()).setValue(userExample)
+        ref.child(userExample1.userId.toString()).setValue(userExample1)
+
+        //Get reference of particular user by id
+        val childRef = ref.child(userExample.userId.toString())
+
+        //Get user by id
+        childRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(@NonNull dataSnapshot: DataSnapshot) {
+                // Obtiene el objeto Usuario para el usuario específico
+                val usuario: User? = dataSnapshot.getValue(User::class.java)
+                if (usuario != null) {
+                    // Aquí puedes trabajar con el objeto Usuario obtenido
+                    val email = usuario.email
+                    // Puedes imprimirlos, mostrarlos en tu UI, etc.
+                    Log.d("Usuario", "Email: $email")
+                } else {
+                    Log.d("Usuario", "No se encontró el usuario con ID: ${userExample.userId}")
+                }
+            }
+
+            override fun onCancelled(@NonNull databaseError: DatabaseError) {
+                // Maneja errores de lectura aquí
+                Log.e(
+                    "Firebase",
+                    "Error al leer usuario con ID: ${userExample.userId}",
+                    databaseError.toException()
+                )
+            }
+        })
+
+        //Empty user table
+        /*ref.removeValue()
+            .addOnSuccessListener(OnSuccessListener<Void?> { // Operación de eliminación exitosa
+                Log.d("Firebase", "Nodo vaciado correctamente")
+            })
+            .addOnFailureListener(OnFailureListener { e -> // Manejo de errores
+                Log.e("Firebase", "Error al vaciar el nodo", e)
+            })*/
+
         setContent {
+            val navController = rememberNavController()
             val viewModel = viewModel<MainViewModel>()
             val orderViewModel = viewModel<OrderViewModel>()
-            orderViewModel.setDatabase(dbOrderHelper)
-            val cardViewModel=viewModel<CardViewModel>()
+            val cardViewModel = viewModel<CardViewModel>()
             val groupViewModel = viewModel<GroupViewModel>()
-            val addressViewModel=viewModel<AddressViewModel>()
-            AppNavigation(this,viewModel, orderViewModel,cardViewModel,groupViewModel,
-                addressViewModel,dbUserHelper,dbRestaurantHelper)
+            val addressViewModel = viewModel<AddressViewModel>()
+            orderViewModel.setDatabase(dbOrderHelper)
+            groupViewModel.setDatabase(dbGroupHelper)
+            AppNavigation(
+                this, navController, viewModel, orderViewModel, cardViewModel, groupViewModel,
+                addressViewModel, dbUserHelper, dbRestaurantHelper, dbGroupHelper, dbOrderHelper
+            )
         }
     }
 

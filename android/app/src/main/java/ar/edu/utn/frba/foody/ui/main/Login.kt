@@ -173,14 +173,15 @@ fun LoginScreen(navController: NavHostController,dbHelper: UserDataBase, orderVi
     }
 }
 
-fun verifyexistence(dbHelper: UserDataBase, email:String, password:String): User?{
-    val users:List<User> = dbHelper.getAllUsers()
-    val user:User? = users.find { userPred: User -> userPred.email==email}
-    if( user!=null && user.password==password){
+fun verifyexistence(dbHelper: UserDataBase, email: String, password: String): User? {
+    val users: List<User> = dbHelper.getAllUsers()
+    val user: User? = users.find { userPred: User -> userPred.email == email }
+    if (user != null && user.password == password) {
         return user
     }
     return null
 }
+
 /*
 @Preview
 @Composable

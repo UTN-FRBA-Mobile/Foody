@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -50,6 +51,7 @@ android {
 dependencies {
     implementation 'com.google.android.gms:play-services-wallet:19.4.0'
     implementation 'androidx.compose.runtime:runtime-livedata:1.6.7'
+    implementation 'com.google.firebase:firebase-database:21.0.0'
     def nav_version = '2.7.7'
     implementation ("mysql:mysql-connector-java:8.0.33")
     implementation 'org.jetbrains:annotations:16.0.2'
@@ -71,6 +73,8 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:18.0.2'
     implementation 'com.google.maps:google-maps-services:0.18.0'
     implementation("com.squareup.okhttp3:okhttp:4.9.2")
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation("com.google.firebase:firebase-analytics")
 
 
     testImplementation 'junit:junit:4.13.2'
