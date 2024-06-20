@@ -56,8 +56,10 @@ class UserDataBase(private var context: Context) :
             put("direccionId", newUser.direccion)
             put("numeroContacto", newUser.numeroContacto)
         }
-        db.update("users", values, "id = " + newUser.userId, null)
-
+        val whereClause= "id = ?"
+        val whereArgs= arrayOf(newUser.userId.toString())
+        db.update("users",values,whereClause,whereArgs)
+        db.close()
     }
 
     fun deleteUser(email: String): Int {
@@ -114,13 +116,29 @@ class UserDataBase(private var context: Context) :
         return db?.insert("direccion", null, values)?.toInt()
 
     }
+    fun updateAddress(dbHelper: UserDataBase,address: Address.AddressInfo):Int{
+        val db=dbHelper.writableDatabase
+        val values = ContentValues().apply {
+            put("calle",address.calle)
+            put("numero", address.numero)
+            put("localidad",address.localidad)
+            put("region",address.region)
+            put("latitud",address.latitud)
+            put("longitud",address.longitud)
+        }
+        val whereClause= "id = ?"
+        val whereArgs= arrayOf(address.id.toString())
+        val id= db.update("direccion",values,whereClause,whereArgs)
+        db.close()
+        return id
+    }
 
     fun getAddress(addressId: Int): Address.AddressInfo? {
         val db = this.readableDatabase
 
         val cursor = if (addressId != 0) {
             db.rawQuery(
-                "SELECT * FROM direccion WHERE id = ${addressId}",
+                "SELECT * FROM direccion WHERE id =?",
                 arrayOf(addressId.toString())
             )
         } else {
@@ -134,8 +152,12 @@ class UserDataBase(private var context: Context) :
             val region = cursor.getString(cursor.getColumnIndexOrThrow("region"))
             val latitud = cursor.getDouble(cursor.getColumnIndexOrThrow("latitud"))
             val longitud = cursor.getDouble(cursor.getColumnIndexOrThrow("longitud"))
-            return Address.AddressInfo(calle, numero, localidad, region, latitud, longitud)
+            cursor.close()
+            db.close()
+            return Address.AddressInfo(id,calle,numero,localidad,region,latitud,longitud)
         }
+        cursor.close()
+        db.close()
         return null
     }
 

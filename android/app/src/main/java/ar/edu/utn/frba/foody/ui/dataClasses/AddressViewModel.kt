@@ -5,17 +5,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import ar.edu.utn.frba.foody.ui.Classes.Address
+import androidx.compose.runtime.State
+
 
 class AddressViewModel : ViewModel() {
 
-    private var address by mutableStateOf(Address.AddressInfo())
-        private set
+    private var _address = mutableStateOf(Address.AddressInfo())
+    val address: State<Address.AddressInfo> get() = _address
 
     fun updateAddress(newAddress: Address.AddressInfo) {
-        address = newAddress
+        _address.value = newAddress
     }
 
     fun getPickedAddress(): Address.AddressInfo {
-        return address
+        return _address.value
     }
 }

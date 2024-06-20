@@ -151,7 +151,7 @@ fun SignUpScreen(navController: NavController, viewModel: AddressViewModel, dbUs
                     enabled = false  // Deshabilitar la edición del TextField
                 )
                 IconButton(onClick = {
-                    navController.navigate(AppScreens.Location_Screen.createRoute("sign_up"))
+                    navController.navigate(AppScreens.Location_Screen.createRoute("sign_up","0"))
                 }) {
                     Icon(
                         modifier = Modifier.size(36.dp),
@@ -169,8 +169,8 @@ fun SignUpScreen(navController: NavController, viewModel: AddressViewModel, dbUs
                 onClick = {
                     user.email=email
                     user.password=password
-                    user.numeroContacto=numero.toInt()
-                    if(validateAnyUserEmpty(user,viewModel.getPickedAddress(),context)) {
+                    if(validateAnyUserEmpty(user,numero,viewModel.getPickedAddress(),context)) {
+                        user.numeroContacto=numero.toInt()
                         val addressId =
                             dbUserDataBase?.addAddress(dbUserDataBase, viewModel.getPickedAddress())
 
@@ -215,7 +215,7 @@ fun SignUpScreen(navController: NavController, viewModel: AddressViewModel, dbUs
     }
 }
 
-fun validateAnyUserEmpty(user:User,direccion:Address.AddressInfo,context: Context):Boolean{
+fun validateAnyUserEmpty(user:User,numero:String,direccion:Address.AddressInfo,context: Context):Boolean{
     if(direccion.calle=="" || direccion.region=="" || direccion.localidad==""
         || direccion.numero==0 || direccion.latitud==0.0 || direccion.longitud==0.0){
         Toast.makeText(context, "Dirección Invalida.", Toast.LENGTH_SHORT).show()
@@ -229,7 +229,7 @@ fun validateAnyUserEmpty(user:User,direccion:Address.AddressInfo,context: Contex
         Toast.makeText(context, "Falta completar la contraseña.", Toast.LENGTH_SHORT).show()
         return false
     }
-    if (user.numeroContacto==0){
+    if (numero==""){
         Toast.makeText(context, "Falta completar el numero de contacto.", Toast.LENGTH_SHORT).show()
         return false
     }

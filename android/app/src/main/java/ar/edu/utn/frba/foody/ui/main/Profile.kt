@@ -55,11 +55,12 @@ fun ProfileScreen(navController: NavController, viewModel: AddressViewModel,
                   dbUserDataBase: UserDataBase?,orderViewModel: OrderViewModel)
 {
     var user=orderViewModel.user
-    var email= user.email
-    var password= user.password
-    var numero = user.numeroContacto
-    var direccion = dbUserDataBase?.getAddress(user.direccion)
+    var email by remember { mutableStateOf(user.email) }
+    var password by remember { mutableStateOf(user.password) }
+    var numero by remember { mutableStateOf(user.numeroContacto.toString()) }
+    var direccion = viewModel.getPickedAddress()
     val context = LocalContext.current
+
 
     Image(
         painter = painterResource(id = R.drawable.background_signup),
@@ -91,7 +92,6 @@ fun ProfileScreen(navController: NavController, viewModel: AddressViewModel,
                     .fillMaxWidth()
                     .padding(vertical = 20.dp)
             )
-
             TextField(
                 value = email, onValueChange = { email = it },
                 label = { Text(text = "Email", modifier = Modifier.padding(start = 16.dp)) },
@@ -105,7 +105,6 @@ fun ProfileScreen(navController: NavController, viewModel: AddressViewModel,
                     backgroundColor = Color.Transparent
                 )
             )
-
             TextField(
                 value = password, onValueChange = { password = it },
                 label = { Text(text = "Password", modifier = Modifier.padding(start = 16.dp)) },
@@ -121,7 +120,7 @@ fun ProfileScreen(navController: NavController, viewModel: AddressViewModel,
                 visualTransformation = PasswordVisualTransformation(),
             )
             TextField(
-                value = numero.toString(), onValueChange = { numero = it.toInt() },
+                value = numero, onValueChange = { numero = it },
                 label = { Text(text = "Numero Contacto", modifier = Modifier.padding(start = 16.dp)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
@@ -139,7 +138,7 @@ fun ProfileScreen(navController: NavController, viewModel: AddressViewModel,
                     .fillMaxWidth()
                     .padding(top = 16.dp)
             ){
-                val direccionText = direccion?.let { "${it.calle} ${it.numero}, ${it.localidad}, ${it.region}" } ?: ""
+                val direccionText = direccion.let { "${it.calle} ${it.numero}, ${it.localidad}, ${it.region}" } ?: ""
 
                 TextField(
                     value = direccionText,
@@ -153,7 +152,8 @@ fun ProfileScreen(navController: NavController, viewModel: AddressViewModel,
                     enabled = false  // Deshabilitar la edición del TextField
                 )
                 IconButton(onClick = {
-                    navController.navigate(AppScreens.Location_Screen.createRoute("profile"))
+                    navController.navigate(AppScreens.Location_Screen.createRoute("profile",
+                        viewModel.getPickedAddress().id.toString()))
                 }) {
                     Icon(
                         modifier = Modifier.size(36.dp),
@@ -171,10 +171,11 @@ fun ProfileScreen(navController: NavController, viewModel: AddressViewModel,
                 onClick = {
                     user.email=email
                     user.password=password
-                    user.numeroContacto=numero.toInt()
-                    if(validateAnyUserEmpty(user,viewModel.getPickedAddress(),context)) {
+                    if(validateAnyUserEmptyProf(user,viewModel.getPickedAddress(),context)) {
+                        user.numeroContacto=numero.toInt()
+
                         val addressId =
-                            dbUserDataBase?.addAddress(dbUserDataBase, viewModel.getPickedAddress())//UPDATE ADDRESS
+                            dbUserDataBase?.updateAddress(dbUserDataBase, viewModel.getPickedAddress())
                         if (addressId != null) {
                             user.direccion=addressId
                         }
@@ -182,9 +183,9 @@ fun ProfileScreen(navController: NavController, viewModel: AddressViewModel,
                             dbUserDataBase,
                            user
                         )
-                        navController.navigate(AppScreens.Login_Screen.route)
+                        navController.navigate(AppScreens.Home_Screen.route)
                     }
-                    else {navController.navigate(AppScreens.SignUp_Screen.route)}
+                    else {navController.navigate(AppScreens.Profile_Screen.route)}
 
 
                 },
@@ -192,23 +193,7 @@ fun ProfileScreen(navController: NavController, viewModel: AddressViewModel,
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                Text("Registrar", fontSize = 18.sp)
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp)
-            ) {
-                Text("Do you have an account?", style = MaterialTheme.typography.body2)
-                Spacer(modifier = Modifier.width(4.dp))
-                ClickableText(
-                    text = AnnotatedString("Sign in"),
-                    onClick = { navController.navigate(AppScreens.Login_Screen.route) },
-                    style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.primary)
-                )
+                Text("Editar", fontSize = 18.sp)
             }
 
 
@@ -247,3 +232,4 @@ fun DefaultPreviewProfile(){
 
     SignUpScreen(navController = navController,addressViewModel,null)
 }
+

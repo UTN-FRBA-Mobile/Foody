@@ -73,7 +73,8 @@ import kotlinx.coroutines.withContext
 fun LocationGoogleScreen(context: ComponentActivity,
                          navController:NavController,
                          viewModel: AddressViewModel,
-                         origin: String
+                         origin: String,
+                         id: String
 ) {
     val permissions = arrayOf(
         android.Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -319,16 +320,20 @@ fun LocationGoogleScreen(context: ComponentActivity,
                         latitud = currentLocation.latitude,
                         longitud = currentLocation.longitude
                     )
-                    coroutineScope.launch {
-                        val location = geocodeAddress(address.calle)
-                        if (location != null) {
-                            stopLocationUpdates()
-                            currentLocation = location
-                            cameraPositionState.position = CameraPosition.fromLatLngZoom(currentLocation, 15f)
+                    //coroutineScope.launch {
+                        //val location = geocodeAddress(address.calle)
+                        if (address.calle != "" || address.numero!=0 || address.localidad!="" ||
+                            address.region!= "" || address.latitud!=0.0 || address.longitud !=0.0) {
+                            //stopLocationUpdates()
+                            //currentLocation = location
+                            //cameraPositionState.position = CameraPosition.fromLatLngZoom(currentLocation, 15f)
                             Log.d("LocationGoogleScreen", "Dirección: ${address.calle}")
                             Log.d("LocationGoogleScreen", "Número: ${address.numero}")
                             Log.d("LocationGoogleScreen", "Localidad: ${address.localidad}")
                             Log.d("LocationGoogleScreen", "Región: ${address.region}")
+                            if( origin=="profile"){
+                                address.id=id.toInt()
+                            }
                             // Guardar la dirección en la variable
                             viewModel.updateAddress(address)
 
@@ -339,7 +344,14 @@ fun LocationGoogleScreen(context: ComponentActivity,
                                 // add other cases if needed
                             }
                         }
-                    }
+                    else {
+                            Toast.makeText(
+                                navController.context,
+                                "Address Incomplete",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                   // }
                 }
             ) {
                 Text("Save & Continue")

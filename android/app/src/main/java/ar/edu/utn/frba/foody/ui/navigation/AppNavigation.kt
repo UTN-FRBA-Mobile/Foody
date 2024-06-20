@@ -53,7 +53,8 @@ fun AppNavigation(
             )
         }
         composable(route = AppScreens.Login_Screen.route) {
-            LoginScreen(navController = navController, dbHelper = dbUserHelper, orderViewModel)
+            LoginScreen(navController = navController,dbHelper=dbUserHelper, orderViewModel,
+                addressViewModel)
         }
         composable(route = AppScreens.SignUp_Screen.route) {
             SignUpScreen(navController = navController, viewModel = addressViewModel, dbUserHelper)
@@ -116,13 +117,13 @@ fun AppNavigation(
         composable(route = AppScreens.Payment.route) {
             PaymentScreen(navController = navController, viewModel = cardViewModel)
         }
-        composable(
-            route = AppScreens.Location_Screen.route,
-            arguments = listOf(navArgument("origin") { type = NavType.StringType })
+        composable(route = AppScreens.Location_Screen.route,
+            arguments = listOf(navArgument("origin") { type = NavType.StringType },
+                navArgument("id") { type = NavType.StringType })
         ) { backStackEntry ->
-            LocationGoogleScreen(
-                context, navController, addressViewModel,
-                origin = backStackEntry.arguments?.getString("origin") ?: "unknown"
+            LocationGoogleScreen(context, navController,addressViewModel,
+                origin = backStackEntry.arguments?.getString("origin") ?: "unknown",
+                id = backStackEntry.arguments?.getString("id") ?: "unknown"
             )
         }
         /* composable(route = AppScreens.Location_Screen.route) {
