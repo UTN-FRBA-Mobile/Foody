@@ -138,10 +138,8 @@ fun ProfileScreen(navController: NavController, viewModel: AddressViewModel,
                     .fillMaxWidth()
                     .padding(top = 16.dp)
             ){
-                val direccionText = direccion.let { "${it.calle} ${it.numero}, ${it.localidad}, ${it.region}" } ?: ""
-
                 TextField(
-                    value = direccionText,
+                    value = "${direccion.calle} ${direccion.numero}, ${direccion.localidad}, ${direccion.region}",
                     onValueChange = {},
                     label = { Text(text = "Direccion", modifier = Modifier.padding(start = 16.dp)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),

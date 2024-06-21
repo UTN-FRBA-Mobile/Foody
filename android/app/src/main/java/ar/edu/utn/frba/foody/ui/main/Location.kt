@@ -40,6 +40,12 @@ fun LocationGoogleScreen(
     origin: String,
     id: String
 ) {
+    var direccion by remember { mutableStateOf(if(origin == "profile") viewModel.getPickedAddress().calle!! else "") }
+    var nro by remember { mutableStateOf(if(origin == "profile") viewModel.getPickedAddress().numero.toString() else "") }
+    var localidad by remember { mutableStateOf(if(origin == "profile") viewModel.getPickedAddress().localidad!! else "") }
+    var region by remember { mutableStateOf(if(origin == "profile") viewModel.getPickedAddress().region!! else "") }
+    var address: Address.AddressInfo
+
     val permissions = arrayOf(
         android.Manifest.permission.ACCESS_COARSE_LOCATION,
         android.Manifest.permission.ACCESS_FINE_LOCATION
@@ -74,12 +80,6 @@ fun LocationGoogleScreen(
             }
         }
     }
-    var direccion by remember { mutableStateOf("") }
-    var nro by remember { mutableStateOf("") }
-    var localidad by remember { mutableStateOf("") }
-    var region by remember { mutableStateOf("") }
-    var address: Address.AddressInfo
-
 
     LaunchedEffect(locationRequired) {
         if (locationRequired) {
