@@ -3,66 +3,47 @@ package ar.edu.utn.frba.foody.ui.main
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.ClickableText
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.foundation.text.*
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.*
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
-import ar.edu.utn.frba.foody.ui.Classes.Address
 import ar.edu.utn.frba.foody.ui.dataClasses.AddressViewModel
 import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.dataBase.UserDataBase
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
-fun SignUpScreen(navController: NavController, viewModel: AddressViewModel, dbUserDataBase: UserDataBase?)
-{
-    var user=User()
+fun SignUpScreen(
+    navController: NavController,
+    viewModel: AddressViewModel,
+    dbUserDataBase: UserDataBase?
+) {
+    val user = User()
+    val context = LocalContext.current
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var numero by remember { mutableStateOf("") }
-    val context = LocalContext.current
 
     Image(
         painter = painterResource(id = R.drawable.background_signup),
         contentDescription = null,
         contentScale = ContentScale.Crop,
-        modifier = Modifier.fillMaxSize())
+        modifier = Modifier.fillMaxSize()
+    )
 
 
     IconButton(onClick = { navController.navigate(AppScreens.Login_Screen.route) }) {
@@ -73,10 +54,11 @@ fun SignUpScreen(navController: NavController, viewModel: AddressViewModel, dbUs
             tint = MaterialTheme.colors.primary
         )
     }
-    LazyColumn (modifier = Modifier
-        .fillMaxSize()
-        .padding(horizontal = 35.dp, vertical = 100.dp)
-    ){
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 35.dp, vertical = 100.dp)
+    ) {
         item {
 
             Text(
@@ -117,9 +99,15 @@ fun SignUpScreen(navController: NavController, viewModel: AddressViewModel, dbUs
                 ),
                 visualTransformation = PasswordVisualTransformation(),
             )
+
             TextField(
                 value = numero, onValueChange = { numero = it },
-                label = { Text(text = "Numero Contacto", modifier = Modifier.padding(start = 16.dp)) },
+                label = {
+                    Text(
+                        text = "Numero Contacto",
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
                 maxLines = 1,
@@ -130,19 +118,26 @@ fun SignUpScreen(navController: NavController, viewModel: AddressViewModel, dbUs
                     backgroundColor = Color.Transparent
                 )
             )
-            Row (
+
+            Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp)
-            ){
-                val direccionText = viewModel.getPickedAddress()?.let { "${it.calle} ${it.numero}, ${it.localidad}, ${it.region}" } ?: ""
+            ) {
+                val direccionText = if (viewModel.existAddress()) viewModel.getPickedAddress()
+                    .let { "${it.calle} ${it.numero}, ${it.localidad}, ${it.region}" } else ""
 
                 TextField(
                     value = direccionText,
                     // Mostrar la dirección si está disponible, de lo contrario, vacío
                     onValueChange = {},  // No permitir cambios en el texto
-                    label = { Text(text = "Direccion", modifier = Modifier.padding(start = 16.dp)) },
+                    label = {
+                        Text(
+                            text = "Direccion",
+                            modifier = Modifier.padding(start = 16.dp)
+                        )
+                    },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     singleLine = true,
                     colors = TextFieldDefaults.textFieldColors(
@@ -150,8 +145,9 @@ fun SignUpScreen(navController: NavController, viewModel: AddressViewModel, dbUs
                     ),
                     enabled = false  // Deshabilitar la edición del TextField
                 )
+
                 IconButton(onClick = {
-                    navController.navigate(AppScreens.Location_Screen.createRoute("sign_up","0"))
+                    navController.navigate(AppScreens.Location_Screen.createRoute("sign_up", "0"))
                 }) {
                     Icon(
                         modifier = Modifier.size(36.dp),
@@ -162,15 +158,14 @@ fun SignUpScreen(navController: NavController, viewModel: AddressViewModel, dbUs
                 }
             }
 
-
             Spacer(modifier = Modifier.height(60.dp))
 
             Button(
                 onClick = {
-                    user.email=email
-                    user.password=password
-                    if(validateAnyUserEmpty(user,numero,viewModel.getPickedAddress(),context)) {
-                        user.numeroContacto=numero.toInt()
+                    user.email = email
+                    user.password = password
+                    if (validateAnyUserEmpty(user, numero, context)) {
+                        user.numeroContacto = numero.toInt()
                         val addressId =
                             dbUserDataBase?.addAddress(dbUserDataBase, viewModel.getPickedAddress())
 
@@ -181,9 +176,12 @@ fun SignUpScreen(navController: NavController, viewModel: AddressViewModel, dbUs
                             addressId,
                             user.numeroContacto
                         )
+                        viewModel.emptyAddress()
+
                         navController.navigate(AppScreens.Login_Screen.route)
+                    } else {
+                        navController.navigate(AppScreens.SignUp_Screen.route)
                     }
-                    else {navController.navigate(AppScreens.SignUp_Screen.route)}
 
 
                 },
@@ -201,35 +199,35 @@ fun SignUpScreen(navController: NavController, viewModel: AddressViewModel, dbUs
                     .fillMaxWidth()
                     .padding(top = 16.dp)
             ) {
+
                 Text("Do you have an account?", style = MaterialTheme.typography.body2)
+
                 Spacer(modifier = Modifier.width(4.dp))
+
                 ClickableText(
                     text = AnnotatedString("Sign in"),
                     onClick = { navController.navigate(AppScreens.Login_Screen.route) },
                     style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.primary)
                 )
             }
-
-
         }
     }
 }
 
-fun validateAnyUserEmpty(user:User,numero:String,direccion:Address.AddressInfo,context: Context):Boolean{
-    if(direccion.calle=="" || direccion.region=="" || direccion.localidad==""
-        || direccion.numero==0 || direccion.latitud==0.0 || direccion.longitud==0.0){
-        Toast.makeText(context, "Dirección Invalida.", Toast.LENGTH_SHORT).show()
-        return false
-    }
-    if (user.email=="") {
+fun validateAnyUserEmpty(
+    user: User,
+    numero: String,
+    context: Context
+): Boolean {
+    if (user.email == "") {
         Toast.makeText(context, "Falta completar el email.", Toast.LENGTH_SHORT).show()
         return false
     }
-    if (user.password==""){
+    if (user.password == "") {
         Toast.makeText(context, "Falta completar la contraseña.", Toast.LENGTH_SHORT).show()
         return false
     }
-    if (numero==""){
+    if (numero == "") {
         Toast.makeText(context, "Falta completar el numero de contacto.", Toast.LENGTH_SHORT).show()
         return false
     }
@@ -240,9 +238,9 @@ fun validateAnyUserEmpty(user:User,numero:String,direccion:Address.AddressInfo,c
 
 @Preview
 @Composable
-fun DefaultPreviewSignUp(){
+fun DefaultPreviewSignUp() {
     val navController = rememberNavController()
-    val addressViewModel= AddressViewModel()
+    val addressViewModel = AddressViewModel()
 
-    SignUpScreen(navController = navController,addressViewModel,null)
+    SignUpScreen(navController = navController, addressViewModel, null)
 }

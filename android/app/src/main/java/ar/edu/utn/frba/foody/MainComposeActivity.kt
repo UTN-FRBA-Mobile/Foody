@@ -1,15 +1,12 @@
 package ar.edu.utn.frba.foody
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.NonNull
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.ui.Classes.Dish
 import ar.edu.utn.frba.foody.ui.Classes.Restaurant
-import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.dataBase.GroupDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.OrderDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.RestaurantDataBase
@@ -20,16 +17,10 @@ import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppNavigation
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.android.gms.tasks.OnSuccessListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 
 
 class MainComposeActivity : ComponentActivity() {
-    public lateinit var dbUserHelper: UserDataBase
+    lateinit var dbUserHelper: UserDataBase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +39,7 @@ class MainComposeActivity : ComponentActivity() {
 
         createTestData(dbRestaurantHelper)
 
-        //Create instance
+       /* //Create instance
         val database = FirebaseDatabase.getInstance()
 
         //Get reference of table users
@@ -90,7 +81,7 @@ class MainComposeActivity : ComponentActivity() {
         })
 
         //Empty user table
-        /*ref.removeValue()
+        *//*ref.removeValue()
             .addOnSuccessListener(OnSuccessListener<Void?> { // Operación de eliminación exitosa
                 Log.d("Firebase", "Nodo vaciado correctamente")
             })
