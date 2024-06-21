@@ -1,22 +1,32 @@
 package ar.edu.utn.frba.foody
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.NonNull
+import androidx.lifecycle.Observer
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.ui.Classes.Dish
 import ar.edu.utn.frba.foody.ui.Classes.Restaurant
-import ar.edu.utn.frba.foody.ui.dataBase.GroupDataBase
-import ar.edu.utn.frba.foody.ui.dataBase.OrderDataBase
-import ar.edu.utn.frba.foody.ui.dataBase.RestaurantDataBase
-import ar.edu.utn.frba.foody.ui.dataBase.UserDataBase
+import ar.edu.utn.frba.foody.ui.Classes.User
+import ar.edu.utn.frba.foody.ui.dataBase.Firebase.UserDataBaseFirebase
+import ar.edu.utn.frba.foody.ui.dataBase.SQLite.GroupDataBase
+import ar.edu.utn.frba.foody.ui.dataBase.SQLite.OrderDataBase
+import ar.edu.utn.frba.foody.ui.dataBase.SQLite.RestaurantDataBase
+import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.AddressViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.CardViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppNavigation
+import ar.edu.utn.frba.foody.ui.navigation.AppScreens
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 
 class MainComposeActivity : ComponentActivity() {
@@ -39,55 +49,85 @@ class MainComposeActivity : ComponentActivity() {
 
         createTestData(dbRestaurantHelper)
 
-       /* //Create instance
+       ///Create instance
         val database = FirebaseDatabase.getInstance()
 
-        //Get reference of table users
-        val ref = database.getReference("users")
+        //Create Firebase data base instance
+        val userDataBaseFirebase = UserDataBaseFirebase(database)
 
-        val userExample = User(userId = 0, email = "example@.gmail.com")
-        val userExample1 = User(userId = 1, email = "johndoe@.gmail.com")
+
+
+
+
+
+
+        val database2 = FirebaseDatabase.getInstance()
+
+        //Get reference of table users
+        val ref = database2.getReference("users")
+
+
+
+        val userExample = User(userId = "asd", email = "example@.gmail.com")
+        val userExample1 = User(userId = "sdff", email = "johndoe@.gmail.com")
 
         //Insert users
-        ref.child(userExample.userId.toString()).setValue(userExample)
+
+
+        ref.child(userExample.email.replace(".", "")).setValue(userExample)
         ref.child(userExample1.userId.toString()).setValue(userExample1)
 
-        //Get reference of particular user by id
-        val childRef = ref.child(userExample.userId.toString())
+
+
+
+
+
+
+
+
+
+
+
+
+
+        val childRef = ref.child(userExample.email.replace(".", ""))
 
         //Get user by id
         childRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(@NonNull dataSnapshot: DataSnapshot) {
                 // Obtiene el objeto Usuario para el usuario específico
                 val usuario: User? = dataSnapshot.getValue(User::class.java)
-                if (usuario != null) {
-                    // Aquí puedes trabajar con el objeto Usuario obtenido
-                    val email = usuario.email
-                    // Puedes imprimirlos, mostrarlos en tu UI, etc.
-                    Log.d("Usuario", "Email: $email")
-                } else {
-                    Log.d("Usuario", "No se encontró el usuario con ID: ${userExample.userId}")
-                }
+
             }
 
             override fun onCancelled(@NonNull databaseError: DatabaseError) {
                 // Maneja errores de lectura aquí
-                Log.e(
-                    "Firebase",
-                    "Error al leer usuario con ID: ${userExample.userId}",
-                    databaseError.toException()
-                )
+
             }
         })
 
-        //Empty user table
-        *//*ref.removeValue()
-            .addOnSuccessListener(OnSuccessListener<Void?> { // Operación de eliminación exitosa
-                Log.d("Firebase", "Nodo vaciado correctamente")
-            })
-            .addOnFailureListener(OnFailureListener { e -> // Manejo de errores
-                Log.e("Firebase", "Error al vaciar el nodo", e)
-            })*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         setContent {
             val navController = rememberNavController()
@@ -98,9 +138,37 @@ class MainComposeActivity : ComponentActivity() {
             val addressViewModel = viewModel<AddressViewModel>()
             orderViewModel.setDatabase(dbOrderHelper)
             groupViewModel.setDatabase(dbGroupHelper)
+            viewModel.setDataBase(userDataBaseFirebase)
+
+            viewModel.user.observe(this, Observer { user ->
+                if (user != null) {
+                    orderViewModel.user = user
+                    orderViewModel.removeOrderFromSession()
+                    navController.navigate(AppScreens.Home_Screen.route)
+                } else {
+                    Toast.makeText(
+                        navController.context,
+                        "Incorrect User or Password",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
+
+
+
             AppNavigation(
-                this, navController, viewModel, orderViewModel, cardViewModel, groupViewModel,
-                addressViewModel, dbUserHelper, dbRestaurantHelper, dbGroupHelper, dbOrderHelper
+                this,
+                navController,
+                viewModel,
+                orderViewModel,
+                cardViewModel,
+                groupViewModel,
+                addressViewModel,
+                dbUserHelper,
+                dbRestaurantHelper,
+                dbGroupHelper,
+                dbOrderHelper,
+                userDataBaseFirebase
             )
         }
     }

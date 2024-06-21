@@ -1,4 +1,4 @@
-package ar.edu.utn.frba.foody.ui.dataBase
+package ar.edu.utn.frba.foody.ui.dataBase.SQLite
 
 import android.content.ContentValues
 import android.content.Context
@@ -180,7 +180,7 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
         return orderId
     }
 
-    fun insertUserOrder(userId: Int, orderId: Int): Long {
+    fun insertUserOrder(userId: String, orderId: Int): Long {
         val db = this.readableDatabase
         val values = ContentValues().apply {
             put(COLUMN_USER_ORDERS_USER_ID, userId)
@@ -243,11 +243,11 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
 
         val cursor = if (groupId != null) {
             db.rawQuery(
-                "SELECT * FROM ${TABLE_GROUPS} WHERE ${COLUMN_GROUPS_ID} = ?",
+                "SELECT * FROM $TABLE_GROUPS WHERE $COLUMN_GROUPS_ID = ?",
                 arrayOf(groupId.toString())
             )
         } else {
-            db.rawQuery("SELECT * FROM ${TABLE_GROUPS}", null)
+            db.rawQuery("SELECT * FROM $TABLE_GROUPS", null)
         }
 
         val groups = mutableListOf<Group>()
@@ -289,7 +289,7 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
 
         if (cursor.moveToFirst()) {
             do {
-                val id = cursor.getInt(cursor.getColumnIndexOrThrow(UserDataBase.COLUMN_ID))
+                val id = cursor.getString(cursor.getColumnIndexOrThrow(UserDataBase.COLUMN_ID))
                 val name = cursor.getString(cursor.getColumnIndexOrThrow(UserDataBase.COLUMN_NAME))
                 val password =
                     cursor.getString(cursor.getColumnIndexOrThrow(UserDataBase.COLUMN_PASSWORD))

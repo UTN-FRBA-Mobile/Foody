@@ -4,8 +4,7 @@ import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import ar.edu.utn.frba.foody.ui.Classes.Group
 import ar.edu.utn.frba.foody.ui.Classes.User
-import ar.edu.utn.frba.foody.ui.dataBase.GroupDataBase
-import ar.edu.utn.frba.foody.ui.dataBase.OrderDataBase
+import ar.edu.utn.frba.foody.ui.dataBase.SQLite.GroupDataBase
 
 
 class GroupViewModel() : ViewModel() {

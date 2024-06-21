@@ -1,13 +1,46 @@
 package ar.edu.utn.frba.foody.ui.dataClasses
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import ar.edu.utn.frba.foody.R
-import ar.edu.utn.frba.foody.ui.Classes.*
+import ar.edu.utn.frba.foody.ui.Classes.Dish
+import ar.edu.utn.frba.foody.ui.Classes.Restaurant
+import ar.edu.utn.frba.foody.ui.Classes.User
+import ar.edu.utn.frba.foody.ui.dataBase.Firebase.UserDataBaseFirebase
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 
 class MainViewModel() : ViewModel() {
+    var userDataBaseFirebase: UserDataBaseFirebase? = null
+
+
+    private val auth: FirebaseAuth = Firebase.auth
+
+
+
+
     private var restaurant by mutableStateOf(Restaurant())
         private set
+
+    private val _user = MutableLiveData<User?>()
+    val user: LiveData<User?> get() = _user
+
+    fun fetchUserByEmail(email: String, password: String) {
+        userDataBaseFirebase!!.getUserByEmail(email) { user ->
+            if(user!!.password == password) {
+                _user.postValue(user)
+            }
+        }
+    }
+
+    fun setDataBase(userDataBaseFirebase: UserDataBaseFirebase) {
+        this.userDataBaseFirebase = userDataBaseFirebase
+    }
 
     fun updateRestaurant(newRestaurant: Restaurant) {
         restaurant = newRestaurant

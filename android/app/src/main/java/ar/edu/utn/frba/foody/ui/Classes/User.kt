@@ -1,10 +1,10 @@
 package ar.edu.utn.frba.foody.ui.Classes
 
 data class User(
-    val userId: Int = 0,
+    var userId: String = "",
     var email: String = "",
     var password: String = "",
-    var direccion: Int = 0,
+    var direccion: Address.AddressInfo = Address.AddressInfo(),
     var numeroContacto: Int = 0,
     var groupId: Int = 0,
     var admin: Boolean = false

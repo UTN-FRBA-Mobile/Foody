@@ -1,11 +1,11 @@
-package ar.edu.utn.frba.foody.ui.dataBase
+package ar.edu.utn.frba.foody.ui.dataBase.SQLite
 
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import ar.edu.utn.frba.foody.ui.Classes.Dish
+import ar.edu.utn.frba.foody.ui.Classes.Address
 import ar.edu.utn.frba.foody.ui.Classes.Group
 import ar.edu.utn.frba.foody.ui.Classes.User
 
@@ -52,7 +52,7 @@ class GroupDataBase(private var context: Context) : SQLiteOpenHelper(
                 put(COLUMN_USER_ID, user.userId)
                 put(COLUMN_USER_EMAIL, user.email)
                 put(COLUMN_USER_PASSWORD, user.password)
-                put(COLUMN_USER_DIRECCION_ID, user.direccion)
+                put(COLUMN_USER_DIRECCION_ID, user.direccion.id)
                 put(COLUMN_USER_ADMIN, user.admin)
                 put(COLUMN_USER_GROUP_ID, groupId)
             }
@@ -71,7 +71,7 @@ class GroupDataBase(private var context: Context) : SQLiteOpenHelper(
                 val userValues = ContentValues().apply {
                     put(COLUMN_USER_EMAIL, user.email)
                     put(COLUMN_USER_PASSWORD, user.password)
-                    put(COLUMN_USER_DIRECCION_ID, user.direccion)
+                    put(COLUMN_USER_DIRECCION_ID, user.direccion.id)
                     put(COLUMN_USER_ADMIN, user.admin)
                     put(COLUMN_USER_GROUP_ID, group.groupId)
                 }
@@ -79,7 +79,7 @@ class GroupDataBase(private var context: Context) : SQLiteOpenHelper(
                 db.update(
                     TABLE_USER,
                     userValues,
-                    "${COLUMN_USER_ID} = ?",
+                    "$COLUMN_USER_ID = ?",
                     arrayOf(user.userId.toString())
                 )
             }
@@ -88,7 +88,7 @@ class GroupDataBase(private var context: Context) : SQLiteOpenHelper(
         db.update(
             TABLE_GROUP,
             contentValues,
-            "${COLUMN_GROUP_ID} = ?",
+            "$COLUMN_GROUP_ID = ?",
             arrayOf(group.groupId.toString())
         )
 
@@ -123,7 +123,7 @@ class GroupDataBase(private var context: Context) : SQLiteOpenHelper(
                     do {
 
                         val userId =
-                            userCursor.getInt(
+                            userCursor.getString(
                                 userCursor.getColumnIndexOrThrow(
                                     COLUMN_USER_ID
                                 )
@@ -144,18 +144,22 @@ class GroupDataBase(private var context: Context) : SQLiteOpenHelper(
         return groups
     }
 
-    fun getUserFromCursor(userCursor: Cursor, userId: Int): User {
+    fun getUserFromCursor(userCursor: Cursor, userId: String): User {
         val userName = userCursor.getString(userCursor.getColumnIndexOrThrow(COLUMN_USER_EMAIL))
         val userPassword = userCursor.getString(
             userCursor.getColumnIndexOrThrow(
                 COLUMN_USER_PASSWORD
             )
         )
+        /*
         val userDirection = userCursor.getInt(
             userCursor.getColumnIndexOrThrow(
                 COLUMN_USER_DIRECCION_ID
             )
-        )
+        )*/
+
+        val userDirection = Address.AddressInfo()
+
         val userGroupId = userCursor.getInt(userCursor.getColumnIndexOrThrow(COLUMN_USER_GROUP_ID))
 
         return User(userId, userName, userPassword, userDirection, 0, userGroupId)

@@ -7,11 +7,12 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import ar.edu.utn.frba.foody.ui.dataBase.GroupDataBase
-import ar.edu.utn.frba.foody.ui.dataBase.OrderDataBase
+import ar.edu.utn.frba.foody.ui.dataBase.Firebase.UserDataBaseFirebase
+import ar.edu.utn.frba.foody.ui.dataBase.SQLite.GroupDataBase
+import ar.edu.utn.frba.foody.ui.dataBase.SQLite.OrderDataBase
+import ar.edu.utn.frba.foody.ui.dataBase.SQLite.RestaurantDataBase
+import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.AddressViewModel
-import ar.edu.utn.frba.foody.ui.dataBase.RestaurantDataBase
-import ar.edu.utn.frba.foody.ui.dataBase.UserDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.CardViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
@@ -43,7 +44,8 @@ fun AppNavigation(
     dbUserHelper: UserDataBase,
     dbRestaurantHelper: RestaurantDataBase,
     dbGroupHelper: GroupDataBase,
-    dbOrderHelper: OrderDataBase
+    dbOrderHelper: OrderDataBase,
+    dbUserDataBaseFirebase: UserDataBaseFirebase
 ) {
     NavHost(navController = navController, startDestination = AppScreens.Login_Screen.route) {
         composable(route = AppScreens.Home_Screen.route) {
@@ -54,10 +56,11 @@ fun AppNavigation(
         }
         composable(route = AppScreens.Login_Screen.route) {
             LoginScreen(navController = navController,dbHelper=dbUserHelper, orderViewModel,
-                addressViewModel)
+                addressViewModel,
+                mainViewModel = viewModel)
         }
         composable(route = AppScreens.SignUp_Screen.route) {
-            SignUpScreen(navController = navController, viewModel = addressViewModel, dbUserHelper)
+            SignUpScreen(navController = navController, viewModel = addressViewModel, dbUserHelper, dbUserDataBaseFirebase)
         }
         composable(route = AppScreens.Profile_Screen.route) {
             ProfileScreen(

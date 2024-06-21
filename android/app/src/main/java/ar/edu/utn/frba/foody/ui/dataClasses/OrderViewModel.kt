@@ -14,7 +14,7 @@ import ar.edu.utn.frba.foody.ui.Classes.OrderState
 import ar.edu.utn.frba.foody.ui.Classes.Restaurant
 import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.Classes.UserOrder
-import ar.edu.utn.frba.foody.ui.dataBase.OrderDataBase
+import ar.edu.utn.frba.foody.ui.dataBase.SQLite.OrderDataBase
 import java.util.Calendar
 
 

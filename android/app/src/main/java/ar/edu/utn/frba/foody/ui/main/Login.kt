@@ -1,6 +1,5 @@
 package ar.edu.utn.frba.foody.ui.main
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,14 +35,16 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.User
-import ar.edu.utn.frba.foody.ui.dataBase.UserDataBase
+import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.AddressViewModel
+import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
-fun LoginScreen(navController: NavHostController,dbHelper: UserDataBase, orderViewModel: OrderViewModel,
-                addressViewModel: AddressViewModel) {
+fun LoginScreen(navController: NavHostController, dbHelper: UserDataBase, orderViewModel: OrderViewModel,
+                addressViewModel: AddressViewModel,
+                mainViewModel: MainViewModel) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
@@ -120,24 +121,12 @@ fun LoginScreen(navController: NavHostController,dbHelper: UserDataBase, orderVi
 
             Button(
                 onClick = {
-                    val user = verifyexistence(dbHelper,email,password)
-                    if(user != null) {
-                        orderViewModel.user = user
-                        orderViewModel.removeOrderFromSession()
-                        dbHelper.getAddress(user.direccion)
-                            ?.let { addressViewModel.updateAddress(it) }
-                        navController.navigate(AppScreens.Home_Screen.route)
-                    }
-                    else {
-                        showError = true
-                        email = ""
-                        password = ""
-                        Toast.makeText(
-                            navController.context,
-                            "Incorrect User or Password",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                    mainViewModel.fetchUserByEmail(email, password)
+
+
+
+                    email = ""
+                    password = ""
                 },
                 modifier = Modifier
                     .fillMaxWidth()
