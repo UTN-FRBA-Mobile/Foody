@@ -139,13 +139,13 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
         """
     }
 
-    fun updateGroup(groupId: Int, orderId: Int) {
+    fun updateGroup(groupId: Int, orderId: String) {
         val db = this.writableDatabase
         val contentValues = ContentValues().apply {
             put(COLUMN_ORDERS_GROUP_ID, groupId)
         }
 
-        db.update(TABLE_ORDERS, contentValues, "$COLUMN_ORDERS_ID = ?", arrayOf(orderId.toString()))
+        db.update(TABLE_ORDERS, contentValues, "$COLUMN_ORDERS_ID = ?", arrayOf(orderId))
 
         db.close()
     }
@@ -163,7 +163,7 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
         return restaurantId
     }
 
-    fun insertOrder(order: Order, groupId: Int?): Long {
+    fun insertOrder(order: Order, groupId: String?): String {
         val db = this.readableDatabase
         val values = ContentValues().apply {
             put(COLUMN_ORDERS_NAME, order.name)
@@ -177,10 +177,10 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
 
         db.close()
 
-        return orderId
+        return orderId.toString()
     }
 
-    fun insertUserOrder(userId: String, orderId: Int): Long {
+    fun insertUserOrder(userId: String, orderId: String): String {
         val db = this.readableDatabase
         val values = ContentValues().apply {
             put(COLUMN_USER_ORDERS_USER_ID, userId)
@@ -190,10 +190,10 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
 
         db.close()
 
-        return userOrderId
+        return userOrderId.toString()
     }
 
-    fun deleteUserOrder(userOrderId: Int) {
+    fun deleteUserOrder(userOrderId: String) {
         val db = this.readableDatabase
 
         db.delete(TABLE_USER_ORDERS, "$COLUMN_USER_ORDERS_ID = ?", arrayOf(userOrderId.toString()))
@@ -201,21 +201,21 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
         db.close()
     }
 
-    fun insertOrderItem(orderItem: OrderItemInfo, userOrderId: Int): Long {
+    fun insertOrderItem(orderItem: OrderItemInfo, userOrderId: String): String {
         val db = this.readableDatabase
         val values = ContentValues().apply {
             put(COLUMN_ORDER_ITEMS_QUANTITY, orderItem.quantity)
             put(COLUMN_ORDER_ITEMS_USER_ORDER_ID, userOrderId)
             put(COLUMN_ORDER_ITEMS_DISH_ID, orderItem.dish.dishId)
         }
-        val orderItemId = db.insert(TABLE_ORDER_ITEMS, null, values)
+        val orderItemId = db.insert(TABLE_ORDER_ITEMS, null, values).toString()
 
         db.close()
 
         return orderItemId
     }
 
-    fun updateQuantityOrderItem(orderItemId: Int, newQuantity: Int) {
+    fun updateQuantityOrderItem(orderItemId: String, newQuantity: Int) {
         val db = this.readableDatabase
         val values = ContentValues().apply {
             put(COLUMN_ORDER_ITEMS_QUANTITY, newQuantity)
@@ -224,27 +224,27 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
             TABLE_ORDER_ITEMS,
             values,
             "$COLUMN_ORDER_ITEMS_ID = ?",
-            arrayOf(orderItemId.toString())
+            arrayOf(orderItemId)
         )
 
         db.close()
     }
 
-    fun deleteOrderItem(orderItemId: Int) {
+    fun deleteOrderItem(orderItemId: String) {
         val db = this.readableDatabase
 
-        db.delete(TABLE_ORDER_ITEMS, "$COLUMN_ORDER_ITEMS_ID = ?", arrayOf(orderItemId.toString()))
+        db.delete(TABLE_ORDER_ITEMS, "$COLUMN_ORDER_ITEMS_ID = ?", arrayOf(orderItemId))
 
         db.close()
     }
 
-    fun getGroups(groupId: Int?): List<Group> {
+    fun getGroups(groupId: String?): List<Group> {
         val db = this.readableDatabase
 
         val cursor = if (groupId != null) {
             db.rawQuery(
                 "SELECT * FROM $TABLE_GROUPS WHERE $COLUMN_GROUPS_ID = ?",
-                arrayOf(groupId.toString())
+                arrayOf(groupId)
             )
         } else {
             db.rawQuery("SELECT * FROM $TABLE_GROUPS", null)
@@ -310,7 +310,7 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
 
         if (cursor.moveToFirst()) {
             do {
-                val orderId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_ID))
+                val orderId = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_ID))
                 val name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_NAME))
                 val inProgress =
                     cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_IN_PROGRESS))
@@ -320,7 +320,7 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
                     cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_ESTIMATED_HOUR))
                 val restaurantId =
                     cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_RESTAURANT_ID))
-                val groupId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_GROUP_ID))
+                val groupId = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_GROUP_ID))
 
                 val userOrdersCursor = db.rawQuery(
                     "SELECT * FROM $TABLE_USER_ORDERS WHERE $COLUMN_USER_ORDERS_ORDER_ID = ?",
@@ -330,7 +330,7 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
 
                 if (userOrdersCursor.moveToFirst()) {
                     do {
-                        val userOrderId = userOrdersCursor.getInt(
+                        val userOrderId = userOrdersCursor.getString(
                             userOrdersCursor.getColumnIndexOrThrow(COLUMN_USER_ORDERS_ID)
                         )
                         val userId = userOrdersCursor.getInt(
@@ -345,7 +345,7 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
 
                         if (orderItemsCursor.moveToFirst()) {
                             do {
-                                val orderItemId = orderItemsCursor.getInt(
+                                val orderItemId = orderItemsCursor.getString(
                                     orderItemsCursor.getColumnIndexOrThrow(COLUMN_ORDER_ITEMS_ID)
                                 )
                                 val quantity = orderItemsCursor.getInt(
@@ -410,7 +410,7 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
         return orders
     }
 
-    fun getOrder(groupId: Int): Order {
+    fun getOrder(groupId: String): Order {
         val db = this.readableDatabase
         val cursor = db.rawQuery("SELECT * FROM $TABLE_ORDERS", null)
         val order = Order()
@@ -418,10 +418,10 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
         if (cursor.moveToFirst()) {
             do {
                 val groupOrderId =
-                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_GROUP_ID))
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_GROUP_ID))
 
                 if (groupOrderId == groupId) {
-                    val orderId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_ID))
+                    val orderId = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_ID))
                     val name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_NAME))
                     val inProgress =
                         cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_IN_PROGRESS))
@@ -442,7 +442,7 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
 
                     if (userOrdersCursor.moveToFirst()) {
                         do {
-                            val userOrderId = userOrdersCursor.getInt(
+                            val userOrderId = userOrdersCursor.getString(
                                 userOrdersCursor.getColumnIndexOrThrow(COLUMN_USER_ORDERS_ID)
                             )
                             val userId = userOrdersCursor.getInt(
@@ -457,7 +457,7 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
 
                             if (orderItemsCursor.moveToFirst()) {
                                 do {
-                                    val orderItemId = orderItemsCursor.getInt(
+                                    val orderItemId = orderItemsCursor.getString(
                                         orderItemsCursor.getColumnIndexOrThrow(COLUMN_ORDER_ITEMS_ID)
                                     )
                                     val quantity = orderItemsCursor.getInt(

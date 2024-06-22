@@ -1,7 +1,7 @@
 package ar.edu.utn.frba.foody.ui.Classes
 
 data class UserOrder(
-    val userOrderId: Int,
+    var userOrderId: String,
     var items: List<OrderItemInfo> = emptyList(),
     val user: User
 )

@@ -19,7 +19,7 @@ import java.util.Calendar
 
 
 class OrderViewModel() : ViewModel() {
-    private var order by mutableStateOf(Order(-1))
+    private var order by mutableStateOf(Order(""))
 
     var orderDataBase: OrderDataBase? = null
 
@@ -51,7 +51,7 @@ class OrderViewModel() : ViewModel() {
     }
 
     fun getUserOrder(restaurant: Restaurant): UserOrder {
-        if(order.orderId == -1){
+        if(order.orderId == ""){
             createOrder(restaurant)
         }
         return getAssignedUserOrder()
@@ -66,20 +66,20 @@ class OrderViewModel() : ViewModel() {
     }
 
     fun removeOrderFromSession() {
-        order = Order(-1)
+        order = Order("")
     }
 
     fun createOrder(restaurant: Restaurant) {
-        val createdOrder = Order(0, restaurant)
+        val createdOrder = Order("", restaurant)
 
-        createdOrder.orderId  = orderDataBase?.insertOrder(createdOrder, null)?.toInt() ?: 0
+        createdOrder.orderId  = orderDataBase?.insertOrder(createdOrder, null) ?: ""
 
         createUserOrder(createdOrder)
     }
 
     fun createUserOrder(newOrder: Order): UserOrder {
         val userOrderId = orderDataBase?.insertUserOrder(user.userId, newOrder.orderId)
-            ?.toInt() ?: 0
+            ?: ""
 
         val userOrder = UserOrder(userOrderId, mutableListOf(), user)
 
@@ -96,7 +96,7 @@ class OrderViewModel() : ViewModel() {
         return order.userOrders.sumOf { x -> x.items.sumOf { y -> y.quantity * y.dish.price } }
     }
 
-    fun deleteItem(userOrderId: Int, userItemId: Int) {
+    fun deleteItem(userOrderId: String, userItemId: String) {
         orderDataBase?.deleteOrderItem(userOrderId)
 
         val userOrderIndex = order.userOrders.indexOfFirst { it.userOrderId == userOrderId }
@@ -113,7 +113,7 @@ class OrderViewModel() : ViewModel() {
         order = order.copy(userOrders = updatedUserOrders.toList())
     }
 
-    fun changeItemQuantity(userOrderId: Int, userItemId: Int, variation: Int) {
+    fun changeItemQuantity(userOrderId: String, userItemId: String, variation: Int) {
         val userOrderIndex = order.userOrders.indexOfFirst { it.userOrderId == userOrderId }
 
         val userOrder = order.userOrders[userOrderIndex]
@@ -142,14 +142,14 @@ class OrderViewModel() : ViewModel() {
         order = order.copy(userOrders = updatedUserOrders.toList())
     }
 
-    fun addItem(userOrderId: Int, quantity: Int, dish: Dish) {
+    fun addItem(userOrderId: String, quantity: Int, dish: Dish) {
         val userOrderIndex = order.userOrders.indexOfFirst { it.user.userId == user.userId }
 
         val userOrder = order.userOrders[userOrderIndex]
 
-        var newOrderItem = OrderItemInfo(-1, dish, quantity)
+        var newOrderItem = OrderItemInfo("", dish, quantity)
 
-        val orderItemId = orderDataBase?.insertOrderItem(newOrderItem, userOrderId)?.toInt() ?: 0
+        val orderItemId = orderDataBase?.insertOrderItem(newOrderItem, userOrderId) ?: ""
 
         newOrderItem.id = orderItemId
 
@@ -164,7 +164,7 @@ class OrderViewModel() : ViewModel() {
         order = order.copy(userOrders = updatedUserOrders.toList())
     }
 
-    fun changeItemQuantityIfExists(userOrderId: Int, orderItem: OrderItemInfo?, variation: Int, dish: Dish, restaurant: Restaurant) {
+    fun changeItemQuantityIfExists(userOrderId: String, orderItem: OrderItemInfo?, variation: Int, dish: Dish, restaurant: Restaurant) {
         if(orderItem == null && order.restaurant.restaurantId != restaurant.restaurantId) {
             createOrder(restaurant)
         }
@@ -219,7 +219,7 @@ class OrderViewModel() : ViewModel() {
 
     val orders: List<Order> = listOf(
         Order(
-            orderId = 1,
+            orderId = "1",
             name = "Order 1",
             inProgress = false,
             direction = "Dorrego 1352",
@@ -227,7 +227,7 @@ class OrderViewModel() : ViewModel() {
             orderStates = defaultOrderStates,
         ),
         Order(
-            orderId = 2,
+            orderId = "2",
             name = "Order 2",
             inProgress = true,
             direction = "Suarez 3450",
@@ -235,7 +235,7 @@ class OrderViewModel() : ViewModel() {
             orderStates = defaultOrderStates
         ),
         Order(
-            orderId = 3,
+            orderId = "3",
             name = "Order 3",
             inProgress = false,
             direction = "Santa Fe 34",
