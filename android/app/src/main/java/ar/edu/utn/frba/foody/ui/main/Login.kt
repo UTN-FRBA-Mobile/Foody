@@ -122,9 +122,6 @@ fun LoginScreen(navController: NavHostController, dbHelper: UserDataBase, orderV
             Button(
                 onClick = {
                     mainViewModel.fetchUserByEmail(email, password)
-
-
-
                     email = ""
                     password = ""
                 },
