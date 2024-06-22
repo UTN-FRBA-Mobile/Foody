@@ -58,13 +58,13 @@ fun RestaurantScreen(
     val restaurant = viewModel.getPickedRestaurant()
     val userOrder = orderViewModel.getUserOrder(restaurant)
     AppScaffold(navController, restaurant.name, { BottomGroupRestaurant(navController) },
-        { TopGroupRestaurant(navController, restaurant.name) }) {
+        { TopGroupRestaurant(navController, restaurant.name, orderViewModel) }) {
         DishesGrid(orderViewModel, restaurant.dishes, userOrder, restaurant)
     }
 }
 
 @Composable
-fun TopGroupRestaurant(navController: NavController, restaurantName: String) {
+fun TopGroupRestaurant(navController: NavController, restaurantName: String, orderViewModel: OrderViewModel) {
     val button_go_back =
         ButtonInterface(
             resourceId = R.drawable.go_back,
@@ -102,7 +102,7 @@ fun TopGroupRestaurant(navController: NavController, restaurantName: String) {
 
 
         IconButton(
-            onClick = { navController.navigate(button_cart.route) },
+            onClick = { orderViewModel.getOrder() },
         ) {
             Image(
                 painter = painterResource(id = button_cart.resourceId),

@@ -21,6 +21,7 @@ import ar.edu.utn.frba.foody.ui.Classes.Restaurant
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.RestaurantDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
+import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
@@ -28,9 +29,10 @@ fun HomeScreen(
     navController: NavController,
     viewModel: MainViewModel,
     restaurantDataBase: RestaurantDataBase?,
-    userDataBase: UserDataBase?
+    userDataBase: UserDataBase?,
+    orderViewModel: OrderViewModel
 ) {
-    AppScaffold(navController, null, { BottomGroupHome(navController) },{ TopGroupHome(navController)}) {
+    AppScaffold(navController, null, { BottomGroupHome(navController, orderViewModel) },{ TopGroupHome(navController)}) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -109,17 +111,12 @@ data class ButtonInterface(
 
 
 @Composable
-fun BottomGroupHome(navController: NavController) {
+fun BottomGroupHome(navController: NavController, orderViewModel: OrderViewModel) {
     val buttons = listOf(
         ButtonInterface(
             resourceId = R.drawable.user_icon,
             imageDescription = "User Icon",
             route = AppScreens.Profile_Screen.route,
-        ),
-        ButtonInterface(
-            resourceId = R.drawable.cart_icon,
-            imageDescription = "Cart Icon",
-            route = AppScreens.Cart_Screen.route,
         ),
         ButtonInterface(
             resourceId = R.drawable.order_icon,
@@ -147,7 +144,20 @@ fun BottomGroupHome(navController: NavController) {
                 )
             }
         }
+
+        IconButton(
+            onClick = { orderViewModel.getOrder() },
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.cart_icon),
+                contentDescription = "Cart Icon",
+                modifier = Modifier.size(24.dp),
+                contentScale = ContentScale.FillBounds
+            )
+        }
     }
+
+
 }
 
 @Composable
@@ -168,6 +178,8 @@ fun TopGroupHome(navController: NavController) {
         }
     )
 }
+
+/*
 @Preview
 @Composable
 fun DefaultPreview() {
@@ -175,3 +187,4 @@ fun DefaultPreview() {
     val viewModel = MainViewModel()
     HomeScreen(navController, viewModel,null,null)
 }
+*/

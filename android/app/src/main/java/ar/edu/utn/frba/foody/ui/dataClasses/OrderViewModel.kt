@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Dish
 import ar.edu.utn.frba.foody.ui.Classes.Group
@@ -19,6 +20,7 @@ import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.Classes.UserOrder
 import ar.edu.utn.frba.foody.ui.dataBase.Firebase.OrderDataBaseFirebase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.OrderDataBase
+import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 import java.util.Calendar
 
 
@@ -27,6 +29,7 @@ class OrderViewModel() : ViewModel() {
 
     var orderDataBase: OrderDataBase? = null
     var orderDataBaseFirebase: OrderDataBaseFirebase? = null
+    var navController: NavController? = null
 
      var user = User()
          set(value) {
@@ -37,9 +40,10 @@ class OrderViewModel() : ViewModel() {
     val addUserOrderResult: LiveData<Boolean> get() = _addUserOrderResult
 
 
-    fun setDatabase(orderDataBase: OrderDataBase, orderDataBaseFirebase: OrderDataBaseFirebase) {
+    fun setServices(orderDataBase: OrderDataBase, orderDataBaseFirebase: OrderDataBaseFirebase, navController: NavController) {
         this.orderDataBase = orderDataBase
         this.orderDataBaseFirebase = orderDataBaseFirebase
+        this.navController = navController
     }
 
     fun updateOrder(newOrder: Order) {
@@ -198,6 +202,15 @@ class OrderViewModel() : ViewModel() {
         }
         else {
             changeItemQuantity(userOrderId, dish.dishId, variation)
+        }
+    }
+
+    fun getOrder() {
+        orderDataBaseFirebase?.getOrderById(order.orderId) { order ->
+            if(order != null) {
+                this.order = order
+            }
+            navController?.navigate(AppScreens.Cart_Screen.route)
         }
     }
 

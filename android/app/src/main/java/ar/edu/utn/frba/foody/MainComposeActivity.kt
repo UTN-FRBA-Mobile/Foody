@@ -64,7 +64,7 @@ class MainComposeActivity : ComponentActivity() {
             val cardViewModel = viewModel<CardViewModel>()
             val groupViewModel = viewModel<GroupViewModel>()
             val addressViewModel = viewModel<AddressViewModel>()
-            orderViewModel.setDatabase(dbOrderHelper, orderDataBaseFirebase)
+            orderViewModel.setServices(dbOrderHelper, orderDataBaseFirebase, navController)
             groupViewModel.setDatabase(dbGroupHelper)
             viewModel.setDataBase(userDataBaseFirebase)
 

@@ -51,8 +51,11 @@ fun AppNavigation(
     NavHost(navController = navController, startDestination = AppScreens.Login_Screen.route) {
         composable(route = AppScreens.Home_Screen.route) {
             HomeScreen(
-                navController = navController, viewModel = viewModel,
-                restaurantDataBase = dbRestaurantHelper, userDataBase = dbUserHelper
+                navController = navController,
+                viewModel = viewModel,
+                restaurantDataBase = dbRestaurantHelper,
+                userDataBase = dbUserHelper,
+                orderViewModel = orderViewModel
             )
         }
         composable(route = AppScreens.Login_Screen.route) {
