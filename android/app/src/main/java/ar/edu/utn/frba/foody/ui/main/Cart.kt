@@ -27,21 +27,25 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Order
 import ar.edu.utn.frba.foody.ui.Classes.OrderItemInfo
 import ar.edu.utn.frba.foody.ui.Classes.UserOrder
-import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
+import ar.edu.utn.frba.foody.ui.composables.DishAlert
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
@@ -55,7 +59,7 @@ fun CartScreen(
         stringResource(id = R.string.label_titulo_carrito),
         { BottomGroupCart(navController, orderViewModel = viewModel, order = order) },
         { TopGroupCart(navController) }) {
-        OrdersGrid(navController = navController, viewModel, order.userOrders)
+        OrdersGrid(viewModel, order.userOrders)
     }
 }
 
@@ -165,7 +169,6 @@ fun BottomGroupCart(
 
 @Composable
 fun OrdersGrid(
-    navController: NavController,
     viewModel: OrderViewModel,
     userOrders: List<UserOrder>
 ) {
@@ -176,13 +179,17 @@ fun OrdersGrid(
 
         ) {
         items(userOrders.size) { index ->
-            OrderCard(navController, viewModel, userOrders[index])
+            if (userOrders[index].items.isNotEmpty()) {
+                OrderCard(viewModel, userOrders[index])
+            }
         }
     }
 }
 
 @Composable
-fun OrderCard(navController: NavController, viewModel: OrderViewModel, userOrder: UserOrder) {
+fun OrderCard(viewModel: OrderViewModel, userOrder: UserOrder) {
+    val heightContent = if (userOrder.items.size > 1) 170.dp else 90.dp
+
     Card(
         modifier = Modifier
             .padding(15.dp)
@@ -191,8 +198,7 @@ fun OrderCard(navController: NavController, viewModel: OrderViewModel, userOrder
     ) {
         Column(
             modifier = Modifier
-                .padding(16.dp)
-                .clickable { /* Navigate to restaurant details */ }
+                .padding(16.dp, 8.dp),
         ) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
@@ -203,7 +209,7 @@ fun OrderCard(navController: NavController, viewModel: OrderViewModel, userOrder
             LazyVerticalGrid(
                 columns = GridCells.Fixed(1),
                 contentPadding = PaddingValues(8.dp),
-                modifier = Modifier.height(140.dp),
+                modifier = Modifier.height(heightContent),
             ) {
                 items(userOrder.items.size) { index ->
                     OrderItem(viewModel, userOrder.items[index], userOrder)
@@ -222,17 +228,25 @@ fun OrderCard(navController: NavController, viewModel: OrderViewModel, userOrder
 
 @Composable
 fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: UserOrder) {
+    val showDialog = remember { mutableStateOf(false) }
+    val totalPrice = orderItem.quantity * orderItem.dish.price
+
+    DishAlert(show = showDialog.value, dish = orderItem.dish, totalPrice) {
+        showDialog.value = false
+    }
+
     Card(
         modifier = Modifier
-            .padding(10.dp)
+            .padding(8.dp)
             .fillMaxWidth()
             .height(60.dp),
-        elevation = 4.dp
+        elevation = 4.dp,
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
+                .padding(8.dp)
+                .clickable { showDialog.value = true },
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -247,7 +261,7 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            Text(text = orderItem.dish.name)
+            Text(text = orderItem.dish.name, modifier = Modifier.width(100.dp))
 
             Spacer(modifier = Modifier.width(8.dp))
 
@@ -276,13 +290,12 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
     }
 }
 
-/*
+
 @Preview
 @Composable
-fun DefaultPreviewOrder() {
-    val navController= rememberNavController()
+fun DefaultPreviewCart() {
+    val navController = rememberNavController()
     val viewModel = OrderViewModel()
-    val groupViewModel = GroupViewModel()
-    CartScreen(navController, viewModel, groupViewModel)
+    CartScreen(navController, viewModel)
 }
- */
+

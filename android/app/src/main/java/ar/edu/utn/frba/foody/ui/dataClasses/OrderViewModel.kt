@@ -59,6 +59,10 @@ class OrderViewModel() : ViewModel() {
         orderDataBase?.updateGroup(newGroup.groupId, order.orderId)
     }
 
+    fun hasItems(newOrder: Order): Boolean {
+        return newOrder.userOrders.any { userOrder -> userOrder.items.isNotEmpty() }
+    }
+
     fun getUserOrder(restaurant: Restaurant): UserOrder {
         if(order.orderId == ""){
             createOrder(restaurant)
@@ -189,10 +193,6 @@ class OrderViewModel() : ViewModel() {
         else {
             changeItemQuantity(userOrderId, orderItem.id, variation)
         }
-    }
-
-    fun getAllOrders(): List<Order> {
-        return orderDataBase?.getAllOrders()!!
     }
 
     fun emptyUserOrder() {

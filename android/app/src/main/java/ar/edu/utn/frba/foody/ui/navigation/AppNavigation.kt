@@ -25,6 +25,7 @@ import ar.edu.utn.frba.foody.ui.main.HomeScreen
 import ar.edu.utn.frba.foody.ui.main.JoinGroupScreen
 import ar.edu.utn.frba.foody.ui.main.LocationGoogleScreen
 import ar.edu.utn.frba.foody.ui.main.LoginScreen
+import ar.edu.utn.frba.foody.ui.main.OrderScreen
 import ar.edu.utn.frba.foody.ui.main.OrdersScreen
 import ar.edu.utn.frba.foody.ui.main.PaymentScreen
 import ar.edu.utn.frba.foody.ui.main.ProfileScreen
@@ -85,7 +86,7 @@ fun AppNavigation(
             )
         }
         composable(route = AppScreens.Order_Screen.route) {
-
+            OrderScreen(navController = navController, viewModel = orderViewModel)
         }
         composable(route = AppScreens.Progress_Order_Screen.route) {
             ProgressOrderScreen(navController = navController, orderViewModel = orderViewModel)
