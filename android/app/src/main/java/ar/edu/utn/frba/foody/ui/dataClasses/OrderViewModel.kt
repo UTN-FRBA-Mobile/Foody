@@ -1,6 +1,7 @@
 package ar.edu.utn.frba.foody.ui.dataClasses
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -85,7 +86,7 @@ class OrderViewModel() : ViewModel() {
     fun createOrder(restaurant: Restaurant) {
         val createdOrder = Order("", restaurant)
 
-        createdOrder.orderId  = orderDataBaseFirebase?.addOrder(createdOrder) ?: ""
+        createdOrder.orderId = orderDataBaseFirebase?.addOrder(createdOrder) ?: ""
 
         createUserOrder(createdOrder)
     }
@@ -99,7 +100,6 @@ class OrderViewModel() : ViewModel() {
         }
 
         //TODO: bloquear pantalla
-
         val userOrders = mutableListOf<UserOrder>()
 
         userOrders.add(userOrder)
@@ -122,7 +122,7 @@ class OrderViewModel() : ViewModel() {
 
         val updatedItems = userOrder.items.filter { it.id != userItemId }
 
-        val updatedUserOrder = userOrder.copy(items = updatedItems)
+        val updatedUserOrder = userOrder.copy(items = updatedItems.toMutableList())
 
         val updatedUserOrders = order.userOrders.toMutableList()
         updatedUserOrders[userOrderIndex] = updatedUserOrder
@@ -130,12 +130,12 @@ class OrderViewModel() : ViewModel() {
         order = order.copy(userOrders = updatedUserOrders.toMutableList())
     }
 
-    fun changeItemQuantity(userOrderId: String, userItemId: String, variation: Int) {
+    fun changeItemQuantity(userOrderId: String, dishId: Int, variation: Int) {
         val userOrderIndex = order.userOrders.indexOfFirst { it.userOrderId == userOrderId }
 
         val userOrder = order.userOrders[userOrderIndex]
 
-        val userItemIndex = userOrder.items.indexOfFirst { it.id == userItemId }
+        val userItemIndex = userOrder.items.indexOfFirst { it.dish.dishId == dishId }
 
         val userItem = userOrder.items[userItemIndex]
 
@@ -143,8 +143,6 @@ class OrderViewModel() : ViewModel() {
             return
 
         val newQuantity = userItem.quantity + variation
-
-        orderDataBase?.updateQuantityOrderItem(orderItemId = userItemId, newQuantity = newQuantity)
 
         val updatedUserItem = userItem.copy(quantity = newQuantity)
 
@@ -157,6 +155,12 @@ class OrderViewModel() : ViewModel() {
         updatedUserOrders[userOrderIndex] = updatedUserOrder
 
         order = order.copy(userOrders = updatedUserOrders.toMutableList())
+
+        //TODO: bloquear pantalla
+
+        orderDataBaseFirebase?.updateUserOrder(order.orderId, updatedUserOrder) { isSuccess ->
+            //TODO: desbloquear pantalla
+        }
     }
 
     fun addItem(userOrderId: String, quantity: Int, dish: Dish) {
@@ -165,10 +169,6 @@ class OrderViewModel() : ViewModel() {
         val userOrder = order.userOrders[userOrderIndex]
 
         var newOrderItem = OrderItemInfo("", dish, quantity)
-
-        val orderItemId = orderDataBase?.insertOrderItem(newOrderItem, userOrderId) ?: ""
-
-        newOrderItem.id = orderItemId
 
         val updatedUserItems = userOrder.items.toMutableList()
         updatedUserItems.add(newOrderItem)
@@ -179,6 +179,12 @@ class OrderViewModel() : ViewModel() {
         updatedUserOrders[userOrderIndex] = updatedUserOrder
 
         order = order.copy(userOrders = updatedUserOrders.toMutableList())
+
+        //TODO: bloquear pantalla
+
+        orderDataBaseFirebase?.updateUserOrder(order.orderId, updatedUserOrder) { isSuccess ->
+            //TODO: desbloquear pantalla
+        }
     }
 
     fun changeItemQuantityIfExists(userOrderId: String, orderItem: OrderItemInfo?, variation: Int, dish: Dish, restaurant: Restaurant) {
@@ -191,7 +197,7 @@ class OrderViewModel() : ViewModel() {
             }
         }
         else {
-            changeItemQuantity(userOrderId, orderItem.id, variation)
+            changeItemQuantity(userOrderId, dish.dishId, variation)
         }
     }
 

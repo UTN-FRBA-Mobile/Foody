@@ -1,6 +1,7 @@
 package ar.edu.utn.frba.foody.ui.dataBase.Firebase
 
 import ar.edu.utn.frba.foody.ui.Classes.Order
+import ar.edu.utn.frba.foody.ui.Classes.OrderItemInfo
 import ar.edu.utn.frba.foody.ui.Classes.UserOrder
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -23,20 +24,6 @@ class OrderDataBaseFirebase(private var database: FirebaseDatabase) {
         return key;
     }
 
-    fun addUserOrder(order: Order, userOrder: UserOrder): String {
-        val myRef = database.getReference(TABLE_ORDERS)
-
-        val key = myRef.push().key!!
-
-        userOrder.userOrderId = key.toString()
-
-        order.userOrders.add(userOrder)
-
-        myRef.child(order.orderId).setValue(order)
-
-        return key
-    }
-
     fun addUserOrderToOrder(orderId: String, userOrder: UserOrder, callback: (Boolean) -> Unit) {
         val orderRef = FirebaseDatabase.getInstance().getReference(TABLE_ORDERS).child(orderId).child(TABLE_USER_ORDERS)
 
@@ -52,6 +39,35 @@ class OrderDataBaseFirebase(private var database: FirebaseDatabase) {
                 userOrdersList.add(userOrder)
                 orderRef.setValue(userOrdersList).addOnCompleteListener { task ->
                     callback(task.isSuccessful)
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                callback(false)
+            }
+        })
+    }
+
+    fun updateUserOrder(orderId: String, userOrder: UserOrder, callback: (Boolean) -> Unit) {
+        val orderRef = FirebaseDatabase.getInstance().getReference(TABLE_ORDERS).child(orderId).child(TABLE_USER_ORDERS)
+
+        orderRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val userOrdersList = mutableListOf<UserOrder>()
+                dataSnapshot.children.forEach { snapshot ->
+                    val existingUserOrder = snapshot.getValue(UserOrder::class.java)
+                    existingUserOrder?.let {
+                        userOrdersList.add(it)
+                    }
+                }
+                val index = userOrdersList.indexOfFirst { it.user.userId == userOrder.user.userId }
+                if(index != -1) {
+                    userOrdersList[index] = userOrder
+                    orderRef.setValue(userOrdersList).addOnCompleteListener { task ->
+                        callback(task.isSuccessful)
+                    }
+                } else {
+                    callback(false)
                 }
             }
 

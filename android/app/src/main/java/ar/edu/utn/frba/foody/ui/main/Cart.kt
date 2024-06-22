@@ -268,7 +268,7 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
             IconButton(onClick = {
                 viewModel.changeItemQuantity(
                     userOrder.userOrderId,
-                    orderItem.id,
+                    orderItem.dish.dishId,
                     1
                 )
             }) {
@@ -280,7 +280,7 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
             IconButton(onClick = {
                 viewModel.changeItemQuantity(
                     userOrder.userOrderId,
-                    orderItem.id,
+                    orderItem.dish.dishId,
                     -1
                 )
             }) {
