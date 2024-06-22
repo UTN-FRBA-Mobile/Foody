@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Dish
@@ -14,6 +16,7 @@ import ar.edu.utn.frba.foody.ui.Classes.OrderState
 import ar.edu.utn.frba.foody.ui.Classes.Restaurant
 import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.Classes.UserOrder
+import ar.edu.utn.frba.foody.ui.dataBase.Firebase.OrderDataBaseFirebase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.OrderDataBase
 import java.util.Calendar
 
@@ -22,14 +25,20 @@ class OrderViewModel() : ViewModel() {
     private var order by mutableStateOf(Order(""))
 
     var orderDataBase: OrderDataBase? = null
+    var orderDataBaseFirebase: OrderDataBaseFirebase? = null
 
      var user = User()
          set(value) {
              field = value
          }
 
-    fun setDatabase(orderDataBase: OrderDataBase) {
+    private val _addUserOrderResult = MutableLiveData<Boolean>()
+    val addUserOrderResult: LiveData<Boolean> get() = _addUserOrderResult
+
+
+    fun setDatabase(orderDataBase: OrderDataBase, orderDataBaseFirebase: OrderDataBaseFirebase) {
         this.orderDataBase = orderDataBase
+        this.orderDataBaseFirebase = orderDataBaseFirebase
     }
 
     fun updateOrder(newOrder: Order) {
@@ -72,16 +81,20 @@ class OrderViewModel() : ViewModel() {
     fun createOrder(restaurant: Restaurant) {
         val createdOrder = Order("", restaurant)
 
-        createdOrder.orderId  = orderDataBase?.insertOrder(createdOrder, null) ?: ""
+        createdOrder.orderId  = orderDataBaseFirebase?.addOrder(createdOrder) ?: ""
 
         createUserOrder(createdOrder)
     }
 
     fun createUserOrder(newOrder: Order): UserOrder {
-        val userOrderId = orderDataBase?.insertUserOrder(user.userId, newOrder.orderId)
-            ?: ""
+        val userOrder = UserOrder("", mutableListOf(), user)
 
-        val userOrder = UserOrder(userOrderId, mutableListOf(), user)
+        orderDataBaseFirebase?.addUserOrderToOrder(newOrder.orderId, userOrder) { isSuccess ->
+            _addUserOrderResult.postValue(isSuccess)
+            //TODO: desbloquear pantalla
+        }
+
+        //TODO: bloquear pantalla
 
         val userOrders = mutableListOf<UserOrder>()
 
@@ -89,7 +102,7 @@ class OrderViewModel() : ViewModel() {
 
         this.order = newOrder.copy(userOrders = userOrders)
 
-        return userOrder;
+        return userOrder
     }
 
     fun getTotal(): Double {
@@ -110,7 +123,7 @@ class OrderViewModel() : ViewModel() {
         val updatedUserOrders = order.userOrders.toMutableList()
         updatedUserOrders[userOrderIndex] = updatedUserOrder
 
-        order = order.copy(userOrders = updatedUserOrders.toList())
+        order = order.copy(userOrders = updatedUserOrders.toMutableList())
     }
 
     fun changeItemQuantity(userOrderId: String, userItemId: String, variation: Int) {
@@ -139,7 +152,7 @@ class OrderViewModel() : ViewModel() {
         val updatedUserOrders = order.userOrders.toMutableList()
         updatedUserOrders[userOrderIndex] = updatedUserOrder
 
-        order = order.copy(userOrders = updatedUserOrders.toList())
+        order = order.copy(userOrders = updatedUserOrders.toMutableList())
     }
 
     fun addItem(userOrderId: String, quantity: Int, dish: Dish) {
@@ -161,7 +174,7 @@ class OrderViewModel() : ViewModel() {
         val updatedUserOrders = order.userOrders.toMutableList()
         updatedUserOrders[userOrderIndex] = updatedUserOrder
 
-        order = order.copy(userOrders = updatedUserOrders.toList())
+        order = order.copy(userOrders = updatedUserOrders.toMutableList())
     }
 
     fun changeItemQuantityIfExists(userOrderId: String, orderItem: OrderItemInfo?, variation: Int, dish: Dish, restaurant: Restaurant) {
@@ -190,7 +203,7 @@ class OrderViewModel() : ViewModel() {
         orderDataBase?.deleteUserOrder(userOrder.userOrderId)
 
         val userOrders = order.userOrders.filter { x -> x.user != user }
-        order = order.copy(userOrders = userOrders)
+        order = order.copy(userOrders = userOrders.toMutableList())
     }
 
     val defaultOrderStates: List<OrderState> = listOf(

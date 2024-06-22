@@ -5,7 +5,7 @@ data class Order(
     val restaurant: Restaurant = Restaurant(),
     val name: String = "",
     val inProgress: Boolean = false,
-    var userOrders: List<UserOrder> = emptyList(),
+    var userOrders: MutableList<UserOrder> = mutableListOf(),
     val direction: String = "",
     val estimatedHour: String = "",
     val orderStates: List<OrderState> = emptyList(),
