@@ -80,7 +80,7 @@ class OrderDataBaseFirebase(private var database: FirebaseDatabase) {
     fun getOrderById(orderId: String, callback: (Order?) -> Unit) {
         val myRef = database.getReference(TABLE_ORDERS)
 
-        myRef.child(orderId).addListenerForSingleValueEvent(object : ValueEventListener {
+        myRef.child(orderId).addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val order = dataSnapshot.getValue(Order::class.java)
                 order?.orderId = dataSnapshot.key.toString()
