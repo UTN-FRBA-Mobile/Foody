@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.*
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.*
@@ -16,6 +18,7 @@ import androidx.navigation.*
 import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.*
+import ar.edu.utn.frba.foody.ui.composables.DishAlert
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
@@ -105,8 +108,7 @@ fun OrderDetailCard(userOrder: UserOrder) {
     ) {
         Column(
             modifier = Modifier
-                .padding(16.dp)
-                .clickable { /* Navigate to restaurant details */ }
+                .padding(16.dp, 8.dp)
         ) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
@@ -136,6 +138,13 @@ fun OrderDetailCard(userOrder: UserOrder) {
 
 @Composable
 fun OrderDetailItem(orderItem: OrderItemInfo) {
+    val showDialog = remember { mutableStateOf(false) }
+    val totalPrice = orderItem.quantity * orderItem.dish.price
+
+    DishAlert(show = showDialog.value, dish = orderItem.dish, totalPrice) {
+        showDialog.value = false
+    }
+
     Card(
         modifier = Modifier
             .padding(10.dp)
@@ -146,7 +155,8 @@ fun OrderDetailItem(orderItem: OrderItemInfo) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
+                .padding(8.dp)
+                .clickable { showDialog.value = true },
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
