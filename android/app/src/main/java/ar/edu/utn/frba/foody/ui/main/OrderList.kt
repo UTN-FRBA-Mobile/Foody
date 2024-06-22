@@ -34,10 +34,12 @@ import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
 fun OrdersScreen(navController: NavController, viewModel: OrderViewModel) {
+    val order = viewModel.getPickedOrder()
+
     AppScaffold(navController = navController,
         null,
         null,
-        { TopGroupOrder(navController = navController)}
+        { TopGroupOrderList(navController = navController)}
     ) {
         Box(
             contentAlignment = Alignment.Center,
@@ -60,21 +62,22 @@ fun OrdersScreen(navController: NavController, viewModel: OrderViewModel) {
                     .fillMaxWidth()
                     .height(505.dp)
             ) {
-                for (order in viewModel.orders) {
                     item {
-                        OrderItem(navController = navController,
-                            viewModel = viewModel,
-                            order = order
-                        )
+                        if (viewModel.hasItems(order)) {
+                            OrderItem(
+                                navController = navController,
+                                viewModel = viewModel,
+                                order = order
+                            )
+                        }
                     }
-                }
             }
         }
     }
 }
 
 @Composable
-fun TopGroupOrder(navController: NavController) {
+fun TopGroupOrderList(navController: NavController) {
     TopAppBar(
         title = {
             Text(text = stringResource(id = R.string.app_name))
