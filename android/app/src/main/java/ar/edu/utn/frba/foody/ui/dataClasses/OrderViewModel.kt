@@ -50,6 +50,10 @@ class OrderViewModel() : ViewModel() {
         orderDataBase?.updateGroup(newGroup.groupId, order.orderId)
     }
 
+    fun hasItems(newOrder: Order): Boolean {
+        return newOrder.userOrders.any { userOrder -> userOrder.items.isNotEmpty() }
+    }
+
     fun getUserOrder(restaurant: Restaurant): UserOrder {
         if(order.orderId == -1){
             createOrder(restaurant)
@@ -89,7 +93,7 @@ class OrderViewModel() : ViewModel() {
 
         this.order = newOrder.copy(userOrders = userOrders)
 
-        return userOrder;
+        return userOrder
     }
 
     fun getTotal(): Double {
@@ -147,7 +151,7 @@ class OrderViewModel() : ViewModel() {
 
         val userOrder = order.userOrders[userOrderIndex]
 
-        var newOrderItem = OrderItemInfo(-1, dish, quantity)
+        val newOrderItem = OrderItemInfo(-1, dish, quantity)
 
         val orderItemId = orderDataBase?.insertOrderItem(newOrderItem, userOrderId)?.toInt() ?: 0
 
@@ -176,10 +180,6 @@ class OrderViewModel() : ViewModel() {
         else {
             changeItemQuantity(userOrderId, orderItem.id, variation)
         }
-    }
-
-    fun getAllOrders(): List<Order> {
-        return orderDataBase?.getAllOrders()!!
     }
 
     fun emptyUserOrder() {
@@ -215,33 +215,6 @@ class OrderViewModel() : ViewModel() {
             imageDescription = "Finished Icon",
             description = "Entregamos tu pedido",
         ),
-    )
-
-    val orders: List<Order> = listOf(
-        Order(
-            orderId = 1,
-            name = "Order 1",
-            inProgress = false,
-            direction = "Dorrego 1352",
-            estimatedHour = getCurrentTime(),
-            orderStates = defaultOrderStates,
-        ),
-        Order(
-            orderId = 2,
-            name = "Order 2",
-            inProgress = true,
-            direction = "Suarez 3450",
-            estimatedHour = getCurrentTime(),
-            orderStates = defaultOrderStates
-        ),
-        Order(
-            orderId = 3,
-            name = "Order 3",
-            inProgress = false,
-            direction = "Santa Fe 34",
-            estimatedHour = getCurrentTime(),
-            orderStates = defaultOrderStates
-        )
     )
 }
 

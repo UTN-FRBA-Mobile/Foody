@@ -41,7 +41,6 @@ import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Order
 import ar.edu.utn.frba.foody.ui.Classes.OrderItemInfo
 import ar.edu.utn.frba.foody.ui.Classes.UserOrder
-import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
@@ -55,7 +54,7 @@ fun CartScreen(
         stringResource(id = R.string.label_titulo_carrito),
         { BottomGroupCart(navController, orderViewModel = viewModel, order = order) },
         { TopGroupCart(navController) }) {
-        OrdersGrid(navController = navController, viewModel, order.userOrders)
+        OrdersGrid(viewModel, order.userOrders)
     }
 }
 
@@ -165,7 +164,6 @@ fun BottomGroupCart(
 
 @Composable
 fun OrdersGrid(
-    navController: NavController,
     viewModel: OrderViewModel,
     userOrders: List<UserOrder>
 ) {
@@ -176,13 +174,17 @@ fun OrdersGrid(
 
         ) {
         items(userOrders.size) { index ->
-            OrderCard(navController, viewModel, userOrders[index])
+            if (userOrders[index].items.isNotEmpty()) {
+                OrderCard(viewModel, userOrders[index])
+            }
         }
     }
 }
 
 @Composable
-fun OrderCard(navController: NavController, viewModel: OrderViewModel, userOrder: UserOrder) {
+fun OrderCard(viewModel: OrderViewModel, userOrder: UserOrder) {
+    val heightContent = if (userOrder.items.size > 1) 170.dp else 90.dp
+
     Card(
         modifier = Modifier
             .padding(15.dp)
@@ -203,7 +205,7 @@ fun OrderCard(navController: NavController, viewModel: OrderViewModel, userOrder
             LazyVerticalGrid(
                 columns = GridCells.Fixed(1),
                 contentPadding = PaddingValues(8.dp),
-                modifier = Modifier.height(140.dp),
+                modifier = Modifier.height(heightContent),
             ) {
                 items(userOrder.items.size) { index ->
                     OrderItem(viewModel, userOrder.items[index], userOrder)
