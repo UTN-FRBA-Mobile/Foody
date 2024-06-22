@@ -12,16 +12,9 @@ import ar.edu.utn.frba.foody.ui.Classes.Restaurant
 import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.dataBase.Firebase.UserDataBaseFirebase
 import com.google.firebase.Firebase
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
 
 class MainViewModel() : ViewModel() {
     var userDataBaseFirebase: UserDataBaseFirebase? = null
-
-
-    private val auth: FirebaseAuth = Firebase.auth
-
-
 
 
     private var restaurant by mutableStateOf(Restaurant())
@@ -32,8 +25,11 @@ class MainViewModel() : ViewModel() {
 
     fun fetchUserByEmail(email: String, password: String) {
         userDataBaseFirebase!!.getUserByEmail(email) { user ->
-            if(user!!.password == password) {
+            if(user != null && user.password == password) {
                 _user.postValue(user)
+            }
+            else {
+                _user.postValue(null)
             }
         }
     }

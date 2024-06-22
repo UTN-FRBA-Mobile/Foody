@@ -25,26 +25,33 @@ class UserDataBaseFirebase(private var database: FirebaseDatabase) {
     fun getUserByEmail(email: String, callback: (User?) -> Unit) {
         val myRef = database.getReference(TABLE_USER)
 
-        val ref = myRef.child(email.replace(".", ""))
+        // Replace '.' with '' in the email to use it as a Firebase key
+        val userId = email.replace(".", "")
 
+        // Reference to the specific user node
+        val ref = myRef.child(userId)
+
+        // Attach a single value event listener to read data once
         ref.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // Check if the snapshot exists (i.e., the user exists in the database)
                 if (dataSnapshot.exists()) {
-                    val userSnapshot = dataSnapshot.children.first()
-                    val user = userSnapshot.getValue(User::class.java)
-                    user?.userId = userSnapshot.key!!
-                    callback(user)
-                    return
+                    // Get the User object from the snapshot
+                    val user = dataSnapshot.getValue(User::class.java)
+                    user?.userId = dataSnapshot.key!! // Assign the key (userId) to the User object
+                    callback(user) // Return the user via the callback
                 } else {
-                    callback(null)
+                    callback(null) // Return null if the user does not exist
                 }
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                callback(null)
+                callback(null) // Return null if there is a database error
             }
         })
     }
+
+
 
 }
 
