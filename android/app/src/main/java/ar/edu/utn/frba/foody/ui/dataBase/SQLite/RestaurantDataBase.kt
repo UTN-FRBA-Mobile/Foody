@@ -1,4 +1,4 @@
-package ar.edu.utn.frba.foody.ui.dataBase
+package ar.edu.utn.frba.foody.ui.dataBase.SQLite
 
 import android.content.ContentValues
 import android.content.Context

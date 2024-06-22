@@ -1,4 +1,4 @@
-package ar.edu.utn.frba.foody.ui.dataBase
+package ar.edu.utn.frba.foody.ui.dataBase.SQLite
 
 import android.content.ContentValues
 import android.content.Context
@@ -53,7 +53,6 @@ class UserDataBase(private var context: Context) :
         val values = ContentValues().apply {
             put("email", newUser.email)
             put("password", newUser.password)
-            put("direccionId", newUser.direccion)
             put("numeroContacto", newUser.numeroContacto)
         }
         val whereClause= "id = ?"
@@ -76,7 +75,7 @@ class UserDataBase(private var context: Context) :
 
         val cursor = if (userId != null) {
             db.rawQuery(
-                "SELECT * FROM $TABLE_NAME WHERE ${COLUMN_ID} = ?",
+                "SELECT * FROM $TABLE_NAME WHERE $COLUMN_ID = ?",
                 arrayOf(userId.toString())
             )
         } else {
@@ -87,13 +86,14 @@ class UserDataBase(private var context: Context) :
 
         if (cursor.moveToFirst()) {
             do {
-                val id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID))
+                val id = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ID))
                 val email = cursor.getString(cursor.getColumnIndexOrThrow("email"))
                 val password = cursor.getString(cursor.getColumnIndexOrThrow("password"))
-                val direccionId = cursor.getInt(cursor.getColumnIndexOrThrow("direccionId"))
                 val numeroContacto = cursor.getInt(cursor.getColumnIndexOrThrow("numeroContacto"))
 
-                users.add(User(id, email, password, direccionId, numeroContacto))
+                val address = Address.AddressInfo()
+
+                users.add(User(id, email, password, address, numeroContacto))
             } while (cursor.moveToNext())
         }
 
@@ -116,7 +116,7 @@ class UserDataBase(private var context: Context) :
         return db?.insert("direccion", null, values)?.toInt()
 
     }
-    fun updateAddress(dbHelper: UserDataBase,address: Address.AddressInfo):Int{
+    fun updateAddress(dbHelper: UserDataBase, address: Address.AddressInfo):Int{
         val db=dbHelper.writableDatabase
         val values = ContentValues().apply {
             put("calle",address.calle)

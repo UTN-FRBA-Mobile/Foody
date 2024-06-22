@@ -3,7 +3,6 @@ package ar.edu.utn.frba.foody.ui.main
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,9 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
@@ -33,26 +30,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Address
-import ar.edu.utn.frba.foody.ui.dataClasses.AddressViewModel
 import ar.edu.utn.frba.foody.ui.Classes.User
-import ar.edu.utn.frba.foody.ui.dataBase.UserDataBase
+import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
+import ar.edu.utn.frba.foody.ui.dataClasses.AddressViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
 fun ProfileScreen(navController: NavController, viewModel: AddressViewModel,
-                  dbUserDataBase: UserDataBase?,orderViewModel: OrderViewModel)
+                  dbUserDataBase: UserDataBase?, orderViewModel: OrderViewModel)
 {
     var user=orderViewModel.user
     var email by remember { mutableStateOf(user.email) }
@@ -175,7 +169,7 @@ fun ProfileScreen(navController: NavController, viewModel: AddressViewModel,
                         val addressId =
                             dbUserDataBase?.updateAddress(dbUserDataBase, viewModel.getPickedAddress())
                         if (addressId != null) {
-                            user.direccion=addressId
+                            user.direccion = Address.AddressInfo()
                         }
                         dbUserDataBase?.updateUser(
                             dbUserDataBase,
@@ -221,7 +215,7 @@ fun validateAnyUserEmptyProf(user:User,direccion:Address.AddressInfo,context: Co
     return true
 }
 
-
+/*
 @Preview
 @Composable
 fun DefaultPreviewProfile(){
@@ -230,4 +224,4 @@ fun DefaultPreviewProfile(){
 
     SignUpScreen(navController = navController,addressViewModel,null)
 }
-
+        */

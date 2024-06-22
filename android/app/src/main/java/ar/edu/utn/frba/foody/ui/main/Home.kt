@@ -18,8 +18,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Restaurant
-import ar.edu.utn.frba.foody.ui.dataBase.RestaurantDataBase
-import ar.edu.utn.frba.foody.ui.dataBase.UserDataBase
+import ar.edu.utn.frba.foody.ui.dataBase.SQLite.RestaurantDataBase
+import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
@@ -28,7 +28,7 @@ fun HomeScreen(
     navController: NavController,
     viewModel: MainViewModel,
     restaurantDataBase: RestaurantDataBase?,
-    userDataBase:UserDataBase?
+    userDataBase: UserDataBase?
 ) {
     AppScaffold(navController, null, { BottomGroupHome(navController) },{ TopGroupHome(navController)}) {
         Box(
