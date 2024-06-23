@@ -2,6 +2,7 @@ package ar.edu.utn.frba.foody.ui.dataClasses
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -68,17 +69,17 @@ class OrderViewModel() : ViewModel() {
         return newOrder.userOrders.any { userOrder -> userOrder.items.isNotEmpty() }
     }
 
-    fun getUserOrder(restaurant: Restaurant): UserOrder {
+    fun getUserOrder(restaurant: Restaurant, loading: MutableState<Boolean>): UserOrder {
         if(order.orderId == ""){
             createOrder(restaurant)
         }
-        return getAssignedUserOrder()
+        return getAssignedUserOrder(loading)
     }
 
-    fun getAssignedUserOrder(): UserOrder {
+    fun getAssignedUserOrder(loading: MutableState<Boolean>): UserOrder {
         val userOrder = order.userOrders.firstOrNull() { x -> x.user.userId == this.user.userId }
         if(userOrder == null) {
-            return createUserOrder(order)
+            return createUserOrder(order, loading)
         }
         return userOrder
     }
@@ -92,18 +93,22 @@ class OrderViewModel() : ViewModel() {
 
         createdOrder.orderId = orderDataBaseFirebase?.addOrder(createdOrder) ?: ""
 
-        createUserOrder(createdOrder)
+        val loading = mutableStateOf(false)
+        createUserOrder(createdOrder, loading)
     }
 
-    fun createUserOrder(newOrder: Order): UserOrder {
+    fun createUserOrder(newOrder: Order, loading: MutableState<Boolean>): UserOrder {
         val userOrder = UserOrder("", mutableListOf(), user)
 
         orderDataBaseFirebase?.addUserOrderToOrder(newOrder.orderId, userOrder) { isSuccess ->
             _addUserOrderResult.postValue(isSuccess)
-            //TODO: desbloquear pantalla
+
+            if (isSuccess) {
+                loading.value = false
+            }
         }
 
-        //TODO: bloquear pantalla
+        loading.value = true
         val userOrders = mutableListOf<UserOrder>()
 
         userOrders.add(userOrder)
@@ -214,7 +219,8 @@ class OrderViewModel() : ViewModel() {
     }
 
     fun emptyUserOrder() {
-        val userOrder = getAssignedUserOrder()
+        val loading = mutableStateOf(false)
+        val userOrder = getAssignedUserOrder(loading)
 
         val userOrders = order.userOrders.filter { x -> x.user != user }
         order = order.copy(userOrders = userOrders.toMutableList())

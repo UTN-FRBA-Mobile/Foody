@@ -44,6 +44,7 @@ import ar.edu.utn.frba.foody.ui.Classes.OrderItemInfo
 import ar.edu.utn.frba.foody.ui.Classes.Restaurant
 import ar.edu.utn.frba.foody.ui.Classes.UserOrder
 import ar.edu.utn.frba.foody.ui.composables.DishAlert
+import ar.edu.utn.frba.foody.ui.composables.shimmerBrush
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
@@ -55,11 +56,13 @@ fun RestaurantScreen(
     viewModel: MainViewModel,
     orderViewModel: OrderViewModel
 ) {
+    val loading = remember { mutableStateOf(true) }
     val restaurant = viewModel.getPickedRestaurant()
-    val userOrder = orderViewModel.getUserOrder(restaurant)
+    val userOrder = orderViewModel.getUserOrder(restaurant, loading)
+
     AppScaffold(navController, restaurant.name, { BottomGroupRestaurant(navController) },
         { TopGroupRestaurant(navController, restaurant.name, orderViewModel) }) {
-        DishesGrid(orderViewModel, restaurant.dishes, userOrder, restaurant)
+        DishesGrid(orderViewModel, restaurant.dishes, userOrder, restaurant, loading.value)
     }
 }
 
@@ -154,7 +157,8 @@ fun DishesGrid(
     viewModel: OrderViewModel,
     dishes: List<Dish>,
     userOrder: UserOrder,
-    restaurant: Restaurant
+    restaurant: Restaurant,
+    loading: Boolean,
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -167,7 +171,8 @@ fun DishesGrid(
                 dishes[index],
                 userOrder,
                 userOrder.items.firstOrNull { x -> x.dish.dishId == dishes[index].dishId },
-                restaurant
+                restaurant,
+                loading
             )
         }
     }
@@ -179,7 +184,8 @@ fun DishCard(
     dish: Dish,
     userOrder: UserOrder,
     userOrderItemInfo: OrderItemInfo?,
-    restaurant: Restaurant
+    restaurant: Restaurant,
+    loading: Boolean
 ) {
     val showDialog = remember { mutableStateOf(false) }
 
@@ -191,7 +197,8 @@ fun DishCard(
         modifier = Modifier
             .padding(15.dp)
             .fillMaxSize()
-            .height(200.dp),
+            .height(200.dp)
+            .background(shimmerBrush(showShimmer = loading)),
         elevation = 4.dp
     ) {
         Column(
