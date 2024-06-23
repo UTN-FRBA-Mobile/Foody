@@ -46,6 +46,10 @@ class MainViewModel() : ViewModel() {
         return restaurant
     }
 
+    fun getPickedRestaurantName(): String {
+        return restaurant.name
+    }
+
     //TODO: pasar los datos estáticos a otro lado
     val restaurants: List<Restaurant> = listOf(
         Restaurant(

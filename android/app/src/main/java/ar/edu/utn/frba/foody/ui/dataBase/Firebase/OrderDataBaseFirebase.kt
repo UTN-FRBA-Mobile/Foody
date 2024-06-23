@@ -85,6 +85,14 @@ class OrderDataBaseFirebase(private var database: FirebaseDatabase) {
         }
     }
 
+    fun deleteOrder(orderId: String, callback: (Boolean) -> Unit) {
+        val orderRef = FirebaseDatabase.getInstance().getReference(TABLE_ORDERS).child(orderId)
+
+        orderRef.removeValue().addOnCompleteListener { task ->
+            callback(task.isSuccessful)
+        }
+    }
+
     fun getOrderById(orderId: String, callback: (Order?) -> Unit) {
         val myRef = database.getReference(TABLE_ORDERS)
 

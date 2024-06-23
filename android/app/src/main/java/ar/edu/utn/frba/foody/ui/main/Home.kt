@@ -72,6 +72,7 @@ fun HomeScreen(
                             RestaurantItem(
                                 navController = navController,
                                 viewModel = viewModel,
+                                orderViewModel = orderViewModel,
                                 restaurant = restaurant
                             )
                         }
@@ -90,18 +91,23 @@ fun HomeScreen(
 }
 
 @Composable
-fun RestaurantItem(navController: NavController, viewModel: MainViewModel, restaurant: Restaurant) {
+fun RestaurantItem(navController: NavController, viewModel: MainViewModel, orderViewModel: OrderViewModel, restaurant: Restaurant) {
     val showAlert = remember {
         mutableStateOf(false)
     }
     val showRestaurant = remember {
         mutableStateOf(false)
     }
+    val changeRestaurant = remember {
+        mutableStateOf(false)
+    }
+
+    val restaurantName = viewModel.getPickedRestaurantName()
 
     SimpleAlert(
         show = showAlert.value,
-        text = "Actualmente tienes un pedido con el restaurante NOMBRE, si eliges este restaurante perderás el pedido actual. ¿Deseas continuar?",
-        onConfirm = { showAlert.value = false; showRestaurant.value = true },
+        text = "Actualmente tienes un pedido con el restaurante ${restaurantName}, si eliges este restaurante perderás el pedido actual. ¿Deseas continuar?",
+        onConfirm = { showAlert.value = false; showRestaurant.value = true; changeRestaurant.value = true },
         onDismiss = { showAlert.value = false }
     )
 
@@ -110,12 +116,16 @@ fun RestaurantItem(navController: NavController, viewModel: MainViewModel, resta
         navController.navigate(AppScreens.Restaurant_Screen.route)
     }
 
+    if (changeRestaurant.value) {
+        orderViewModel.changeRestaurant(restaurant)
+    }
+
     Card(backgroundColor = MaterialTheme.colors.secondary) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(onClick = {
-                    if (restaurant != viewModel.getPickedRestaurant()) {
+                    if (restaurantName != "" && restaurant != viewModel.getPickedRestaurant()) {
                         showAlert.value = true
                     } else {
                         showRestaurant.value = true

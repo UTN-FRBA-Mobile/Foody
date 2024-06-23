@@ -209,10 +209,13 @@ class OrderViewModel() : ViewModel() {
         }
     }
 
-    fun changeItemQuantityIfExists(orderItem: OrderItemInfo?, variation: Int, dish: Dish, restaurant: Restaurant) {
-        if(orderItem == null && order.restaurant.restaurantId != restaurant.restaurantId) {
-            createOrder(restaurant)
+    fun changeRestaurant(newRestaurant: Restaurant) {
+        orderDataBaseFirebase?.deleteOrder(order.orderId) { isSuccess ->
+            createOrder(newRestaurant)
         }
+    }
+
+    fun changeItemQuantityIfExists(orderItem: OrderItemInfo?, variation: Int, dish: Dish, restaurant: Restaurant) {
         if (orderItem == null) {
             if(variation > 0) {
                 addItem(variation, dish)
