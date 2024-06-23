@@ -221,7 +221,6 @@ fun DishCard(
             ) {
                 IconButton(onClick = {
                     viewModel.changeItemQuantityIfExists(
-                        userOrder.userOrderId,
                         userOrderItemInfo,
                         1,
                         dish,
@@ -236,7 +235,6 @@ fun DishCard(
                 Text(text = (userOrderItemInfo?.quantity ?: 0).toString(), fontSize = 18.sp)
                 IconButton(onClick = {
                     viewModel.changeItemQuantityIfExists(
-                        userOrder.userOrderId,
                         userOrderItemInfo,
                         -1,
                         dish,

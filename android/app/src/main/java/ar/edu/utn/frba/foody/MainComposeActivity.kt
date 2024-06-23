@@ -82,8 +82,6 @@ class MainComposeActivity : ComponentActivity() {
                 }
             })
 
-
-
             AppNavigation(
                 this,
                 navController,

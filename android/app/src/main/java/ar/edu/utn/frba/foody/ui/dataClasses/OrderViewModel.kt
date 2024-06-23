@@ -117,25 +117,31 @@ class OrderViewModel() : ViewModel() {
         return order.userOrders.sumOf { x -> x.items.sumOf { y -> y.quantity * y.dish.price } }
     }
 
-    fun deleteItem(userOrderId: String, userItemId: String) {
-        orderDataBase?.deleteOrderItem(userOrderId)
-
-        val userOrderIndex = order.userOrders.indexOfFirst { it.userOrderId == userOrderId }
+    fun deleteItem(dishId: Int) {
+        val userOrderIndex = order.userOrders.indexOfFirst { it.user.userId == user.userId }
 
         val userOrder = order.userOrders[userOrderIndex]
 
-        val updatedItems = userOrder.items.filter { it.id != userItemId }
+        if(userOrder.items.size > 1) {
+            val updatedItems = userOrder.items.filter { it.dish.dishId != dishId }
 
-        val updatedUserOrder = userOrder.copy(items = updatedItems.toMutableList())
+            val updatedUserOrder = userOrder.copy(items = updatedItems.toMutableList())
 
-        val updatedUserOrders = order.userOrders.toMutableList()
-        updatedUserOrders[userOrderIndex] = updatedUserOrder
+            val updatedUserOrders = order.userOrders.toMutableList()
+            updatedUserOrders[userOrderIndex] = updatedUserOrder
 
-        order = order.copy(userOrders = updatedUserOrders.toMutableList())
+            order = order.copy(userOrders = updatedUserOrders.toMutableList())
+
+            orderDataBaseFirebase?.updateUserOrder(order.orderId, updatedUserOrder) { isSuccess -> }
+        }
+        else {
+            this.emptyUserOrder()
+        }
+
     }
 
-    fun changeItemQuantity(userOrderId: String, dishId: Int, variation: Int) {
-        val userOrderIndex = order.userOrders.indexOfFirst { it.userOrderId == userOrderId }
+    fun changeItemQuantity(dishId: Int, variation: Int) {
+        val userOrderIndex = order.userOrders.indexOfFirst { it.user.userId == user.userId }
 
         val userOrder = order.userOrders[userOrderIndex]
 
@@ -143,8 +149,10 @@ class OrderViewModel() : ViewModel() {
 
         val userItem = userOrder.items[userItemIndex]
 
-        if(variation < 0 && userItem.quantity == 0)
+        if(userItem.quantity + variation == 0) {
+            deleteItem(dishId)
             return
+        }
 
         val newQuantity = userItem.quantity + variation
 
@@ -167,7 +175,7 @@ class OrderViewModel() : ViewModel() {
         }
     }
 
-    fun addItem(userOrderId: String, quantity: Int, dish: Dish) {
+    fun addItem(quantity: Int, dish: Dish) {
         val userOrderIndex = order.userOrders.indexOfFirst { it.user.userId == user.userId }
 
         val userOrder = order.userOrders[userOrderIndex]
@@ -191,17 +199,17 @@ class OrderViewModel() : ViewModel() {
         }
     }
 
-    fun changeItemQuantityIfExists(userOrderId: String, orderItem: OrderItemInfo?, variation: Int, dish: Dish, restaurant: Restaurant) {
+    fun changeItemQuantityIfExists(orderItem: OrderItemInfo?, variation: Int, dish: Dish, restaurant: Restaurant) {
         if(orderItem == null && order.restaurant.restaurantId != restaurant.restaurantId) {
             createOrder(restaurant)
         }
         if (orderItem == null) {
             if(variation > 0) {
-                addItem(userOrderId, variation, dish)
+                addItem(variation, dish)
             }
         }
         else {
-            changeItemQuantity(userOrderId, dish.dishId, variation)
+            changeItemQuantity(dish.dishId, variation)
         }
     }
 
