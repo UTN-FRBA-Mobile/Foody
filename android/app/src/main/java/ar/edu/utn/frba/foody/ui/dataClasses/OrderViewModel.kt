@@ -11,6 +11,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
+import ar.edu.utn.frba.foody.ui.Classes.Address
 import ar.edu.utn.frba.foody.ui.Classes.Dish
 import ar.edu.utn.frba.foody.ui.Classes.Group
 import ar.edu.utn.frba.foody.ui.Classes.Order
@@ -250,6 +251,38 @@ class OrderViewModel() : ViewModel() {
         order = order.copy(userOrders = userOrders.toMutableList())
 
         orderDataBaseFirebase?.updateUserOrderList(order.orderId, mutableListOf<UserOrder>()) { isSuccess -> }
+    }
+
+    fun updateAddress(newAddress: Address.AddressInfo) {
+        user.direccion = newAddress
+    }
+
+    fun existAddress(): Boolean {
+        return user.direccion.calle != null
+                && user.direccion.numero != null
+                && user.direccion.localidad != null
+                && user.direccion.region != null
+    }
+
+    fun emptyAddress() {
+        user.direccion = Address.AddressInfo(
+            id = null,
+            calle = null,
+            numero = null,
+            localidad = null,
+            region = null,
+            latitud = null,
+            longitud = null
+        )
+    }
+
+    fun isEmptyAddress(address: Address.AddressInfo): Boolean {
+        return address.calle == ""
+                || address.region == ""
+                || address.localidad == ""
+                || address.numero == 0
+                || address.latitud == 0.0
+                || address.longitud == 0.0
     }
 
     val defaultOrderStates: List<OrderState> = listOf(

@@ -45,12 +45,13 @@ import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.dataBase.Firebase.UserDataBaseFirebase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.AddressViewModel
+import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
 fun SignUpScreen(
     navController: NavController,
-    viewModel: AddressViewModel,
+    viewModel: OrderViewModel,
     dbUserDataBase: UserDataBase?,
     dbUserDataBaseFirebase: UserDataBaseFirebase
 ) {
@@ -147,7 +148,7 @@ fun SignUpScreen(
                     .fillMaxWidth()
                     .padding(top = 16.dp)
             ) {
-                val direccionText = if (viewModel.existAddress()) viewModel.getPickedAddress()
+                val direccionText = if (viewModel.existAddress()) viewModel.user.direccion
                     .let { "${it.calle} ${it.numero}, ${it.localidad}, ${it.region}" } else ""
 
                 TextField(
@@ -189,7 +190,7 @@ fun SignUpScreen(
                     if (validateAnyUserEmpty(user, numero, context)) {
                         user.numeroContacto = numero.toInt()
 
-                        val address = viewModel.getPickedAddress()
+                        val address = viewModel.user.direccion
 
                         dbUserDataBaseFirebase.addUser(user.email, user.password, address, user.numeroContacto)
 

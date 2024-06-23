@@ -48,11 +48,11 @@ import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 fun ProfileScreen(navController: NavController, viewModel: AddressViewModel,
                   dbUserDataBase: UserDataBase?, orderViewModel: OrderViewModel)
 {
-    var user=orderViewModel.user
+    var user = orderViewModel.user
     var email by remember { mutableStateOf(user.email) }
     var password by remember { mutableStateOf(user.password) }
     var numero by remember { mutableStateOf(user.numeroContacto.toString()) }
-    var direccion = viewModel.getPickedAddress()
+    var direccion by remember { mutableStateOf(user.direccion) }
     val context = LocalContext.current
 
 
@@ -143,9 +143,11 @@ fun ProfileScreen(navController: NavController, viewModel: AddressViewModel,
                     ),
                     enabled = false  // Deshabilitar la edición del TextField
                 )
+
+                //VER QUE HACER CON EL ID DE ADDRESS
                 IconButton(onClick = {
                     navController.navigate(AppScreens.Location_Screen.createRoute("profile",
-                        viewModel.getPickedAddress().id.toString()))
+                        user.direccion.id.toString()))
                 }) {
                     Icon(
                         modifier = Modifier.size(36.dp),
@@ -163,11 +165,11 @@ fun ProfileScreen(navController: NavController, viewModel: AddressViewModel,
                 onClick = {
                     user.email=email
                     user.password=password
-                    if(validateAnyUserEmptyProf(user,viewModel.getPickedAddress(),context)) {
+                    if(validateAnyUserEmptyProf(user, user.direccion ,context)) {
                         user.numeroContacto=numero.toInt()
 
                         val addressId =
-                            dbUserDataBase?.updateAddress(dbUserDataBase, viewModel.getPickedAddress())
+                            dbUserDataBase?.updateAddress(dbUserDataBase, user.direccion)
                         if (addressId != null) {
                             user.direccion = Address.AddressInfo()
                         }

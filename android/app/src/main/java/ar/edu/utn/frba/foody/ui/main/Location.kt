@@ -24,6 +24,7 @@ import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Address
 import ar.edu.utn.frba.foody.ui.dataClasses.AddressViewModel
+import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.*
@@ -36,14 +37,14 @@ import kotlinx.coroutines.*
 fun LocationGoogleScreen(
     context: ComponentActivity,
     navController: NavController,
-    viewModel: AddressViewModel,
+    viewModel: OrderViewModel,
     origin: String,
     id: String
 ) {
-    var direccion by remember { mutableStateOf(if(origin == "profile") viewModel.getPickedAddress().calle!! else "") }
-    var nro by remember { mutableStateOf(if(origin == "profile") viewModel.getPickedAddress().numero.toString() else "") }
-    var localidad by remember { mutableStateOf(if(origin == "profile") viewModel.getPickedAddress().localidad!! else "") }
-    var region by remember { mutableStateOf(if(origin == "profile") viewModel.getPickedAddress().region!! else "") }
+    var direccion by remember { mutableStateOf(if(origin == "profile") viewModel.user.direccion.calle!! else "") }
+    var nro by remember { mutableStateOf(if(origin == "profile") viewModel.user.direccion.numero.toString() else "") }
+    var localidad by remember { mutableStateOf(if(origin == "profile") viewModel.user.direccion.localidad!! else "") }
+    var region by remember { mutableStateOf(if(origin == "profile") viewModel.user.direccion.region!! else "") }
     var address: Address.AddressInfo
 
     val permissions = arrayOf(

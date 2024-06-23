@@ -64,7 +64,7 @@ fun AppNavigation(
                 mainViewModel = viewModel)
         }
         composable(route = AppScreens.SignUp_Screen.route) {
-            SignUpScreen(navController = navController, viewModel = addressViewModel, dbUserHelper, dbUserDataBaseFirebase)
+            SignUpScreen(navController = navController, viewModel = orderViewModel, dbUserHelper, dbUserDataBaseFirebase)
         }
         composable(route = AppScreens.Profile_Screen.route) {
             ProfileScreen(
@@ -128,7 +128,7 @@ fun AppNavigation(
             arguments = listOf(navArgument("origin") { type = NavType.StringType },
                 navArgument("id") { type = NavType.StringType })
         ) { backStackEntry ->
-            LocationGoogleScreen(context, navController,addressViewModel,
+            LocationGoogleScreen(context, navController, orderViewModel,
                 origin = backStackEntry.arguments?.getString("origin") ?: "unknown",
                 id = backStackEntry.arguments?.getString("id") ?: "unknown"
             )
