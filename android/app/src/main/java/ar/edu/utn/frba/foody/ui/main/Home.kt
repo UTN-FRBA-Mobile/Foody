@@ -146,7 +146,10 @@ fun BottomGroupHome(navController: NavController, orderViewModel: OrderViewModel
         }
 
         IconButton(
-            onClick = { orderViewModel.getOrder() },
+            onClick = {
+                orderViewModel.getOrder()
+                navController.navigate(AppScreens.Cart_Screen.route)
+            },
         ) {
             Image(
                 painter = painterResource(id = R.drawable.cart_icon),

@@ -102,7 +102,10 @@ fun TopGroupRestaurant(navController: NavController, restaurantName: String, ord
 
 
         IconButton(
-            onClick = { orderViewModel.getOrder() },
+            onClick = {
+                orderViewModel.getOrder()
+                navController.navigate(AppScreens.Cart_Screen.route)
+            },
         ) {
             Image(
                 painter = painterResource(id = button_cart.resourceId),

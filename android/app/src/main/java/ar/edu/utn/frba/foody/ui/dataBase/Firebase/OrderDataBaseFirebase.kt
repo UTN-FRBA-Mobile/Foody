@@ -77,6 +77,14 @@ class OrderDataBaseFirebase(private var database: FirebaseDatabase) {
         })
     }
 
+    fun updateUserOrderList(orderId: String, userOrders: List<UserOrder>, callback: (Boolean) -> Unit) {
+        val orderRef = FirebaseDatabase.getInstance().getReference(TABLE_ORDERS).child(orderId).child(TABLE_USER_ORDERS)
+
+        orderRef.setValue(userOrders).addOnCompleteListener { task ->
+            callback(task.isSuccessful)
+        }
+    }
+
     fun getOrderById(orderId: String, callback: (Order?) -> Unit) {
         val myRef = database.getReference(TABLE_ORDERS)
 
@@ -92,7 +100,6 @@ class OrderDataBaseFirebase(private var database: FirebaseDatabase) {
             }
         })
     }
-
 
     fun getOrdersByUser(userId: String, callback: (List<Order>) -> Unit) {
         val myRef = database.getReference(TABLE_ORDERS)

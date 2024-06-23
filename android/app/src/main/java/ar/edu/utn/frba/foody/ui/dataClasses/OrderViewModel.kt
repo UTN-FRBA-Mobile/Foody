@@ -210,19 +210,16 @@ class OrderViewModel() : ViewModel() {
             if(order != null) {
                 this.order = order
             }
-            navController?.navigate(AppScreens.Cart_Screen.route)
         }
     }
 
     fun emptyUserOrder() {
         val userOrder = getAssignedUserOrder()
-        userOrder.items.forEach {
-            orderDataBase?.deleteOrderItem(it.id)
-        }
-        orderDataBase?.deleteUserOrder(userOrder.userOrderId)
 
         val userOrders = order.userOrders.filter { x -> x.user != user }
         order = order.copy(userOrders = userOrders.toMutableList())
+
+        orderDataBaseFirebase?.updateUserOrderList(order.orderId, mutableListOf<UserOrder>()) { isSuccess -> }
     }
 
     val defaultOrderStates: List<OrderState> = listOf(
