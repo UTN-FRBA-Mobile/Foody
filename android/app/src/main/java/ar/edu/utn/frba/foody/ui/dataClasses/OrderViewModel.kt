@@ -266,7 +266,6 @@ class OrderViewModel() : ViewModel() {
 
     fun emptyAddress() {
         user.direccion = Address.AddressInfo(
-            id = null,
             calle = null,
             numero = null,
             localidad = null,

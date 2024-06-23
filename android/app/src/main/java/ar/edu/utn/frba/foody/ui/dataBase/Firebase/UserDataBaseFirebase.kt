@@ -22,6 +22,13 @@ class UserDataBaseFirebase(private var database: FirebaseDatabase) {
         return user;
     }
 
+    //Create method to update user
+    fun updateUser(user: User) {
+        val myRef = database.getReference(TABLE_USER)
+
+        myRef.child(user.userId).setValue(user)
+    }
+
     fun getUserByEmail(email: String, callback: (User?) -> Unit) {
         val myRef = database.getReference(TABLE_USER)
 

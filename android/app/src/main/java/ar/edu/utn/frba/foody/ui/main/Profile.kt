@@ -41,11 +41,12 @@ import ar.edu.utn.frba.foody.ui.Classes.Address
 import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.AddressViewModel
+import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
-fun ProfileScreen(navController: NavController, viewModel: AddressViewModel,
+fun ProfileScreen(navController: NavController, viewModel: MainViewModel,
                   dbUserDataBase: UserDataBase?, orderViewModel: OrderViewModel)
 {
     var user = orderViewModel.user
@@ -144,10 +145,9 @@ fun ProfileScreen(navController: NavController, viewModel: AddressViewModel,
                     enabled = false  // Deshabilitar la edición del TextField
                 )
 
-                //VER QUE HACER CON EL ID DE ADDRESS
                 IconButton(onClick = {
                     navController.navigate(AppScreens.Location_Screen.createRoute("profile",
-                        user.direccion.id.toString()))
+                        user.userId.toString()))
                 }) {
                     Icon(
                         modifier = Modifier.size(36.dp),
@@ -168,15 +168,7 @@ fun ProfileScreen(navController: NavController, viewModel: AddressViewModel,
                     if(validateAnyUserEmptyProf(user, user.direccion ,context)) {
                         user.numeroContacto=numero.toInt()
 
-                        val addressId =
-                            dbUserDataBase?.updateAddress(dbUserDataBase, user.direccion)
-                        if (addressId != null) {
-                            user.direccion = Address.AddressInfo()
-                        }
-                        dbUserDataBase?.updateUser(
-                            dbUserDataBase,
-                           user
-                        )
+                        viewModel.updateUser(user)
                         navController.navigate(AppScreens.Home_Screen.route)
                     }
                     else {navController.navigate(AppScreens.Profile_Screen.route)}

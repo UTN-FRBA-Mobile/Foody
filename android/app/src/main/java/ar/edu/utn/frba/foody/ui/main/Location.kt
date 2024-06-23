@@ -293,7 +293,6 @@ fun LocationGoogleScreen(
             Button(
                 onClick = {
                     address = Address.AddressInfo(
-                        id = 0,
                         calle = direccion,
                         numero = if (nro == "") 0 else nro.toInt(),
                         localidad = localidad,
@@ -317,9 +316,6 @@ fun LocationGoogleScreen(
                         Log.d("LocationGoogleScreen", "Número: ${address.numero}")
                         Log.d("LocationGoogleScreen", "Localidad: ${address.localidad}")
                         Log.d("LocationGoogleScreen", "Región: ${address.region}")
-                        if (origin == "profile") {
-                            address.id = id.toInt()
-                        }
                         // Guardar la dirección en la variable
                         viewModel.updateAddress(address)
 

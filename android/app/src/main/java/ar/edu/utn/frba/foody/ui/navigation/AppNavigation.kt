@@ -68,7 +68,7 @@ fun AppNavigation(
         }
         composable(route = AppScreens.Profile_Screen.route) {
             ProfileScreen(
-                navController = navController, viewModel = addressViewModel,
+                navController = navController, viewModel = viewModel,
                 dbUserDataBase = dbUserHelper, orderViewModel
             )
         }
