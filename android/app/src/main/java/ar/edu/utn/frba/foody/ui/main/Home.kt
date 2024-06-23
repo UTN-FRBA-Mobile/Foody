@@ -6,6 +6,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -18,6 +20,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Restaurant
+import ar.edu.utn.frba.foody.ui.composables.SimpleAlert
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.RestaurantDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
@@ -32,26 +35,33 @@ fun HomeScreen(
     userDataBase: UserDataBase?,
     orderViewModel: OrderViewModel
 ) {
-    AppScaffold(navController, null, { BottomGroupHome(navController, orderViewModel) },{ TopGroupHome(navController)}) {
+    AppScaffold(
+        navController,
+        null,
+        { BottomGroupHome(navController, orderViewModel) },
+        { TopGroupHome(navController) }) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .fillMaxSize()
-                ) {
-            Box(modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 32.dp)
-                .fillMaxWidth()
+        ) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 32.dp)
+                    .fillMaxWidth()
             ) {
-                    Text(text = "Restaurants",
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        textAlign = TextAlign.Center,
-                        fontSize = 24.sp
-                    )
+                Text(
+                    text = "Restaurants",
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    fontSize = 24.sp
+                )
             }
             Spacer(modifier = Modifier.height(16.dp))
-            LazyColumn(horizontalAlignment = Alignment.CenterHorizontally,
+            LazyColumn(
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(505.dp)
@@ -59,14 +69,20 @@ fun HomeScreen(
                 if (restaurantDataBase != null) {
                     for (restaurant in restaurantDataBase.getAllRestaurants(userDataBase)) {
                         item {
-                            RestaurantItem(navController = navController, viewModel = viewModel, restaurant = restaurant)
+                            RestaurantItem(
+                                navController = navController,
+                                viewModel = viewModel,
+                                restaurant = restaurant
+                            )
                         }
                     }
                 }
             }
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomCenter)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+            ) {
             }
         }
     }
@@ -75,14 +91,38 @@ fun HomeScreen(
 
 @Composable
 fun RestaurantItem(navController: NavController, viewModel: MainViewModel, restaurant: Restaurant) {
+    val showAlert = remember {
+        mutableStateOf(false)
+    }
+    val showRestaurant = remember {
+        mutableStateOf(false)
+    }
+
+    SimpleAlert(
+        show = showAlert.value,
+        text = "Actualmente tienes un pedido con el restaurante NOMBRE, si eliges este restaurante perderás el pedido actual. ¿Deseas continuar?",
+        onConfirm = { showAlert.value = false; showRestaurant.value = true },
+        onDismiss = { showAlert.value = false }
+    )
+
+    if (showRestaurant.value) {
+        viewModel.updateRestaurant(restaurant)
+        navController.navigate(AppScreens.Restaurant_Screen.route)
+    }
+
     Card(backgroundColor = MaterialTheme.colors.secondary) {
-        Row (modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = {
-                viewModel.updateRestaurant(restaurant)
-                navController.navigate(AppScreens.Restaurant_Screen.route)
-            })
-            .padding(16.dp, 4.dp)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = {
+                    if (restaurant != viewModel.getPickedRestaurant()) {
+                        showAlert.value = true
+                    } else {
+                        showRestaurant.value = true
+                    }
+                })
+                .padding(16.dp, 4.dp)
+        ) {
             Image(
                 painter = painterResource(id = restaurant.image),
                 contentDescription = restaurant.imageDescription,
@@ -92,7 +132,8 @@ fun RestaurantItem(navController: NavController, viewModel: MainViewModel, resta
                 contentScale = ContentScale.FillBounds,
             )
             Spacer(modifier = Modifier.width(16.dp))
-            Text(text = restaurant.name,
+            Text(
+                text = restaurant.name,
                 Modifier
                     .fillMaxWidth()
                     .align(Alignment.CenterVertically),
@@ -131,7 +172,7 @@ fun BottomGroupHome(navController: NavController, orderViewModel: OrderViewModel
     )
 
     Row(modifier = Modifier.fillMaxWidth()) {
-        buttons.forEach{
+        buttons.forEach {
             IconButton(
                 onClick = { navController.navigate(it.route) },
                 modifier = Modifier.weight(1f)
