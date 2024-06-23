@@ -160,11 +160,6 @@ fun BottomGroupHome(navController: NavController, orderViewModel: OrderViewModel
             route = AppScreens.Profile_Screen.route,
         ),
         ButtonInterface(
-            resourceId = R.drawable.order_icon,
-            imageDescription = "Order Icon",
-            route = AppScreens.Orders_Screen.route,
-        ),
-        ButtonInterface(
             resourceId = R.drawable.create_group_icon,
             imageDescription = "Join Group Icon",
             route = AppScreens.Join_Group_Screen.route
@@ -195,6 +190,20 @@ fun BottomGroupHome(navController: NavController, orderViewModel: OrderViewModel
             Image(
                 painter = painterResource(id = R.drawable.cart_icon),
                 contentDescription = "Cart Icon",
+                modifier = Modifier.size(24.dp),
+                contentScale = ContentScale.FillBounds
+            )
+        }
+
+        IconButton(
+            onClick = {
+                orderViewModel.findAllOrdersForUser()
+                navController.navigate(AppScreens.Orders_Screen.route)
+            },
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.order_icon),
+                contentDescription = "Order Icon",
                 modifier = Modifier.size(24.dp),
                 contentScale = ContentScale.FillBounds
             )

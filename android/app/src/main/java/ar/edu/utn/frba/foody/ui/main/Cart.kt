@@ -251,10 +251,7 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = {
-                viewModel.deleteItem(
-                    userOrderId = userOrder.userOrderId,
-                    userItemId = orderItem.id
-                )
+                viewModel.deleteItem(orderItem.dish.dishId)
             }) {
                 Icon(imageVector = Icons.Default.Clear, contentDescription = "Remove")
             }
@@ -266,11 +263,7 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
             Spacer(modifier = Modifier.width(8.dp))
 
             IconButton(onClick = {
-                viewModel.changeItemQuantity(
-                    userOrder.userOrderId,
-                    orderItem.dish.dishId,
-                    1
-                )
+                viewModel.changeItemQuantity(orderItem.dish.dishId, 1)
             }) {
                 Icon(imageVector = Icons.Default.KeyboardArrowUp, contentDescription = "Increase")
             }
@@ -278,11 +271,7 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
             Text(text = orderItem.quantity.toString(), fontSize = 18.sp)
 
             IconButton(onClick = {
-                viewModel.changeItemQuantity(
-                    userOrder.userOrderId,
-                    orderItem.dish.dishId,
-                    -1
-                )
+                viewModel.changeItemQuantity(orderItem.dish.dishId,-1)
             }) {
                 Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "Decrease")
             }

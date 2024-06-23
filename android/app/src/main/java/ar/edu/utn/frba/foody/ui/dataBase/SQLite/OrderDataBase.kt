@@ -395,9 +395,9 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
                         orderId,
                         restaurant,
                         name,
+                        direction,
                         inProgressMapeado,
                         userOrders,
-                        direction,
                         estimatedHour,
                         orderStates,
                         group
@@ -501,9 +501,9 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
                         orderId,
                         restaurant!!,
                         name,
+                        direction,
                         inProgressMapeado,
                         userOrders,
-                        direction,
                         estimatedHour,
                         orderStates,
                         group

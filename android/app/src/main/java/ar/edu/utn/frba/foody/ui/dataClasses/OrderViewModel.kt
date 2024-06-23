@@ -27,6 +27,7 @@ import java.util.Calendar
 
 class OrderViewModel() : ViewModel() {
     private var order by mutableStateOf(Order(""))
+    private var orders by mutableStateOf(listOf<Order>())
 
     var orderDataBase: OrderDataBase? = null
     var orderDataBaseFirebase: OrderDataBaseFirebase? = null
@@ -53,6 +54,10 @@ class OrderViewModel() : ViewModel() {
 
     fun getPickedOrder(): Order {
         return order
+    }
+
+    fun getAllOrdersForUser(): List<Order> {
+        return orders
     }
 
     fun createGroup(newGroup: Group) {
@@ -89,7 +94,7 @@ class OrderViewModel() : ViewModel() {
     }
 
     fun createOrder(restaurant: Restaurant) {
-        val createdOrder = Order("", restaurant)
+        val createdOrder = Order("", restaurant, restaurant.name, user.direccion.calle + " " + user.direccion.numero)
 
         createdOrder.orderId = orderDataBaseFirebase?.addOrder(createdOrder) ?: ""
 
@@ -122,25 +127,31 @@ class OrderViewModel() : ViewModel() {
         return order.userOrders.sumOf { x -> x.items.sumOf { y -> y.quantity * y.dish.price } }
     }
 
-    fun deleteItem(userOrderId: String, userItemId: String) {
-        orderDataBase?.deleteOrderItem(userOrderId)
-
-        val userOrderIndex = order.userOrders.indexOfFirst { it.userOrderId == userOrderId }
+    fun deleteItem(dishId: Int) {
+        val userOrderIndex = order.userOrders.indexOfFirst { it.user.userId == user.userId }
 
         val userOrder = order.userOrders[userOrderIndex]
 
-        val updatedItems = userOrder.items.filter { it.id != userItemId }
+        if(userOrder.items.size > 1) {
+            val updatedItems = userOrder.items.filter { it.dish.dishId != dishId }
 
-        val updatedUserOrder = userOrder.copy(items = updatedItems.toMutableList())
+            val updatedUserOrder = userOrder.copy(items = updatedItems.toMutableList())
 
-        val updatedUserOrders = order.userOrders.toMutableList()
-        updatedUserOrders[userOrderIndex] = updatedUserOrder
+            val updatedUserOrders = order.userOrders.toMutableList()
+            updatedUserOrders[userOrderIndex] = updatedUserOrder
 
-        order = order.copy(userOrders = updatedUserOrders.toMutableList())
+            order = order.copy(userOrders = updatedUserOrders.toMutableList())
+
+            orderDataBaseFirebase?.updateUserOrder(order.orderId, updatedUserOrder) { isSuccess -> }
+        }
+        else {
+            this.emptyUserOrder()
+        }
+
     }
 
-    fun changeItemQuantity(userOrderId: String, dishId: Int, variation: Int) {
-        val userOrderIndex = order.userOrders.indexOfFirst { it.userOrderId == userOrderId }
+    fun changeItemQuantity(dishId: Int, variation: Int) {
+        val userOrderIndex = order.userOrders.indexOfFirst { it.user.userId == user.userId }
 
         val userOrder = order.userOrders[userOrderIndex]
 
@@ -148,8 +159,10 @@ class OrderViewModel() : ViewModel() {
 
         val userItem = userOrder.items[userItemIndex]
 
-        if(variation < 0 && userItem.quantity == 0)
+        if(userItem.quantity + variation == 0) {
+            deleteItem(dishId)
             return
+        }
 
         val newQuantity = userItem.quantity + variation
 
@@ -172,7 +185,7 @@ class OrderViewModel() : ViewModel() {
         }
     }
 
-    fun addItem(userOrderId: String, quantity: Int, dish: Dish) {
+    fun addItem(quantity: Int, dish: Dish) {
         val userOrderIndex = order.userOrders.indexOfFirst { it.user.userId == user.userId }
 
         val userOrder = order.userOrders[userOrderIndex]
@@ -196,17 +209,17 @@ class OrderViewModel() : ViewModel() {
         }
     }
 
-    fun changeItemQuantityIfExists(userOrderId: String, orderItem: OrderItemInfo?, variation: Int, dish: Dish, restaurant: Restaurant) {
+    fun changeItemQuantityIfExists(orderItem: OrderItemInfo?, variation: Int, dish: Dish, restaurant: Restaurant) {
         if(orderItem == null && order.restaurant.restaurantId != restaurant.restaurantId) {
             createOrder(restaurant)
         }
         if (orderItem == null) {
             if(variation > 0) {
-                addItem(userOrderId, variation, dish)
+                addItem(variation, dish)
             }
         }
         else {
-            changeItemQuantity(userOrderId, dish.dishId, variation)
+            changeItemQuantity(dish.dishId, variation)
         }
     }
 
@@ -214,6 +227,14 @@ class OrderViewModel() : ViewModel() {
         orderDataBaseFirebase?.getOrderById(order.orderId) { order ->
             if(order != null) {
                 this.order = order
+            }
+        }
+    }
+
+    fun findAllOrdersForUser() {
+        orderDataBaseFirebase?.getOrdersByUser(user.userId) { orders ->
+            if(orders.isNotEmpty()) {
+                this.orders = orders
             }
         }
     }
@@ -250,33 +271,6 @@ class OrderViewModel() : ViewModel() {
             imageDescription = "Finished Icon",
             description = "Entregamos tu pedido",
         ),
-    )
-
-    val orders: List<Order> = listOf(
-        Order(
-            orderId = "1",
-            name = "Order 1",
-            inProgress = false,
-            direction = "Dorrego 1352",
-            estimatedHour = getCurrentTime(),
-            orderStates = defaultOrderStates,
-        ),
-        Order(
-            orderId = "2",
-            name = "Order 2",
-            inProgress = true,
-            direction = "Suarez 3450",
-            estimatedHour = getCurrentTime(),
-            orderStates = defaultOrderStates
-        ),
-        Order(
-            orderId = "3",
-            name = "Order 3",
-            inProgress = false,
-            direction = "Santa Fe 34",
-            estimatedHour = getCurrentTime(),
-            orderStates = defaultOrderStates
-        )
     )
 }
 

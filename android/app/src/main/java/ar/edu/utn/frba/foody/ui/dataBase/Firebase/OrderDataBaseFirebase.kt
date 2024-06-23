@@ -104,7 +104,7 @@ class OrderDataBaseFirebase(private var database: FirebaseDatabase) {
     fun getOrdersByUser(userId: String, callback: (List<Order>) -> Unit) {
         val myRef = database.getReference(TABLE_ORDERS)
 
-        myRef.addListenerForSingleValueEvent(object : ValueEventListener {
+        myRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val orders = mutableListOf<Order>()
                 dataSnapshot.children.forEach { orderSnapshot ->
