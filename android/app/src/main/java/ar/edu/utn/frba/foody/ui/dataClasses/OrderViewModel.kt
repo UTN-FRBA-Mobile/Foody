@@ -26,6 +26,7 @@ import java.util.Calendar
 
 class OrderViewModel() : ViewModel() {
     private var order by mutableStateOf(Order(""))
+    private var orders by mutableStateOf(listOf<Order>())
 
     var orderDataBase: OrderDataBase? = null
     var orderDataBaseFirebase: OrderDataBaseFirebase? = null
@@ -52,6 +53,10 @@ class OrderViewModel() : ViewModel() {
 
     fun getPickedOrder(): Order {
         return order
+    }
+
+    fun getAllOrdersForUser(): List<Order> {
+        return orders
     }
 
     fun createGroup(newGroup: Group) {
@@ -88,7 +93,7 @@ class OrderViewModel() : ViewModel() {
     }
 
     fun createOrder(restaurant: Restaurant) {
-        val createdOrder = Order("", restaurant)
+        val createdOrder = Order("", restaurant, restaurant.name, user.direccion.calle + " " + user.direccion.numero)
 
         createdOrder.orderId = orderDataBaseFirebase?.addOrder(createdOrder) ?: ""
 
@@ -221,6 +226,14 @@ class OrderViewModel() : ViewModel() {
         }
     }
 
+    fun findAllOrdersForUser() {
+        orderDataBaseFirebase?.getOrdersByUser(user.userId) { orders ->
+            if(orders.isNotEmpty()) {
+                this.orders = orders
+            }
+        }
+    }
+
     fun emptyUserOrder() {
         val userOrder = getAssignedUserOrder()
 
@@ -252,33 +265,6 @@ class OrderViewModel() : ViewModel() {
             imageDescription = "Finished Icon",
             description = "Entregamos tu pedido",
         ),
-    )
-
-    val orders: List<Order> = listOf(
-        Order(
-            orderId = "1",
-            name = "Order 1",
-            inProgress = false,
-            direction = "Dorrego 1352",
-            estimatedHour = getCurrentTime(),
-            orderStates = defaultOrderStates,
-        ),
-        Order(
-            orderId = "2",
-            name = "Order 2",
-            inProgress = true,
-            direction = "Suarez 3450",
-            estimatedHour = getCurrentTime(),
-            orderStates = defaultOrderStates
-        ),
-        Order(
-            orderId = "3",
-            name = "Order 3",
-            inProgress = false,
-            direction = "Santa Fe 34",
-            estimatedHour = getCurrentTime(),
-            orderStates = defaultOrderStates
-        )
     )
 }
 
