@@ -14,12 +14,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -45,6 +45,12 @@ fun OrdersScreen(navController: NavController, viewModel: OrderViewModel) {
             contentAlignment = Alignment.Center,
             modifier = Modifier.fillMaxSize()
         ) {
+            Image(
+                painter = painterResource(id = R.drawable.background_signup),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
             Box(modifier = Modifier
                 .align(Alignment.TopCenter)
                 .padding(top = 32.dp)
@@ -73,11 +79,6 @@ fun OrdersScreen(navController: NavController, viewModel: OrderViewModel) {
                         }
                     }
                 }
-
-
-
-
-
             }
         }
     }
@@ -104,7 +105,10 @@ fun TopGroupOrderList(navController: NavController) {
 
 @Composable
 fun OrderItem(navController: NavController, viewModel: OrderViewModel, order: Order) {
-    Card(backgroundColor = MaterialTheme.colors.secondary) {
+    Card(modifier = Modifier
+        .fillMaxSize(),
+        backgroundColor = Color.Transparent,
+        elevation = 0.dp) {
         Row (modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp, 4.dp),

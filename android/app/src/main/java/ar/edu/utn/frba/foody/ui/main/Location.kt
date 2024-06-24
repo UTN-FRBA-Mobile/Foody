@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Address
-import ar.edu.utn.frba.foody.ui.dataClasses.AddressViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 import com.google.android.gms.location.*
@@ -224,11 +223,11 @@ fun LocationGoogleScreen(
                     value = direccion, onValueChange = { direccion = it },
                     label = {
                         Text(
-                            text = "Direccion",
+                            text = "Calle",
                             modifier = Modifier.padding(start = 16.dp)
                         )
                     },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     singleLine = true,
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = Color.Transparent
@@ -238,8 +237,8 @@ fun LocationGoogleScreen(
                 TextField(
                     modifier = Modifier.weight(1f),
                     value = nro, onValueChange = { nro = it },
-                    label = { Text(text = "Nro", modifier = Modifier.padding(start = 16.dp)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    label = { Text(text = "Altura", modifier = Modifier.padding(start = 16.dp)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = Color.Transparent
@@ -251,7 +250,7 @@ fun LocationGoogleScreen(
                 modifier = Modifier.fillMaxWidth(),
                 value = localidad, onValueChange = { localidad = it },
                 label = { Text(text = "Localidad", modifier = Modifier.padding(start = 16.dp)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 singleLine = true,
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = Color.Transparent

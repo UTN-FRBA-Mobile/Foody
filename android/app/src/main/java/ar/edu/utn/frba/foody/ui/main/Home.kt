@@ -10,14 +10,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Restaurant
 import ar.edu.utn.frba.foody.ui.composables.SimpleAlert
@@ -39,7 +38,14 @@ fun HomeScreen(
         navController,
         null,
         { BottomGroupHome(navController, orderViewModel) },
-        { TopGroupHome(navController) }) {
+        { TopGroupHome(navController) }
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.background_signup),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -77,13 +83,11 @@ fun HomeScreen(
                             )
                         }
                     }
+                    item {
+                        if (restaurantDataBase.getAllRestaurants(userDataBase).isNotEmpty())
+                        Divider()
+                    }
                 }
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-            ) {
             }
         }
     }
@@ -91,7 +95,12 @@ fun HomeScreen(
 }
 
 @Composable
-fun RestaurantItem(navController: NavController, viewModel: MainViewModel, orderViewModel: OrderViewModel, restaurant: Restaurant) {
+fun RestaurantItem(
+    navController: NavController,
+    viewModel: MainViewModel,
+    orderViewModel: OrderViewModel,
+    restaurant: Restaurant
+) {
     val showAlert = remember {
         mutableStateOf(false)
     }
@@ -107,7 +116,9 @@ fun RestaurantItem(navController: NavController, viewModel: MainViewModel, order
     SimpleAlert(
         show = showAlert.value,
         text = "Actualmente tienes un pedido con el restaurante ${restaurantName}, si eliges este restaurante perderás el pedido actual. ¿Deseas continuar?",
-        onConfirm = { showAlert.value = false; showRestaurant.value = true; changeRestaurant.value = true },
+        onConfirm = {
+            showAlert.value = false; showRestaurant.value = true; changeRestaurant.value = true
+        },
         onDismiss = { showAlert.value = false }
     )
 
@@ -120,7 +131,12 @@ fun RestaurantItem(navController: NavController, viewModel: MainViewModel, order
         orderViewModel.changeRestaurant(restaurant)
     }
 
-    Card(backgroundColor = MaterialTheme.colors.secondary) {
+    Card(
+        modifier = Modifier
+            .fillMaxSize(),
+        backgroundColor = Color.Transparent,
+        elevation = 0.dp
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -170,57 +186,39 @@ fun BottomGroupHome(navController: NavController, orderViewModel: OrderViewModel
             route = AppScreens.Profile_Screen.route,
         ),
         ButtonInterface(
+            resourceId = R.drawable.cart_icon,
+            imageDescription = "Cart Icon",
+            route = AppScreens.Cart_Screen.createRoute(origin = "home")
+        ),
+        ButtonInterface(
+            resourceId = R.drawable.order_icon,
+            imageDescription = "Order Icon",
+            route = AppScreens.Orders_Screen.route
+        ),
+        ButtonInterface(
             resourceId = R.drawable.create_group_icon,
             imageDescription = "Join Group Icon",
             route = AppScreens.Join_Group_Screen.route
         )
     )
 
-    Row(modifier = Modifier.fillMaxWidth()) {
-        buttons.forEach {
-            IconButton(
-                onClick = { navController.navigate(it.route) },
-                modifier = Modifier.weight(1f)
-            ) {
-                Image(
-                    painter = painterResource(id = it.resourceId),
-                    contentDescription = it.imageDescription,
-                    modifier = Modifier.size(24.dp),
-                    contentScale = ContentScale.FillBounds
-                )
+    BottomAppBar {
+        Row(modifier = Modifier.fillMaxWidth()) {
+            buttons.forEach {
+                IconButton(
+                    onClick = { navController.navigate(it.route) },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Image(
+                        painter = painterResource(id = it.resourceId),
+                        contentDescription = it.imageDescription,
+                        modifier = Modifier.size(24.dp),
+                        contentScale = ContentScale.FillBounds
+                    )
+                }
             }
         }
-
-        IconButton(
-            onClick = {
-                orderViewModel.getOrder()
-                navController.navigate(AppScreens.Cart_Screen.route)
-            },
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.cart_icon),
-                contentDescription = "Cart Icon",
-                modifier = Modifier.size(24.dp),
-                contentScale = ContentScale.FillBounds
-            )
-        }
-
-        IconButton(
-            onClick = {
-                orderViewModel.findAllOrdersForUser()
-                navController.navigate(AppScreens.Orders_Screen.route)
-            },
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.order_icon),
-                contentDescription = "Order Icon",
-                modifier = Modifier.size(24.dp),
-                contentScale = ContentScale.FillBounds
-            )
-        }
     }
-
-
 }
 
 @Composable
@@ -246,8 +244,9 @@ fun TopGroupHome(navController: NavController) {
 @Preview
 @Composable
 fun DefaultPreview() {
-    val navController= rememberNavController()
+    val navController = rememberNavController()
     val viewModel = MainViewModel()
-    HomeScreen(navController, viewModel,null,null)
+    val orderViewModel = OrderViewModel()
+    HomeScreen(navController, viewModel, null, null, orderViewModel)
 }
 */
