@@ -12,10 +12,8 @@ import androidx.compose.ui.*
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.*
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.navigation.*
-import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.*
 import ar.edu.utn.frba.foody.ui.composables.DishAlert
@@ -82,6 +80,12 @@ fun BottomGroupOrder(
 fun OrderDetailGrid(
     userOrders: List<UserOrder>
 ) {
+    Image(
+        painter = painterResource(id = R.drawable.background_signup),
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = Modifier.fillMaxSize()
+    )
     LazyVerticalGrid(
         columns = GridCells.Fixed(1),
         contentPadding = PaddingValues(8.dp),
@@ -170,11 +174,11 @@ fun OrderDetailItem(orderItem: OrderItemInfo) {
 }
 
 
+/*
 @Preview
 @Composable
 fun DefaultPreviewOrder() {
     val navController = rememberNavController()
     val viewModel = OrderViewModel()
     OrderScreen(navController, viewModel)
-}
-
+}*/

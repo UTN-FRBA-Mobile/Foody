@@ -6,4 +6,6 @@
     <string name="label_contrasena">Contraseña</string>
     <string name="ok">Ok</string>
     <string name="label_titulo_carrito">Mi carrito</string>
+    <string name="aceptar">Aceptar</string>
+    <string name="cancelar">Cancelar</string>
 </resources>

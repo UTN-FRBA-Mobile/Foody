@@ -127,8 +127,8 @@ class UserDataBase(private var context: Context) :
             put("longitud",address.longitud)
         }
         val whereClause= "id = ?"
-        val whereArgs= arrayOf(address.id.toString())
-        val id= db.update("direccion",values,whereClause,whereArgs)
+        //val whereArgs= arrayOf(address.id.toString())
+        val id=  1;//db.update("direccion",values,whereClause,whereArgs)
         db.close()
         return id
     }
@@ -145,7 +145,6 @@ class UserDataBase(private var context: Context) :
             db.rawQuery("SELECT * FROM direccion", null)
         }
         if (cursor.moveToFirst()) {
-            val id = cursor.getInt(cursor.getColumnIndexOrThrow("id"))
             val calle = cursor.getString(cursor.getColumnIndexOrThrow("calle"))
             val numero = cursor.getInt(cursor.getColumnIndexOrThrow("numero"))
             val localidad = cursor.getString(cursor.getColumnIndexOrThrow("localidad"))
@@ -154,7 +153,7 @@ class UserDataBase(private var context: Context) :
             val longitud = cursor.getDouble(cursor.getColumnIndexOrThrow("longitud"))
             cursor.close()
             db.close()
-            return Address.AddressInfo(id,calle,numero,localidad,region,latitud,longitud)
+            return Address.AddressInfo(calle,numero,localidad,region,latitud,longitud)
         }
         cursor.close()
         db.close()

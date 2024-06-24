@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import ar.edu.utn.frba.foody.R
+import ar.edu.utn.frba.foody.ui.Classes.Address
 import ar.edu.utn.frba.foody.ui.Classes.Dish
 import ar.edu.utn.frba.foody.ui.Classes.Restaurant
 import ar.edu.utn.frba.foody.ui.Classes.User
@@ -44,6 +45,14 @@ class MainViewModel() : ViewModel() {
 
     fun getPickedRestaurant(): Restaurant {
         return restaurant
+    }
+
+    fun getPickedRestaurantName(): String {
+        return restaurant.name
+    }
+
+    fun updateUser(user: User) {
+        userDataBaseFirebase!!.updateUser(user)
     }
 
     //TODO: pasar los datos estáticos a otro lado

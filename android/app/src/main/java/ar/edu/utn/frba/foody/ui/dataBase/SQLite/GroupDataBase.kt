@@ -52,7 +52,6 @@ class GroupDataBase(private var context: Context) : SQLiteOpenHelper(
                 put(COLUMN_USER_ID, user.userId)
                 put(COLUMN_USER_EMAIL, user.email)
                 put(COLUMN_USER_PASSWORD, user.password)
-                put(COLUMN_USER_DIRECCION_ID, user.direccion.id)
                 put(COLUMN_USER_ADMIN, user.admin)
                 put(COLUMN_USER_GROUP_ID, groupId)
             }
@@ -71,8 +70,6 @@ class GroupDataBase(private var context: Context) : SQLiteOpenHelper(
                 val userValues = ContentValues().apply {
                     put(COLUMN_USER_EMAIL, user.email)
                     put(COLUMN_USER_PASSWORD, user.password)
-                    put(COLUMN_USER_DIRECCION_ID, user.direccion.id)
-                    put(COLUMN_USER_ADMIN, user.admin)
                     put(COLUMN_USER_GROUP_ID, group.groupId)
                 }
 

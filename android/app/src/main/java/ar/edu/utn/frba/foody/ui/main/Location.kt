@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Address
-import ar.edu.utn.frba.foody.ui.dataClasses.AddressViewModel
+import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.*
@@ -36,14 +36,14 @@ import kotlinx.coroutines.*
 fun LocationGoogleScreen(
     context: ComponentActivity,
     navController: NavController,
-    viewModel: AddressViewModel,
+    viewModel: OrderViewModel,
     origin: String,
     id: String
 ) {
-    var direccion by remember { mutableStateOf(if(origin == "profile") viewModel.getPickedAddress().calle!! else "") }
-    var nro by remember { mutableStateOf(if(origin == "profile") viewModel.getPickedAddress().numero.toString() else "") }
-    var localidad by remember { mutableStateOf(if(origin == "profile") viewModel.getPickedAddress().localidad!! else "") }
-    var region by remember { mutableStateOf(if(origin == "profile") viewModel.getPickedAddress().region!! else "") }
+    var direccion by remember { mutableStateOf(if(origin == "profile") viewModel.user.direccion.calle!! else "") }
+    var nro by remember { mutableStateOf(if(origin == "profile") viewModel.user.direccion.numero.toString() else "") }
+    var localidad by remember { mutableStateOf(if(origin == "profile") viewModel.user.direccion.localidad!! else "") }
+    var region by remember { mutableStateOf(if(origin == "profile") viewModel.user.direccion.region!! else "") }
     var address: Address.AddressInfo
 
     val permissions = arrayOf(
@@ -223,11 +223,11 @@ fun LocationGoogleScreen(
                     value = direccion, onValueChange = { direccion = it },
                     label = {
                         Text(
-                            text = "Direccion",
+                            text = "Calle",
                             modifier = Modifier.padding(start = 16.dp)
                         )
                     },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     singleLine = true,
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = Color.Transparent
@@ -237,8 +237,8 @@ fun LocationGoogleScreen(
                 TextField(
                     modifier = Modifier.weight(1f),
                     value = nro, onValueChange = { nro = it },
-                    label = { Text(text = "Nro", modifier = Modifier.padding(start = 16.dp)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    label = { Text(text = "Altura", modifier = Modifier.padding(start = 16.dp)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = Color.Transparent
@@ -250,7 +250,7 @@ fun LocationGoogleScreen(
                 modifier = Modifier.fillMaxWidth(),
                 value = localidad, onValueChange = { localidad = it },
                 label = { Text(text = "Localidad", modifier = Modifier.padding(start = 16.dp)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 singleLine = true,
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = Color.Transparent
@@ -292,7 +292,6 @@ fun LocationGoogleScreen(
             Button(
                 onClick = {
                     address = Address.AddressInfo(
-                        id = 0,
                         calle = direccion,
                         numero = if (nro == "") 0 else nro.toInt(),
                         localidad = localidad,
@@ -316,9 +315,6 @@ fun LocationGoogleScreen(
                         Log.d("LocationGoogleScreen", "Número: ${address.numero}")
                         Log.d("LocationGoogleScreen", "Localidad: ${address.localidad}")
                         Log.d("LocationGoogleScreen", "Región: ${address.region}")
-                        if (origin == "profile") {
-                            address.id = id.toInt()
-                        }
                         // Guardar la dirección en la variable
                         viewModel.updateAddress(address)
 

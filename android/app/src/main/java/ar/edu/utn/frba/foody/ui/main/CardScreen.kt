@@ -11,17 +11,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
@@ -36,165 +33,187 @@ import java.util.Calendar
 
 
 @Composable
-fun CardInfoScreen(navController: NavHostController,viewModel: CardViewModel) {
-    AppScaffold(navController, null,null,
-        { TopGroupCard(navController)}){
+fun CardInfoScreen(navController: NavHostController, viewModel: CardViewModel) {
+    AppScaffold(navController,
+        null,
+        null,
+        { TopGroupCard(navController) }
+    ) {
         var cardInfo by remember { mutableStateOf(Card.CardInfo()) }
 
         val context = LocalContext.current
 
-        Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-
-    ) {
-        Text(
-            text = "Add new card",
-            style = MaterialTheme.typography.h5.copy(fontSize = 24.sp),
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 16.dp),
-            textAlign = TextAlign.Left
-        )
-        // Card number input
-        TextField(
-            value = cardInfo.cardNumber,
-            onValueChange = { cardInfo = cardInfo.copy(cardNumber = it) },
-            label = { Text("Card number") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            trailingIcon = {
-            },
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.Transparent
-            )
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Name and Last Name inputs
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxWidth()
+                .fillMaxSize()
         ) {
-            TextField(
-                value = cardInfo.firstName,
-                onValueChange = { cardInfo =cardInfo.copy(firstName =  it) },
-                label = { Text("Name") },
-                modifier = Modifier.weight(1f),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.Transparent
+            Image(
+                painter = painterResource(id = R.drawable.background_signup),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+
+            ) {
+                Text(
+                    text = "Add new card",
+                    style = MaterialTheme.typography.h5.copy(fontSize = 24.sp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    textAlign = TextAlign.Left
                 )
-            )
-            TextField(
-                value = cardInfo.lastName,
-                onValueChange = { cardInfo =cardInfo.copy(lastName =  it) },
-                label = { Text("Last Name") },
-                modifier = Modifier.weight(1f),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.Transparent
+                // Card number input
+                TextField(
+                    value = cardInfo.cardNumber,
+                    onValueChange = { cardInfo = cardInfo.copy(cardNumber = it) },
+                    label = { Text("Card number") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true,
+                    maxLines = 1,
+                    trailingIcon = {
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.Transparent
+                    )
                 )
-            )
-        }
 
-        Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-        // Expiry date and CVV inputs
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            TextField(
-                value = cardInfo.expiryDate,
-                onValueChange = { cardInfo =cardInfo.copy(expiryDate =  it) },
-                label = { Text("Expiry date(MM/YY)") },
-                visualTransformation = ExpiryDateVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.weight(1.1f),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.Transparent
-                ),
-                maxLines = 1
-            )
-
-
-            TextField(
-                value = cardInfo.cvv,
-                onValueChange = {
-                    if (it.length <= 3 && it.all { char -> char.isDigit() }) {
-                        cardInfo = cardInfo.copy(cvv = it)
-                    }
-                },
-                label = { Text("CVC/CVV") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.weight(1f),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.Transparent
-                )
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Disclaimer text
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Save button
-        Button(
-            onClick = {
-                if(validator(cardInfo,context)==true){
-                    viewModel.addCard(cardInfo)
-                    navController.popBackStack() // Replace with your next screen navigation
+                // Name and Last Name inputs
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    TextField(
+                        value = cardInfo.firstName,
+                        onValueChange = { cardInfo = cardInfo.copy(firstName = it) },
+                        label = { Text("Name") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        singleLine = true,
+                        maxLines = 1,
+                        modifier = Modifier.weight(1f),
+                        colors = TextFieldDefaults.textFieldColors(
+                            backgroundColor = Color.Transparent
+                        )
+                    )
+                    TextField(
+                        value = cardInfo.lastName,
+                        onValueChange = { cardInfo = cardInfo.copy(lastName = it) },
+                        label = { Text("Last Name") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        singleLine = true,
+                        maxLines = 1,
+                        modifier = Modifier.weight(1f),
+                        colors = TextFieldDefaults.textFieldColors(
+                            backgroundColor = Color.Transparent
+                        )
+                    )
                 }
 
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            shape = RoundedCornerShape(25)
-        ) {
-            Text("Save", fontSize = 18.sp)
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Expiry date and CVV inputs
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    TextField(
+                        value = cardInfo.expiryDate,
+                        onValueChange = { cardInfo = cardInfo.copy(expiryDate = it) },
+                        label = { Text("Expiry date(MM/YY)") },
+                        visualTransformation = ExpiryDateVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true,
+                        maxLines = 1,
+                        modifier = Modifier.weight(1.1f),
+                        colors = TextFieldDefaults.textFieldColors(
+                            backgroundColor = Color.Transparent
+                        ),
+                    )
+
+
+                    TextField(
+                        value = cardInfo.cvv,
+                        onValueChange = {
+                            if (it.length <= 3 && it.all { char -> char.isDigit() }) {
+                                cardInfo = cardInfo.copy(cvv = it)
+                            }
+                        },
+                        label = { Text("CVC/CVV") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true,
+                        maxLines = 1,
+                        visualTransformation = PasswordVisualTransformation(),
+                        modifier = Modifier.weight(1f),
+                        colors = TextFieldDefaults.textFieldColors(
+                            backgroundColor = Color.Transparent
+                        )
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Disclaimer text
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Save button
+                Button(
+                    onClick = {
+                        if (validator(cardInfo, context) == true) {
+                            viewModel.addCard(cardInfo)
+                            navController.popBackStack() // Replace with your next screen navigation
+                        }
+
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                ) {
+                    Text("Save", fontSize = 18.sp)
+                }
+            }
         }
-    }
     }
 }
 
 @Composable
 fun TopGroupCard(navController: NavController) {
-    val button_go_back =
-        ButtonInterface(
-            resourceId = R.drawable.go_back,
-            imageDescription = "Go Back Icon",
-            route = AppScreens.Home_Screen.route,
-
-            )
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .background(MaterialTheme.colors.primarySurface),
-        horizontalArrangement = Arrangement.SpaceBetween) {
-        IconButton(
-            onClick = { navController.popBackStack() },
-        ) {
-            Image(
-                painter = painterResource(id = button_go_back.resourceId),
-                contentDescription = button_go_back.imageDescription,
-                modifier = Modifier.size(24.dp),
-                contentScale = ContentScale.FillBounds
-            )
+    TopAppBar(
+        title = {
+            Text(text = stringResource(id = R.string.app_name))
+        },
+        actions = {
+            IconButton(onClick = { navController.navigate(AppScreens.Payment.route) }) {
+                Image(
+                    painter = painterResource(id = R.drawable.go_back),
+                    contentDescription = "Go Back Icon",
+                    modifier = Modifier.size(24.dp),
+                    contentScale = ContentScale.FillBounds
+                )
+            }
         }
-    }
+    )
 }
 
-fun validator(cardInfo: Card.CardInfo,context: Context):Boolean {
-    if (validateExpiryDate(cardInfo.expiryDate,context)=="" || validateCVV(cardInfo.cvv,context) =="" ||
-        cardInfo.cardNumber=="" || cardInfo.lastName=="" || cardInfo.firstName=="")
+fun validator(cardInfo: Card.CardInfo, context: Context): Boolean {
+    if (validateExpiryDate(cardInfo.expiryDate, context) == "" || validateCVV(
+            cardInfo.cvv,
+            context
+        ) == "" ||
+        cardInfo.cardNumber == "" || cardInfo.lastName == "" || cardInfo.firstName == ""
+    )
         return false
     return true
 }
+
 fun validateExpiryDate(input: String, context: Context): String {
     val cleanedInput = input.filter { it.isDigit() }
     if (cleanedInput.length > 4) return input.dropLast(1)
@@ -204,26 +223,32 @@ fun validateExpiryDate(input: String, context: Context): String {
     val currentYear = Calendar.getInstance().get(Calendar.YEAR) % 100
 
     if (month == null || (month < 1 || month > 12)) {
-        Toast.makeText(context, "Invalid month. Must be between 01 and 12.", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Invalid month. Must be between 01 and 12.", Toast.LENGTH_SHORT)
+            .show()
         return ""
     }
 
     if (year == null || year < currentYear) {
-        Toast.makeText(context, "Invalid year. Must be the current year or later.", Toast.LENGTH_SHORT).show()
+        Toast.makeText(
+            context,
+            "Invalid year. Must be the current year or later.",
+            Toast.LENGTH_SHORT
+        ).show()
         return ""
     }
 
     return cleanedInput
 }
 
-fun validateCVV(input: String,context:Context): String {
+fun validateCVV(input: String, context: Context): String {
     val cleanedInput = input.filter { it.isDigit() }
-    if (cleanedInput.length <3 ) {
+    if (cleanedInput.length < 3) {
         Toast.makeText(context, "Invalid CVV.", Toast.LENGTH_SHORT).show()
         return ""
     }
     return input
 }
+
 class ExpiryDateVisualTransformation : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
         val trimmed = if (text.text.length >= 4) text.text.substring(0, 4) else text.text
@@ -251,10 +276,11 @@ class ExpiryDateVisualTransformation : VisualTransformation {
     }
 }
 
+/*
 @Preview
 @Composable
 fun DefaultPreviewCardInfo() {
-    val navController= rememberNavController()
-    val cardViewModel= CardViewModel()
-   CardInfoScreen(navController,cardViewModel)
-}
+    val navController = rememberNavController()
+    val cardViewModel = CardViewModel()
+    CardInfoScreen(navController, cardViewModel)
+}*/

@@ -6,18 +6,20 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Restaurant
+import ar.edu.utn.frba.foody.ui.composables.SimpleAlert
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.RestaurantDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
@@ -32,26 +34,40 @@ fun HomeScreen(
     userDataBase: UserDataBase?,
     orderViewModel: OrderViewModel
 ) {
-    AppScaffold(navController, null, { BottomGroupHome(navController, orderViewModel) },{ TopGroupHome(navController)}) {
+    AppScaffold(
+        navController,
+        null,
+        { BottomGroupHome(navController, orderViewModel) },
+        { TopGroupHome(navController) }
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.background_signup),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .fillMaxSize()
-                ) {
-            Box(modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 32.dp)
-                .fillMaxWidth()
+        ) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 32.dp)
+                    .fillMaxWidth()
             ) {
-                    Text(text = "Restaurants",
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        textAlign = TextAlign.Center,
-                        fontSize = 24.sp
-                    )
+                Text(
+                    text = "Restaurants",
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    fontSize = 24.sp
+                )
             }
             Spacer(modifier = Modifier.height(16.dp))
-            LazyColumn(horizontalAlignment = Alignment.CenterHorizontally,
+            LazyColumn(
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(505.dp)
@@ -59,14 +75,19 @@ fun HomeScreen(
                 if (restaurantDataBase != null) {
                     for (restaurant in restaurantDataBase.getAllRestaurants(userDataBase)) {
                         item {
-                            RestaurantItem(navController = navController, viewModel = viewModel, restaurant = restaurant)
+                            RestaurantItem(
+                                navController = navController,
+                                viewModel = viewModel,
+                                orderViewModel = orderViewModel,
+                                restaurant = restaurant
+                            )
                         }
                     }
+                    item {
+                        if (restaurantDataBase.getAllRestaurants(userDataBase).isNotEmpty())
+                        Divider()
+                    }
                 }
-            }
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomCenter)) {
             }
         }
     }
@@ -74,15 +95,60 @@ fun HomeScreen(
 }
 
 @Composable
-fun RestaurantItem(navController: NavController, viewModel: MainViewModel, restaurant: Restaurant) {
-    Card(backgroundColor = MaterialTheme.colors.secondary) {
-        Row (modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = {
-                viewModel.updateRestaurant(restaurant)
-                navController.navigate(AppScreens.Restaurant_Screen.route)
-            })
-            .padding(16.dp, 4.dp)) {
+fun RestaurantItem(
+    navController: NavController,
+    viewModel: MainViewModel,
+    orderViewModel: OrderViewModel,
+    restaurant: Restaurant
+) {
+    val showAlert = remember {
+        mutableStateOf(false)
+    }
+    val showRestaurant = remember {
+        mutableStateOf(false)
+    }
+    val changeRestaurant = remember {
+        mutableStateOf(false)
+    }
+
+    val restaurantName = viewModel.getPickedRestaurantName()
+
+    SimpleAlert(
+        show = showAlert.value,
+        text = "Actualmente tienes un pedido con el restaurante ${restaurantName}, si eliges este restaurante perderás el pedido actual. ¿Deseas continuar?",
+        onConfirm = {
+            showAlert.value = false; showRestaurant.value = true; changeRestaurant.value = true
+        },
+        onDismiss = { showAlert.value = false }
+    )
+
+    if (showRestaurant.value) {
+        viewModel.updateRestaurant(restaurant)
+        navController.navigate(AppScreens.Restaurant_Screen.route)
+    }
+
+    if (changeRestaurant.value) {
+        orderViewModel.changeRestaurant(restaurant)
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxSize(),
+        backgroundColor = Color.Transparent,
+        elevation = 0.dp
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = {
+                    if (restaurantName != "" && restaurant != viewModel.getPickedRestaurant()) {
+                        showAlert.value = true
+                    } else {
+                        showRestaurant.value = true
+                    }
+                })
+                .padding(16.dp, 4.dp)
+        ) {
             Image(
                 painter = painterResource(id = restaurant.image),
                 contentDescription = restaurant.imageDescription,
@@ -92,7 +158,8 @@ fun RestaurantItem(navController: NavController, viewModel: MainViewModel, resta
                 contentScale = ContentScale.FillBounds,
             )
             Spacer(modifier = Modifier.width(16.dp))
-            Text(text = restaurant.name,
+            Text(
+                text = restaurant.name,
                 Modifier
                     .fillMaxWidth()
                     .align(Alignment.CenterVertically),
@@ -119,57 +186,39 @@ fun BottomGroupHome(navController: NavController, orderViewModel: OrderViewModel
             route = AppScreens.Profile_Screen.route,
         ),
         ButtonInterface(
+            resourceId = R.drawable.cart_icon,
+            imageDescription = "Cart Icon",
+            route = AppScreens.Cart_Screen.createRoute(origin = "home")
+        ),
+        ButtonInterface(
+            resourceId = R.drawable.order_icon,
+            imageDescription = "Order Icon",
+            route = AppScreens.Orders_Screen.route
+        ),
+        ButtonInterface(
             resourceId = R.drawable.create_group_icon,
             imageDescription = "Join Group Icon",
             route = AppScreens.Join_Group_Screen.route
         )
     )
 
-    Row(modifier = Modifier.fillMaxWidth()) {
-        buttons.forEach{
-            IconButton(
-                onClick = { navController.navigate(it.route) },
-                modifier = Modifier.weight(1f)
-            ) {
-                Image(
-                    painter = painterResource(id = it.resourceId),
-                    contentDescription = it.imageDescription,
-                    modifier = Modifier.size(24.dp),
-                    contentScale = ContentScale.FillBounds
-                )
+    BottomAppBar {
+        Row(modifier = Modifier.fillMaxWidth()) {
+            buttons.forEach {
+                IconButton(
+                    onClick = { navController.navigate(it.route) },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Image(
+                        painter = painterResource(id = it.resourceId),
+                        contentDescription = it.imageDescription,
+                        modifier = Modifier.size(24.dp),
+                        contentScale = ContentScale.FillBounds
+                    )
+                }
             }
         }
-
-        IconButton(
-            onClick = {
-                orderViewModel.getOrder()
-                navController.navigate(AppScreens.Cart_Screen.route)
-            },
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.cart_icon),
-                contentDescription = "Cart Icon",
-                modifier = Modifier.size(24.dp),
-                contentScale = ContentScale.FillBounds
-            )
-        }
-
-        IconButton(
-            onClick = {
-                orderViewModel.findAllOrdersForUser()
-                navController.navigate(AppScreens.Orders_Screen.route)
-            },
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.order_icon),
-                contentDescription = "Order Icon",
-                modifier = Modifier.size(24.dp),
-                contentScale = ContentScale.FillBounds
-            )
-        }
     }
-
-
 }
 
 @Composable
@@ -195,8 +244,9 @@ fun TopGroupHome(navController: NavController) {
 @Preview
 @Composable
 fun DefaultPreview() {
-    val navController= rememberNavController()
+    val navController = rememberNavController()
     val viewModel = MainViewModel()
-    HomeScreen(navController, viewModel,null,null)
+    val orderViewModel = OrderViewModel()
+    HomeScreen(navController, viewModel, null, null, orderViewModel)
 }
 */

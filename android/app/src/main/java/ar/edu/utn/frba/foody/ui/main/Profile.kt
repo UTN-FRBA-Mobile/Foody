@@ -19,6 +19,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -40,174 +42,204 @@ import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Address
 import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
-import ar.edu.utn.frba.foody.ui.dataClasses.AddressViewModel
+import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
-fun ProfileScreen(navController: NavController, viewModel: AddressViewModel,
-                  dbUserDataBase: UserDataBase?, orderViewModel: OrderViewModel)
-{
-    var user=orderViewModel.user
+fun ProfileScreen(
+    navController: NavController, viewModel: MainViewModel,
+    dbUserDataBase: UserDataBase?, orderViewModel: OrderViewModel
+) {
+    val user = orderViewModel.user
     var email by remember { mutableStateOf(user.email) }
     var password by remember { mutableStateOf(user.password) }
     var numero by remember { mutableStateOf(user.numeroContacto.toString()) }
-    var direccion = viewModel.getPickedAddress()
+    val direccion by remember { mutableStateOf(user.direccion) }
     val context = LocalContext.current
 
-
-    Image(
-        painter = painterResource(id = R.drawable.background_signup),
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
-        modifier = Modifier.fillMaxSize())
-
-
-    IconButton(onClick = { navController.navigate(AppScreens.Home_Screen.route) }) {
-        Icon(
-            modifier = Modifier.size(36.dp),
-            painter = painterResource(id = R.drawable.go_back),
+    AppScaffold(
+        navController,
+        null,
+        null,
+        { TopGroupProfile(navController) }
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.background_signup),
             contentDescription = null,
-            tint = MaterialTheme.colors.primary
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
         )
-    }
-    LazyColumn (modifier = Modifier
-        .fillMaxSize()
-        .padding(horizontal = 35.dp, vertical = 100.dp)
-    ){
-        item {
 
-            Text(
-                text = "Edit Your Information",
-                style = MaterialTheme.typography.h5,
-                color = MaterialTheme.colors.primary,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 20.dp)
-            )
-            TextField(
-                value = email, onValueChange = { email = it },
-                label = { Text(text = "Email", modifier = Modifier.padding(start = 16.dp)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                singleLine = true,
-                maxLines = 1,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.Transparent
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 35.dp, vertical = 100.dp)
+        ) {
+            item {
+                Text(
+                    text = "Edit Your Information",
+                    style = MaterialTheme.typography.h5,
+                    color = MaterialTheme.colors.primary,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 20.dp)
                 )
-            )
-            TextField(
-                value = password, onValueChange = { password = it },
-                label = { Text(text = "Password", modifier = Modifier.padding(start = 16.dp)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                singleLine = true,
-                maxLines = 1,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.Transparent
-                ),
-                visualTransformation = PasswordVisualTransformation(),
-            )
-            TextField(
-                value = numero, onValueChange = { numero = it },
-                label = { Text(text = "Numero Contacto", modifier = Modifier.padding(start = 16.dp)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                singleLine = true,
-                maxLines = 1,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.Transparent
-                )
-            )
-            Row (
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp)
-            ){
+
                 TextField(
-                    value = "${direccion.calle} ${direccion.numero}, ${direccion.localidad}, ${direccion.region}",
-                    onValueChange = {},
-                    label = { Text(text = "Direccion", modifier = Modifier.padding(start = 16.dp)) },
+                    value = email, onValueChange = { email = it },
+                    label = { Text(text = "Username", modifier = Modifier.padding(start = 16.dp)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    singleLine = true,
+                    maxLines = 1,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.Transparent
+                    )
+                )
+
+                TextField(
+                    value = password, onValueChange = { password = it },
+                    label = { Text(text = "Password", modifier = Modifier.padding(start = 16.dp)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     singleLine = true,
+                    maxLines = 1,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = Color.Transparent
                     ),
-                    enabled = false  // Deshabilitar la edición del TextField
+                    visualTransformation = PasswordVisualTransformation(),
                 )
-                IconButton(onClick = {
-                    navController.navigate(AppScreens.Location_Screen.createRoute("profile",
-                        viewModel.getPickedAddress().id.toString()))
-                }) {
-                    Icon(
-                        modifier = Modifier.size(36.dp),
-                        painter = painterResource(id = R.drawable.address_add_location),
-                        contentDescription = null,
-                        tint = MaterialTheme.colors.primary
+
+                TextField(
+                    value = numero, onValueChange = { numero = it },
+                    label = {
+                        Text(
+                            text = "Numero Contacto",
+                            modifier = Modifier.padding(start = 16.dp)
+                        )
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true,
+                    maxLines = 1,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.Transparent
                     )
+                )
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp)
+                ) {
+                    TextField(
+                        value = "${direccion.calle} ${direccion.numero}, ${direccion.localidad}, ${direccion.region}",
+                        onValueChange = {},
+                        label = {
+                            Text(
+                                text = "Direccion",
+                                modifier = Modifier.padding(start = 16.dp)
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        singleLine = true,
+                        colors = TextFieldDefaults.textFieldColors(
+                            backgroundColor = Color.Transparent
+                        ),
+                        enabled = false  // Deshabilitar la edición del TextField
+                    )
+
+                    IconButton(onClick = {
+                        navController.navigate(
+                            AppScreens.Location_Screen.createRoute(
+                                "profile",
+                                user.userId
+                            )
+                        )
+                    }) {
+                        Icon(
+                            modifier = Modifier.size(36.dp),
+                            painter = painterResource(id = R.drawable.address_add_location),
+                            contentDescription = null,
+                            tint = MaterialTheme.colors.primary
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(60.dp))
+
+                Button(
+                    onClick = {
+                        user.email = email
+                        user.password = password
+                        if (validateAnyUserEmptyProf(user, user.direccion, context)) {
+                            user.numeroContacto = numero.toInt()
+
+                            viewModel.updateUser(user)
+                            navController.navigate(AppScreens.Home_Screen.route)
+                        } else {
+                            navController.navigate(AppScreens.Profile_Screen.route)
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                ) {
+                    Text("Editar", fontSize = 18.sp)
                 }
             }
-
-
-            Spacer(modifier = Modifier.height(60.dp))
-
-            Button(
-                onClick = {
-                    user.email=email
-                    user.password=password
-                    if(validateAnyUserEmptyProf(user,viewModel.getPickedAddress(),context)) {
-                        user.numeroContacto=numero.toInt()
-
-                        val addressId =
-                            dbUserDataBase?.updateAddress(dbUserDataBase, viewModel.getPickedAddress())
-                        if (addressId != null) {
-                            user.direccion = Address.AddressInfo()
-                        }
-                        dbUserDataBase?.updateUser(
-                            dbUserDataBase,
-                           user
-                        )
-                        navController.navigate(AppScreens.Home_Screen.route)
-                    }
-                    else {navController.navigate(AppScreens.Profile_Screen.route)}
-
-
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-            ) {
-                Text("Editar", fontSize = 18.sp)
-            }
-
-
         }
     }
 }
 
-fun validateAnyUserEmptyProf(user:User,direccion:Address.AddressInfo,context: Context):Boolean{
-    if(direccion.calle=="" || direccion.region=="" || direccion.localidad==""
-        || direccion.numero==0 || direccion.latitud==0.0 || direccion.longitud==0.0){
+@Composable
+fun TopGroupProfile(navController: NavController) {
+    TopAppBar(
+        title = {
+            Text(text = stringResource(id = R.string.app_name))
+        },
+        actions = {
+            IconButton(onClick = { navController.navigate(AppScreens.Home_Screen.route) }) {
+                Image(
+                    painter = painterResource(id = R.drawable.go_back),
+                    contentDescription = "Go Back Icon",
+                    modifier = Modifier.size(24.dp),
+                    contentScale = ContentScale.FillBounds
+                )
+            }
+        }
+    )
+}
+
+fun validateAnyUserEmptyProf(
+    user: User,
+    direccion: Address.AddressInfo,
+    context: Context
+): Boolean {
+    if (direccion.calle == "" || direccion.region == "" || direccion.localidad == ""
+        || direccion.numero == 0 || direccion.latitud == 0.0 || direccion.longitud == 0.0
+    ) {
         Toast.makeText(context, "Dirección Invalida.", Toast.LENGTH_SHORT).show()
         return false
     }
-    if (user.email=="") {
+    if (user.email == "") {
         Toast.makeText(context, "Falta completar el email.", Toast.LENGTH_SHORT).show()
         return false
     }
-    if (user.password==""){
+    if (user.password == "") {
         Toast.makeText(context, "Falta completar la contraseña.", Toast.LENGTH_SHORT).show()
         return false
     }
-    if (user.numeroContacto==0){
+    if (user.numeroContacto == 0) {
         Toast.makeText(context, "Falta completar el numero de contacto.", Toast.LENGTH_SHORT).show()
         return false
     }
