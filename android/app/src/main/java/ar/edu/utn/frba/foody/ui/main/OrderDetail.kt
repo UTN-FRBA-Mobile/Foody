@@ -23,9 +23,10 @@ import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 @Composable
 fun OrderScreen(
     navController: NavHostController,
-    viewModel: OrderViewModel
+    viewModel: OrderViewModel,
+    order_id: String
 ) {
-    val order = viewModel.getPickedOrder()
+    val order = viewModel.getOrderById(order_id)
 
     AppScaffold(navController,
         null,

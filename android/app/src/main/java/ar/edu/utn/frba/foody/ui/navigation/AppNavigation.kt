@@ -92,11 +92,22 @@ fun AppNavigation(
                 orderViewModel = orderViewModel
             )
         }
-        composable(route = AppScreens.Order_Screen.route) {
-            OrderScreen(navController = navController, viewModel = orderViewModel)
+        composable(
+            route = AppScreens.Order_Screen.route,
+            arguments = listOf(navArgument("order_id") { type = NavType.StringType })
+        ) {
+                backStackEntry ->
+            OrderScreen(navController = navController, viewModel = orderViewModel,
+                backStackEntry.arguments?.getString("order_id") ?: "unknown")
         }
-        composable(route = AppScreens.Progress_Order_Screen.route) {
-            ProgressOrderScreen(navController = navController, orderViewModel = orderViewModel)
+        composable(
+            route = AppScreens.Progress_Order_Screen.route,
+            arguments = listOf(navArgument("order_id") { type = NavType.StringType })
+
+        ) {backStackEntry->
+            ProgressOrderScreen(navController = navController, orderViewModel = orderViewModel,
+                backStackEntry.arguments?.getString("order_id") ?: "unknown"
+            )
         }
         composable(route = AppScreens.Group_Screen.route) {
             GroupScreen(

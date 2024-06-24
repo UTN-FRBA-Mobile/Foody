@@ -19,11 +19,14 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
 import androidx.compose.material.RadioButtonDefaults
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -52,7 +55,8 @@ fun PaymentScreen(navController: NavHostController,
                   mainViewModel: MainViewModel,orderViewModel: OrderViewModel) {
     var totalAmount = orderViewModel.getTotal()
     var deliveryFee = 500.0
-    var address by remember { mutableStateOf("") }
+    val user = orderViewModel.user
+    var address by remember { mutableStateOf(user.direccion) }
     var paymentMethod by remember { mutableStateOf("Efectivo") }
     val paymentOptions = listOf("Efectivo", "Tarjeta")
     val totalPayment = totalAmount + deliveryFee
@@ -79,23 +83,38 @@ fun PaymentScreen(navController: NavHostController,
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    Text(
-                        text = "Dirección de Entrega",
-                        style = MaterialTheme.typography.h6,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
-                    BasicTextField(
-                        value = address,
-                        onValueChange = { address = it },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                            .background(Color.LightGray, shape = MaterialTheme.shapes.small)
-                            .padding(16.dp),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    TextField(
+                        value = "${address.calle} ${address.numero}, ${address.localidad}, ${address.region}",
+                        onValueChange = {},
+                        label = {
+                            Text(
+                                text = "Direccion",
+                                modifier = Modifier.padding(start = 16.dp)
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         singleLine = true,
-                        maxLines = 1,
+                        colors = TextFieldDefaults.textFieldColors(
+                            backgroundColor = Color.Transparent
+                        ),
+                        enabled = false  // Deshabilitar la edición del TextField
                     )
+
+                    IconButton(onClick = {
+                        navController.navigate(
+                            AppScreens.Location_Screen.createRoute(
+                                "payment",
+                                user.userId
+                            )
+                        )
+                    }) {
+                        Icon(
+                            modifier = Modifier.size(36.dp),
+                            painter = painterResource(id = R.drawable.address_add_location),
+                            contentDescription = null,
+                            tint = MaterialTheme.colors.primary
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(16.dp))
 

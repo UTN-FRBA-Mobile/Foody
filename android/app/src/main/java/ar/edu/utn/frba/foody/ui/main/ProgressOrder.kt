@@ -37,8 +37,9 @@ import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
-fun ProgressOrderScreen(navController: NavController, orderViewModel: OrderViewModel) {
-    val order = orderViewModel.getPickedOrder()
+fun ProgressOrderScreen(navController: NavController, orderViewModel: OrderViewModel,
+                        order_id:String) {
+    val order = orderViewModel.getOrderById(order_id)
 
     AppScaffold(navController = navController,
         null,

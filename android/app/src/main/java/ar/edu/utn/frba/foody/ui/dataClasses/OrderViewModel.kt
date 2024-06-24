@@ -29,6 +29,7 @@ import java.util.Calendar
 class OrderViewModel() : ViewModel() {
     private var order by mutableStateOf(Order(""))
     private var orders by mutableStateOf(listOf<Order>())
+    private var orderDetail by mutableStateOf(Order(""))
 
     var orderDataBase: OrderDataBase? = null
     var orderDataBaseFirebase: OrderDataBaseFirebase? = null
@@ -242,6 +243,15 @@ class OrderViewModel() : ViewModel() {
                 this.orders = orders
             }
         }
+    }
+    fun getOrderById(order_id:String):Order{
+        orderDataBaseFirebase?.getOrderById(order_id){
+            order ->
+            if (order!= null){
+                this.orderDetail=order
+            }
+        }
+        return orderDetail
     }
 
     fun emptyUserOrder() {

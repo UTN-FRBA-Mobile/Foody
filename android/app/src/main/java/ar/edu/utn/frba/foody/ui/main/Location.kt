@@ -41,10 +41,10 @@ fun LocationGoogleScreen(
     origin: String,
     id: String
 ) {
-    var direccion by remember { mutableStateOf(if(origin == "profile") viewModel.user.direccion.calle!! else "") }
-    var nro by remember { mutableStateOf(if(origin == "profile") viewModel.user.direccion.numero.toString() else "") }
-    var localidad by remember { mutableStateOf(if(origin == "profile") viewModel.user.direccion.localidad!! else "") }
-    var region by remember { mutableStateOf(if(origin == "profile") viewModel.user.direccion.region!! else "") }
+    var direccion by remember { mutableStateOf(if(origin != "sign_up") viewModel.user.direccion.calle!! else "") }
+    var nro by remember { mutableStateOf(if(origin != "sign_up") viewModel.user.direccion.numero.toString() else "") }
+    var localidad by remember { mutableStateOf(if(origin != "sign_up") viewModel.user.direccion.localidad!! else "") }
+    var region by remember { mutableStateOf(if(origin != "sign_up") viewModel.user.direccion.region!! else "") }
     var address: Address.AddressInfo
 
     val permissions = arrayOf(
@@ -146,7 +146,7 @@ fun LocationGoogleScreen(
     }
 
     val coroutineScope = rememberCoroutineScope()
-    if(origin =="profile" && currentLocation.latitude==0.0 && currentLocation.longitude==0.0){
+    if(origin !="sign_up" && currentLocation.latitude==0.0 && currentLocation.longitude==0.0){
         val fullAddress = "$direccion $nro, $localidad, $region"
         coroutineScope.launch {
             val location = geocodeAddress(fullAddress)
@@ -168,6 +168,7 @@ fun LocationGoogleScreen(
         when (origin) {
             "sign_up" -> navController.navigate(AppScreens.SignUp_Screen.route)
             "profile" -> navController.navigate(AppScreens.Profile_Screen.route)
+            "payment" -> navController.navigate(AppScreens.Payment.route)
         }
     }) {
         Icon(

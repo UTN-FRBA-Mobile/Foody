@@ -127,8 +127,8 @@ fun OrderItem(navController: NavController, viewModel: OrderViewModel, order: Or
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    IconButton(onClick = { viewModel.updateOrder(order)
-                        navController.navigate(AppScreens.Order_Screen.route) }
+                    IconButton(onClick = { //viewModel.updateOrder(order)
+                        navController.navigate(AppScreens.Order_Screen.createRoute(order.orderId)) }
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.details_icon),
@@ -138,8 +138,11 @@ fun OrderItem(navController: NavController, viewModel: OrderViewModel, order: Or
                         )
                     }
                     if (order.inProgress) {
-                        IconButton(onClick = { viewModel.updateOrder(order)
-                            navController.navigate(AppScreens.Progress_Order_Screen.route) }) {
+                        IconButton(onClick = {
+                            //viewModel.updateOrder(order)
+                            navController.navigate(
+                                AppScreens.Progress_Order_Screen.createRoute(order.orderId)
+                            ) }) {
                             Image(
                                 painter = painterResource(id = R.drawable.order_progress_icon),
                                 contentDescription = "Order Progress Icon",
