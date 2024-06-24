@@ -18,7 +18,6 @@ import ar.edu.utn.frba.foody.ui.dataBase.SQLite.OrderDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.RestaurantDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.AddressViewModel
-import ar.edu.utn.frba.foody.ui.dataClasses.CardViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
@@ -61,7 +60,6 @@ class MainComposeActivity : ComponentActivity() {
             val navController = rememberNavController()
             val viewModel = viewModel<MainViewModel>()
             val orderViewModel = viewModel<OrderViewModel>()
-            val cardViewModel = viewModel<CardViewModel>()
             val groupViewModel = viewModel<GroupViewModel>()
             orderViewModel.setServices(dbOrderHelper, orderDataBaseFirebase, navController)
             groupViewModel.setDatabase(dbGroupHelper)
@@ -86,7 +84,6 @@ class MainComposeActivity : ComponentActivity() {
                 navController,
                 viewModel,
                 orderViewModel,
-                cardViewModel,
                 groupViewModel,
                 dbUserHelper,
                 dbRestaurantHelper,

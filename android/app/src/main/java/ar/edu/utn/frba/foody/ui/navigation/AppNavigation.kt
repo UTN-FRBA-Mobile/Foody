@@ -13,7 +13,6 @@ import ar.edu.utn.frba.foody.ui.dataBase.SQLite.OrderDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.RestaurantDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.AddressViewModel
-import ar.edu.utn.frba.foody.ui.dataClasses.CardViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
@@ -39,7 +38,6 @@ fun AppNavigation(
     navController: NavHostController,
     viewModel: MainViewModel,
     orderViewModel: OrderViewModel,
-    cardViewModel: CardViewModel,
     groupViewModel: GroupViewModel,
     dbUserHelper: UserDataBase,
     dbRestaurantHelper: RestaurantDataBase,
@@ -125,10 +123,10 @@ fun AppNavigation(
             )
         }
         composable(route = AppScreens.Card_Screen.route) {
-            CardInfoScreen(navController = navController, viewModel = cardViewModel)
+            CardInfoScreen(navController = navController,viewModel,orderViewModel)
         }
         composable(route = AppScreens.Payment.route) {
-            PaymentScreen(navController = navController, viewModel = cardViewModel)
+            PaymentScreen(navController = navController,viewModel,orderViewModel)
         }
         composable(
             route = AppScreens.Location_Screen.route,

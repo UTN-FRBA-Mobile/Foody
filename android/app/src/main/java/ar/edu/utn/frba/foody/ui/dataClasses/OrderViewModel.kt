@@ -83,6 +83,7 @@ class OrderViewModel() : ViewModel() {
     }
 
     fun getAssignedUserOrder(loading: MutableState<Boolean>): UserOrder {
+
         val userOrder = order.userOrders.firstOrNull() { x -> x.user.userId == this.user.userId }
         if(userOrder == null) {
             return createUserOrder(order, loading)

@@ -3,6 +3,7 @@ package ar.edu.utn.frba.foody.ui.main
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -56,7 +58,7 @@ fun CartScreen(
         null,
         { BottomGroupCart(navController, orderViewModel = viewModel, order = order) },
         { TopGroupCart(navController, origin) }) {
-        OrdersGrid(viewModel, order.userOrders)
+        OrdersGrid(viewModel, order.userOrders,navController)
     }
 }
 
@@ -161,7 +163,8 @@ fun BottomGroupCart(
 @Composable
 fun OrdersGrid(
     viewModel: OrderViewModel,
-    userOrders: List<UserOrder>
+    userOrders: List<UserOrder>,
+    navController: NavController
 ) {
     Image(
         painter = painterResource(id = R.drawable.background_signup),
@@ -177,14 +180,14 @@ fun OrdersGrid(
         ) {
         items(userOrders.size) { index ->
             if (userOrders[index].items.isNotEmpty()) {
-                OrderCard(viewModel, userOrders[index])
+                OrderCard(viewModel, userOrders[index], navController)
             }
         }
     }
 }
 
 @Composable
-fun OrderCard(viewModel: OrderViewModel, userOrder: UserOrder) {
+fun OrderCard(viewModel: OrderViewModel, userOrder: UserOrder,navController: NavController) {
     val heightContent = if (userOrder.items.size > 1) 170.dp else 90.dp
 
     Card(
@@ -219,6 +222,24 @@ fun OrderCard(viewModel: OrderViewModel, userOrder: UserOrder) {
                 style = MaterialTheme.typography.h6,
                 modifier = Modifier.padding(vertical = 4.dp)
             )
+        }
+    }
+    Box(
+        modifier = Modifier
+            .padding(horizontal = 32.dp)
+            .fillMaxWidth()
+            .padding(bottom = 100.dp),
+        contentAlignment = Alignment.BottomCenter
+    ) {
+        Button(
+            onClick = {
+                navController.navigate(AppScreens.Payment.route)
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+        ) {
+            Text("Pagar", fontSize = 18.sp)
         }
     }
 }

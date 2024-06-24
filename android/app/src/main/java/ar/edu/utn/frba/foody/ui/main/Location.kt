@@ -32,6 +32,7 @@ import com.google.maps.android.compose.*
 import com.google.maps.model.GeocodingResult
 import kotlinx.coroutines.*
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun LocationGoogleScreen(
     context: ComponentActivity,
@@ -145,7 +146,18 @@ fun LocationGoogleScreen(
     }
 
     val coroutineScope = rememberCoroutineScope()
-
+    if(origin =="profile" && currentLocation.latitude==0.0 && currentLocation.longitude==0.0){
+        val fullAddress = "$direccion $nro, $localidad, $region"
+        coroutineScope.launch {
+            val location = geocodeAddress(fullAddress)
+            if (location != null) {
+                stopLocationUpdates()
+                currentLocation = location
+                cameraPositionState.position =
+                    CameraPosition.fromLatLngZoom(currentLocation, 15f)
+            }
+        }
+    }
     Image(
         painter = painterResource(id = R.drawable.background_signup),
         contentDescription = null,
@@ -322,6 +334,7 @@ fun LocationGoogleScreen(
                         when (origin) {
                             "sign_up" -> navController.navigate(AppScreens.SignUp_Screen.route)
                             "profile" -> navController.navigate(AppScreens.Profile_Screen.route)
+                            "payment" -> navController.navigate(AppScreens.Payment.route)
                             // add other cases if needed
                         }
                     }
