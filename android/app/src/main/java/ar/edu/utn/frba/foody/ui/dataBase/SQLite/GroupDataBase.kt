@@ -133,7 +133,7 @@ class GroupDataBase(private var context: Context) : SQLiteOpenHelper(
                 }
                 userCursor.close()
 
-                groups.add(Group(groupId, name, password, users, membersLimit))
+                groups.add(Group(groupId.toString(), name, password, users, membersLimit))
             } while (cursor.moveToNext())
         }
         cursor.close()
@@ -159,7 +159,7 @@ class GroupDataBase(private var context: Context) : SQLiteOpenHelper(
 
         val userGroupId = userCursor.getInt(userCursor.getColumnIndexOrThrow(COLUMN_USER_GROUP_ID))
 
-        return User(userId, userName, userPassword, userDirection, 0, userGroupId)
+        return User(userId, userName, userPassword, userDirection, 0, userGroupId.toString())
     }
 
     companion object {

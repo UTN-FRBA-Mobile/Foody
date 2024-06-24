@@ -1,7 +1,7 @@
 package ar.edu.utn.frba.foody.ui.Classes
 
 data class Group (
-    val groupId: Int = 0,
+    var groupId: String = "",
     var name: String = "",
     var password: String = "",
     var members: List<User> = emptyList(),

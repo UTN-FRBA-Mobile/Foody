@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.ui.Classes.Dish
 import ar.edu.utn.frba.foody.ui.Classes.Restaurant
 import ar.edu.utn.frba.foody.ui.Classes.User
+import ar.edu.utn.frba.foody.ui.dataBase.Firebase.GroupDataBaseFirebase
 import ar.edu.utn.frba.foody.ui.dataBase.Firebase.OrderDataBaseFirebase
 import ar.edu.utn.frba.foody.ui.dataBase.Firebase.UserDataBaseFirebase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.GroupDataBase
@@ -56,6 +57,7 @@ class MainComposeActivity : ComponentActivity() {
         //Create Firebase data base instance
         val userDataBaseFirebase = UserDataBaseFirebase(database)
         val orderDataBaseFirebase = OrderDataBaseFirebase(database)
+        val groupDataBaseFirebase = GroupDataBaseFirebase(database)
 
         setContent {
             val navController = rememberNavController()
@@ -65,7 +67,8 @@ class MainComposeActivity : ComponentActivity() {
             val groupViewModel = viewModel<GroupViewModel>()
             val addressViewModel = viewModel<AddressViewModel>()
             orderViewModel.setServices(dbOrderHelper, orderDataBaseFirebase, navController)
-            groupViewModel.setDatabase(dbGroupHelper)
+            //groupViewModel.setDatabase(dbGroupHelper)
+            groupViewModel.setServices(dbGroupHelper,groupDataBaseFirebase,navController)
             viewModel.setDataBase(userDataBaseFirebase)
 
             viewModel.user.observe(this, Observer { user ->

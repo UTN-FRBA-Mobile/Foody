@@ -6,6 +6,6 @@ data class User(
     var password: String = "",
     var direccion: Address.AddressInfo = Address.AddressInfo(),
     var numeroContacto: Int = 0,
-    var groupId: Int = 0,
+    var groupId: String = "",
     var admin: Boolean = false
 )
