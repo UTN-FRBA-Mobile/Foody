@@ -1,11 +1,14 @@
 package ar.edu.utn.frba.foody.ui.dataBase.Firebase
 
 import android.database.Cursor
+import androidx.compose.runtime.mutableStateOf
 import ar.edu.utn.frba.foody.ui.Classes.Group
+import ar.edu.utn.frba.foody.ui.Classes.Order
 import ar.edu.utn.frba.foody.ui.Classes.User
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.ValueEventListener
 
 class GroupDataBaseFirebase(private var database: FirebaseDatabase) {
@@ -40,28 +43,49 @@ class GroupDataBaseFirebase(private var database: FirebaseDatabase) {
         }
     }
 
-    fun getGroups(): List<Group>{
+    fun getGroups() : List<Group>{
         val myRef = database.getReference(TABLE_GROUPS)
 
-        val grouplist = mutableListOf<Group>()
+        var groups = mutableListOf<Group>()
 
-        myRef.addValueEventListener(object : ValueEventListener{
-            override fun onDataChange(snapshot: DataSnapshot) {
-                for (dataSnapshot in snapshot.children){
-                    val group = dataSnapshot.getValue(Group::class.java)
+        myRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                dataSnapshot.children.forEach { orderSnapshot ->
+                    val group = orderSnapshot.getValue(Group::class.java)
                     if (group != null){
-                        grouplist.add(group)
+                        groups.add(group)
                     }
                 }
-
             }
+
             override fun onCancelled(databaseError: DatabaseError) {
-                grouplist.clear()
+                groups = emptyList<Group>().toMutableList()
             }
-
         })
 
-        return grouplist
+        return groups
     }
+    /*
+        val myRef = database.getReference(TABLE_ORDERS)
 
+        myRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val orders = mutableListOf<Order>()
+                dataSnapshot.children.forEach { orderSnapshot ->
+                    val order = orderSnapshot.getValue(Order::class.java)
+                    order?.orderId = orderSnapshot.key.toString()
+                    order?.userOrders?.forEach { userOrder ->
+                        if(userOrder.user.userId == userId) {
+                            orders.add(order)
+                        }
+                    }
+                }
+                callback(orders)
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                callback(emptyList())
+            }
+        })
+     */
 }

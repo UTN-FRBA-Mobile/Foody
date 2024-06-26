@@ -97,7 +97,8 @@ fun JoinGroupScreen(
 
                 Button(
                     onClick = {
-                        val group = verifyGroupExist(groupViewModel, name, password)
+                        //val group = verifyGroupExist(groupViewModel, name, password)
+                        val group = groupViewModel.verifyGroupExist(name, password)
                         if (group != null) {
                             orderViewModel.removeOrderFromSession()
                             orderViewModel.updateGroup(group)
@@ -147,11 +148,11 @@ fun TopGroupJoinGroup(navController: NavController) {
     )
 }
 
-fun verifyGroupExist(groupViewModel: GroupViewModel, name: String, password: String): Group? {
+/*fun verifyGroupExist(groupViewModel: GroupViewModel, name: String, password: String): Group? {
     val groups: List<Group> = groupViewModel.getGroups()
     val group: Group? = groups.find { groupPred: Group -> groupPred.name == name }
     if (group != null && group.password == password) {
         return group
     }
     return null
-}
+}*/

@@ -54,59 +54,28 @@ class GroupViewModel() : ViewModel() {
         return updatedGroup
     }
 
-    fun getGroups(): List<Group> {
-        if (groupDataBaseFirebase != null) {
-            return groupDataBaseFirebase!!.getGroups()
+    fun verifyNameGroupExist(name : String) : Boolean
+    {
+        val groups = groupDataBaseFirebase?.getGroups()
+        val group = groups?.find { itemGroup: Group -> itemGroup.name == name }
+
+        return if (group != null){
+            true
+        }else{
+            false
         }
-        return emptyList()
     }
+
+    fun verifyGroupExist(name : String, pass : String) : Group?
+    {
+        val groups = groupDataBaseFirebase?.getGroups()
+        val group = groups?.find { itemGroup: Group -> itemGroup.name == name }
+
+        return if (group != null && group.password == pass){
+            group
+        }else{
+            null
+        }
+    }
+
 }
-
-/*class GroupViewModel() : ViewModel() {
-    private var group by mutableStateOf(Group())
-
-    var groupDataBase: GroupDataBase? = null
-
-    fun setDatabase(groupDataBase: GroupDataBase) {
-        this.groupDataBase = groupDataBase
-    }
-
-    fun updateGroup(newGroup: Group) {
-        group = newGroup
-    }
-
-    fun getPickedGroup(): Group {
-        return group
-    }
-
-    fun createGroup(newGroup: Group, admin: User) {
-        this.updateGroup(newGroup)
-        this.addUser(admin)
-        groupDataBase?.insertGroup(newGroup)
-    }
-
-    fun addUser(user: User) {
-        val mutableList = group.members.toMutableList()
-        mutableList.add(user)
-        val updatedGroup = group.copy(members = mutableList.toList())
-        group = updatedGroup
-    }
-
-    fun updateUser(user: User) {
-        this.addUser(user)
-        groupDataBase?.updateGroup(group)
-    }
-
-    fun deleteUser(user: User): Group {
-        val updatedGroup = group.copy(members = group.members.filter { it != user })
-        group = updatedGroup
-        return updatedGroup
-    }
-
-    fun getGroups(): List<Group> {
-        if (groupDataBase != null) {
-            return groupDataBase!!.getGroups()
-        }
-       return emptyList()
-    }
-}*/
