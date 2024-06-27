@@ -66,7 +66,7 @@ fun ProgressOrderScreen(navController: NavController, orderViewModel: OrderViewM
                     elevation = 4.dp
                 ) {
                     Column(verticalArrangement = Arrangement.Center) {
-                        TextInfo(text = "Estado", align = true)
+                        TextInfo(text = "Estado: ${order.estado}", align = true)
                         Row(verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.padding(16.dp, 0.dp)
                         ) {
@@ -83,6 +83,7 @@ fun ProgressOrderScreen(navController: NavController, orderViewModel: OrderViewM
                         Spacer(modifier = Modifier.height(32.dp))
                         StateDescriptions(order.orderStates)
                     }
+
 
                 }
             }

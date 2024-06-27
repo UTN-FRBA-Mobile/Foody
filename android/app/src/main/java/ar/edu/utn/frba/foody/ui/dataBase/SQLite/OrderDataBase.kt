@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import ar.edu.utn.frba.foody.ui.Classes.Estado
 import ar.edu.utn.frba.foody.ui.Classes.Group
 import ar.edu.utn.frba.foody.ui.Classes.Order
 import ar.edu.utn.frba.foody.ui.Classes.OrderItemInfo
@@ -69,7 +70,7 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
         private const val TABLE_ORDERS = "orders"
         private const val COLUMN_ORDERS_ID = "id"
         private const val COLUMN_ORDERS_NAME = "name"
-        private const val COLUMN_ORDERS_IN_PROGRESS = "inProgress"
+        private const val COLUMN_ORDERS_ESTADO = "estado"
         private const val COLUMN_ORDERS_DIRECTION = "direction"
         private const val COLUMN_ORDERS_ESTIMATED_HOUR = "estimatedHour"
         private const val COLUMN_ORDERS_RESTAURANT_ID = "restaurantId"
@@ -167,7 +168,7 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
         val db = this.readableDatabase
         val values = ContentValues().apply {
             put(COLUMN_ORDERS_NAME, order.name)
-            put(COLUMN_ORDERS_IN_PROGRESS, order.inProgress)
+            put(COLUMN_ORDERS_ESTADO, order.estado.toString())
             put(COLUMN_ORDERS_DIRECTION, order.direction)
             put(COLUMN_ORDERS_ESTIMATED_HOUR, order.estimatedHour)
             put(COLUMN_ORDERS_RESTAURANT_ID, order.restaurant.restaurantId)
@@ -312,8 +313,8 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
             do {
                 val orderId = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_ID))
                 val name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_NAME))
-                val inProgress =
-                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_IN_PROGRESS))
+                val estado =
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_ESTADO))
                 val direction =
                     cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_DIRECTION))
                 val estimatedHour =
@@ -383,7 +384,14 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
                 val restaurant =
                     restaurantDataBase.getRestaurants(userDataBase, restaurantId).first()
 
-                val inProgressMapeado = if (inProgress == 1) true else false;
+                val estadoEnum =
+                    if (estado == "ENPROGRESO") {
+                        Estado.ENPROGRESO
+                    } else if(estado == "ENCAMINO"){
+                        Estado.ENCAMINO
+                    } else{
+                        Estado.FINALIZADO
+                    }
 
                 val group = getGroups(groupId).first()
 
@@ -396,7 +404,7 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
                         restaurant,
                         name,
                         direction,
-                        inProgressMapeado,
+                        estadoEnum,
                         userOrders,
                         estimatedHour,
                         orderStates,
@@ -423,8 +431,8 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
                 if (groupOrderId == groupId) {
                     val orderId = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_ID))
                     val name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_NAME))
-                    val inProgress =
-                        cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_IN_PROGRESS))
+                    val estado =
+                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_ESTADO))
                     val direction =
                         cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_DIRECTION))
                     val estimatedHour =
@@ -432,8 +440,14 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
                     val restaurantId =
                         cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ORDERS_RESTAURANT_ID))
                     val restaurant = restaurantDataBase.getRestaurant(userDataBase, restaurantId)
-                    val inProgressMapeado = if (inProgress == 1) true else false;
-
+                    val estadoEnum =
+                        if (estado == "ENPROGRESO") {
+                            Estado.ENPROGRESO
+                        } else if(estado == "ENCAMINO"){
+                            Estado.ENCAMINO
+                        } else{
+                            Estado.FINALIZADO
+                        }
                     val userOrdersCursor = db.rawQuery(
                         "SELECT * FROM $TABLE_USER_ORDERS WHERE $COLUMN_USER_ORDERS_ORDER_ID = ?",
                         arrayOf(orderId.toString())
@@ -502,7 +516,7 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
                         restaurant!!,
                         name,
                         direction,
-                        inProgressMapeado,
+                        estadoEnum,
                         userOrders,
                         estimatedHour,
                         orderStates,

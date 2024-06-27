@@ -28,6 +28,7 @@ class MainViewModel() : ViewModel() {
         userDataBaseFirebase!!.getUserByEmail(email) { user ->
             if(user != null && user.password == password) {
                 _user.postValue(user)
+
             }
             else {
                 _user.postValue(null)

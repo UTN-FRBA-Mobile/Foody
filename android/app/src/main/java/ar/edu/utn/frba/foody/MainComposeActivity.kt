@@ -69,6 +69,7 @@ class MainComposeActivity : ComponentActivity() {
                 if (user != null) {
                     orderViewModel.user = user
                     orderViewModel.removeOrderFromSession()
+                    orderViewModel.updateOrderLogin()
                     navController.navigate(AppScreens.Home_Screen.route)
                 } else {
                     Toast.makeText(

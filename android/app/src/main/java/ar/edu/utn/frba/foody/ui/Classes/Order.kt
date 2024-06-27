@@ -4,10 +4,12 @@ data class Order(
     var orderId: String = "",
     val restaurant: Restaurant = Restaurant(),
     val name: String = "",
-    val direction: String = "",
-    val inProgress: Boolean = false,
+    var direction: String = "",
+    var estado: Estado = Estado.ENPROGRESO,
     var userOrders: MutableList<UserOrder> = mutableListOf(),
     val estimatedHour: String = "",
     val orderStates: List<OrderState> = emptyList(),
     var group: Group? = null,
+    var montoPagado: Double = 0.0,
+    var tarjetaUsada: String = ""
 )

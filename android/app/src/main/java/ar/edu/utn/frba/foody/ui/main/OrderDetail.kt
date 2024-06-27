@@ -32,7 +32,7 @@ fun OrderScreen(
         null,
         { BottomGroupOrder(orderViewModel = viewModel) },
         { TopGroupOrder(navController) }) {
-        OrderDetailGrid(order.userOrders)
+        OrderDetailGrid(order.userOrders,order)
     }
 }
 
@@ -79,7 +79,8 @@ fun BottomGroupOrder(
 
 @Composable
 fun OrderDetailGrid(
-    userOrders: List<UserOrder>
+    userOrders: List<UserOrder>,
+    order: Order
 ) {
     Image(
         painter = painterResource(id = R.drawable.background_signup),
@@ -95,14 +96,14 @@ fun OrderDetailGrid(
         ) {
         items(userOrders.size) { index ->
             if (userOrders[index].items.isNotEmpty()) {
-                OrderDetailCard(userOrders[index])
+                OrderDetailCard(userOrders[index], order)
             }
         }
     }
 }
 
 @Composable
-fun OrderDetailCard(userOrder: UserOrder) {
+fun OrderDetailCard(userOrder: UserOrder,order:Order) {
     val heightContent = if (userOrder.items.size > 1) 170.dp else 90.dp
 
     Card(
@@ -132,11 +133,45 @@ fun OrderDetailCard(userOrder: UserOrder) {
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Total: $" + userOrder.items.sumOf { x -> x.quantity * x.dish.price }
+                text = "Total Sin Envio: $" + userOrder.items.sumOf { x -> x.quantity * x.dish.price }
                     .toString(),
                 style = MaterialTheme.typography.h6,
                 modifier = Modifier.padding(vertical = 4.dp)
             )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Total : $" + order.montoPagado.toString(),
+                style = MaterialTheme.typography.h6,
+                modifier = Modifier.padding(vertical = 4.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Dirección de entrega : " + order.direction,
+                style = MaterialTheme.typography.h6,
+                modifier = Modifier.padding(vertical = 4.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            if (order.tarjetaUsada.equals("Efectivo")){
+                Text(
+                    text = "Pago Realizado en Efectivo",
+                    style = MaterialTheme.typography.body1,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                )
+            }
+            else {
+                Text(
+                    text = "Tarjeta usada : **** **** **** ${
+                        order.tarjetaUsada.takeLast(4)
+                    }",
+                    style = MaterialTheme.typography.body1,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                )
+            }
+
         }
     }
 }

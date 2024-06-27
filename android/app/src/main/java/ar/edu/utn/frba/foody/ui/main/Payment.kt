@@ -1,7 +1,6 @@
 package ar.edu.utn.frba.foody.ui.main
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
@@ -46,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import ar.edu.utn.frba.foody.R
+import ar.edu.utn.frba.foody.ui.Classes.Estado
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
@@ -58,6 +57,7 @@ fun PaymentScreen(navController: NavHostController,
     val user = orderViewModel.user
     var address by remember { mutableStateOf(user.direccion) }
     var paymentMethod by remember { mutableStateOf("Efectivo") }
+    var tarjeta by remember { mutableStateOf("Efectivo")}
     val paymentOptions = listOf("Efectivo", "Tarjeta")
     val totalPayment = totalAmount + deliveryFee
     var cards = orderViewModel.user.tarjetas
@@ -82,9 +82,10 @@ fun PaymentScreen(navController: NavHostController,
                     .padding(16.dp),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
+                var direcccion = "${address.calle} ${address.numero}, ${address.localidad}, ${address.region}"
                 Column {
                     TextField(
-                        value = "${address.calle} ${address.numero}, ${address.localidad}, ${address.region}",
+                        value = direcccion ,
                         onValueChange = {},
                         label = {
                             Text(
@@ -132,6 +133,9 @@ fun PaymentScreen(navController: NavHostController,
                                 .padding(vertical = 4.dp)
                                 .clickable {
                                     paymentMethod = option
+                                    if(paymentMethod=="Efectivo"){
+                                        tarjeta="Efectivo"
+                                    }
                                 }
                         ) {
                             RadioButton(
@@ -148,16 +152,46 @@ fun PaymentScreen(navController: NavHostController,
 
                 if (paymentMethod == "Tarjeta") {
                     Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Selecciona una tarjeta:",
+                        style = MaterialTheme.typography.subtitle1,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
                     cards.forEach { card ->
-                        Text(
-                            text = "**** **** **** ${
-                                card.cardNumber.takeLast(4)
-                            } - ${card.firstName} ${card.lastName}",
-                            style = MaterialTheme.typography.body1,
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 4.dp)
-                        )
+                                .clickable {tarjeta=card.cardNumber}
+                        ) {
+                            RadioButton(
+                                selected = tarjeta.equals(card.cardNumber),
+                                onClick = { tarjeta= card.cardNumber },
+                                colors = RadioButtonDefaults.colors(
+                                    selectedColor = MaterialTheme.colors.primary,
+                                    unselectedColor = MaterialTheme.colors.onSurface
+                                )
+                            )
+                            Text(
+                                text = "**** **** **** ${card.cardNumber.takeLast(4)} - ${card.firstName} ${card.lastName}",
+                                style = MaterialTheme.typography.body1
+                            )
+                        }
+
+                        /*cards.forEach { card ->
+                            Text(
+                                text = "**** **** **** ${
+                                    card.cardNumber.takeLast(4)
+                                } - ${card.firstName} ${card.lastName}",
+                                style = MaterialTheme.typography.body1,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp)
+                            )
+
+                         */
                         Text(
                             text = "Borrar tarjeta",
                             style = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.primary),
@@ -206,7 +240,16 @@ fun PaymentScreen(navController: NavHostController,
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
                     Button(
-                        onClick = { /* Manejar acción de pagar */ },
+                        onClick = {
+                            //validar que se haya elegido efectivo/una tarjeta y que haya una direccion
+                            var order= orderViewModel.getPickedOrder()
+                            order.estado= Estado.FINALIZADO //DEBE SER EN CAMINO PERO ESTOY HACIENDO PRUEBAS
+                            order.direction= direcccion
+                            order.montoPagado= totalPayment
+                            order.tarjetaUsada=tarjeta
+                            orderViewModel.updateDataBaseOrder(order)
+                            navController.navigate(AppScreens.Orders_Screen.route)
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),

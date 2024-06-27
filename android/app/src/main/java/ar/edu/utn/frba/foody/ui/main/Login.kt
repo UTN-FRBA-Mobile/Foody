@@ -40,13 +40,13 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
+import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
 fun LoginScreen(
     navController: NavHostController,
-    mainViewModel: MainViewModel
-) {
+    mainViewModel: MainViewModel) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val showError by remember { mutableStateOf(false) }
@@ -153,7 +153,7 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                ClickableText(
+               /* ClickableText(
                     text = AnnotatedString("Forgot Password?"),
                     onClick = { /* Aquí puedes manejar la lógica de recuperación de contraseña */ },
                     style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.primary)
@@ -161,6 +161,8 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
+
+                */
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
