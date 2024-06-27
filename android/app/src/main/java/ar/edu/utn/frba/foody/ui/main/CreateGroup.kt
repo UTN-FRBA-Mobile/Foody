@@ -3,12 +3,15 @@ package ar.edu.utn.frba.foody.ui.main
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.*
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.lifecycleScope
@@ -42,6 +45,12 @@ fun CreateGroupScreen(
         null,
         { TopGroupCreateGroup(navController = navController) }
     ) {
+        Image(
+            painter = painterResource(id = R.drawable.background_signup),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
         Box(
             modifier = Modifier.padding(vertical = 16.dp, horizontal = 32.dp),
             contentAlignment = Alignment.TopCenter
@@ -63,8 +72,11 @@ fun CreateGroupScreen(
                     value = groupName,
                     onValueChange = { groupName = it },
                     label = {
-                        Text(text = "Group Name")
+                        Text(text = "Name")
                     },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    singleLine = true,
+                    maxLines = 1,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 20.dp),
@@ -76,8 +88,12 @@ fun CreateGroupScreen(
                     value = password,
                     onValueChange = { password = it },
                     label = {
-                        Text(text = "Group Password")
+                        Text(text = "Password")
                     },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    visualTransformation = PasswordVisualTransformation(),
+                    singleLine = true,
+                    maxLines = 1,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 20.dp),
@@ -85,8 +101,40 @@ fun CreateGroupScreen(
                         backgroundColor = Color.Transparent
                     )
                 )
-                CustomText(text = order.restaurant.name)
-                CustomText(text = order.direction)
+                TextField(
+                    value = order.restaurant.name,
+                    onValueChange = { },
+                    label = {
+                        Text(text = "Restaurant")
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    singleLine = true,
+                    maxLines = 1,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 20.dp),
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.Transparent
+                    ),
+                    enabled = false
+                )
+                TextField(
+                    value = order.direction,
+                    onValueChange = { },
+                    label = {
+                        Text(text = "Address")
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    singleLine = true,
+                    maxLines = 1,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 20.dp),
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.Transparent
+                    ),
+                    enabled = false
+                )
                 CustomText(text = "(You pay the total)")
             }
         }

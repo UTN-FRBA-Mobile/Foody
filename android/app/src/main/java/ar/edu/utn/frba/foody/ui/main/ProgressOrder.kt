@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,11 +28,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.OrderState
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
@@ -49,6 +48,12 @@ fun ProgressOrderScreen(navController: NavController, orderViewModel: OrderViewM
         Box(modifier = Modifier.fillMaxHeight(),
             contentAlignment = Alignment.Center
         ) {
+            Image(
+                painter = painterResource(id = R.drawable.background_signup),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
             Column {
                 TextInfo(text = "Direccion: " + order.direction)
                 TextInfo(text = "Hora estimada: " + order.estimatedHour)
@@ -206,10 +211,11 @@ fun TopGroupProgressOrder(navController: NavController) {
     )
 }
 
+/*
 @Preview
 @Composable
 fun ProgressOrderPreview() {
     val navController= rememberNavController()
     val viewModel = OrderViewModel()
     ProgressOrderScreen(navController, viewModel)
-}
+}*/

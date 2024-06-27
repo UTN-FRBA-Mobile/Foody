@@ -1,7 +1,6 @@
 package ar.edu.utn.frba.foody.ui.main
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,11 +20,11 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,13 +33,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Order
 import ar.edu.utn.frba.foody.ui.Classes.OrderItemInfo
@@ -52,48 +48,38 @@ import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 @Composable
 fun CartScreen(
     navController: NavHostController,
-    viewModel: OrderViewModel
+    viewModel: OrderViewModel,
+    origin: String,
 ) {
     val order = viewModel.getPickedOrder()
     AppScaffold(navController,
-        stringResource(id = R.string.label_titulo_carrito),
+        null,
         { BottomGroupCart(navController, orderViewModel = viewModel, order = order) },
-        { TopGroupCart(navController) }) {
+        { TopGroupCart(navController, origin) }) {
         OrdersGrid(viewModel, order.userOrders)
     }
 }
 
 @Composable
-fun TopGroupCart(navController: NavController) {
-    val button_go_back =
-        ButtonInterface(
-            resourceId = R.drawable.go_back,
-            imageDescription = "Go Back Icon",
-            route = AppScreens.Home_Screen.route
-        )
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colors.primarySurface),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        IconButton(
-            onClick = { navController.navigate(button_go_back.route) },
-        ) {
-            Image(
-                painter = painterResource(id = button_go_back.resourceId),
-                contentDescription = button_go_back.imageDescription,
-                modifier = Modifier.size(24.dp),
-                contentScale = ContentScale.FillBounds
-            )
+fun TopGroupCart(navController: NavController, origin: String) {
+    val route =
+        if (origin == "home") AppScreens.Home_Screen.route else AppScreens.Restaurant_Screen.route
+
+    TopAppBar(
+        title = {
+            Text(text = stringResource(id = R.string.app_name))
+        },
+        actions = {
+            IconButton(onClick = { navController.navigate(route) }) {
+                Image(
+                    painter = painterResource(id = R.drawable.go_back),
+                    contentDescription = "Go Back Icon",
+                    modifier = Modifier.size(24.dp),
+                    contentScale = ContentScale.FillBounds
+                )
+            }
         }
-        Text(
-            stringResource(id = R.string.label_titulo_carrito),
-            Modifier
-                .align(Alignment.CenterVertically),
-            textAlign = TextAlign.Center
-        )
-    }
+    )
 }
 
 @Composable
@@ -102,18 +88,23 @@ fun BottomGroupCart(
     orderViewModel: OrderViewModel,
     order: Order
 ) {
-    val buttons = listOf(
+    val buttons = mutableListOf(
         ButtonInterface(
             resourceId = R.drawable.payment_icon,
             imageDescription = "Payment Icon",
-            route = AppScreens.Profile_Screen.route,
-        ),
-        ButtonInterface(
-            resourceId = if (order.group != null) R.drawable.group_icon else R.drawable.create_group_icon,
-            imageDescription = "Group Icon",
-            route = if (order.group != null) AppScreens.Group_Screen.route else AppScreens.Create_Group_Screen.route
+            route = AppScreens.Payment.route,
         )
     )
+
+    if (order.group != null) {
+        buttons.add(
+            ButtonInterface(
+                resourceId = R.drawable.group_icon,
+                imageDescription = "Group Icon",
+                route = AppScreens.Group_Screen.route
+            )
+        )
+    }
 
     Row(
         modifier = Modifier
@@ -172,6 +163,12 @@ fun OrdersGrid(
     viewModel: OrderViewModel,
     userOrders: List<UserOrder>
 ) {
+    Image(
+        painter = painterResource(id = R.drawable.background_signup),
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = Modifier.fillMaxSize()
+    )
     LazyVerticalGrid(
         columns = GridCells.Fixed(1),
         contentPadding = PaddingValues(8.dp),
@@ -271,7 +268,7 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
             Text(text = orderItem.quantity.toString(), fontSize = 18.sp)
 
             IconButton(onClick = {
-                viewModel.changeItemQuantity(orderItem.dish.dishId,-1)
+                viewModel.changeItemQuantity(orderItem.dish.dishId, -1)
             }) {
                 Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "Decrease")
             }
@@ -279,12 +276,11 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
     }
 }
 
-
+/*
 @Preview
 @Composable
 fun DefaultPreviewCart() {
     val navController = rememberNavController()
     val viewModel = OrderViewModel()
-    CartScreen(navController, viewModel)
-}
-
+    CartScreen(navController, viewModel, origin = "home")
+}*/

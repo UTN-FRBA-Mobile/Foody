@@ -65,7 +65,6 @@ class MainComposeActivity : ComponentActivity() {
             val orderViewModel = viewModel<OrderViewModel>()
             val cardViewModel = viewModel<CardViewModel>()
             val groupViewModel = viewModel<GroupViewModel>()
-            val addressViewModel = viewModel<AddressViewModel>()
             orderViewModel.setServices(dbOrderHelper, orderDataBaseFirebase, navController)
             //groupViewModel.setDatabase(dbGroupHelper)
             groupViewModel.setServices(dbGroupHelper,groupDataBaseFirebase,navController)
@@ -92,7 +91,6 @@ class MainComposeActivity : ComponentActivity() {
                 orderViewModel,
                 cardViewModel,
                 groupViewModel,
-                addressViewModel,
                 dbUserHelper,
                 dbRestaurantHelper,
                 dbGroupHelper,

@@ -41,7 +41,6 @@ fun AppNavigation(
     orderViewModel: OrderViewModel,
     cardViewModel: CardViewModel,
     groupViewModel: GroupViewModel,
-    addressViewModel: AddressViewModel,
     dbUserHelper: UserDataBase,
     dbRestaurantHelper: RestaurantDataBase,
     dbGroupHelper: GroupDataBase,
@@ -59,12 +58,18 @@ fun AppNavigation(
             )
         }
         composable(route = AppScreens.Login_Screen.route) {
-            LoginScreen(navController = navController,dbHelper=dbUserHelper, orderViewModel,
-                addressViewModel,
-                mainViewModel = viewModel)
+            LoginScreen(
+                navController = navController,
+                mainViewModel = viewModel
+            )
         }
         composable(route = AppScreens.SignUp_Screen.route) {
-            SignUpScreen(navController = navController, viewModel = orderViewModel, dbUserHelper, dbUserDataBaseFirebase)
+            SignUpScreen(
+                navController = navController,
+                viewModel = orderViewModel,
+                dbUserHelper,
+                dbUserDataBaseFirebase
+            )
         }
         composable(route = AppScreens.Profile_Screen.route) {
             ProfileScreen(
@@ -72,10 +77,11 @@ fun AppNavigation(
                 dbUserDataBase = dbUserHelper, orderViewModel
             )
         }
-        composable(route = AppScreens.Cart_Screen.route) {
+        composable(route = AppScreens.Cart_Screen.route) { backStackEntry ->
             CartScreen(
                 navController = navController,
-                viewModel = orderViewModel
+                viewModel = orderViewModel,
+                origin = backStackEntry.arguments?.getString("origin") ?: "unknown",
             )
         }
         composable(route = AppScreens.Orders_Screen.route) {
@@ -124,19 +130,16 @@ fun AppNavigation(
         composable(route = AppScreens.Payment.route) {
             PaymentScreen(navController = navController, viewModel = cardViewModel)
         }
-        composable(route = AppScreens.Location_Screen.route,
+        composable(
+            route = AppScreens.Location_Screen.route,
             arguments = listOf(navArgument("origin") { type = NavType.StringType },
                 navArgument("id") { type = NavType.StringType })
         ) { backStackEntry ->
-            LocationGoogleScreen(context, navController, orderViewModel,
+            LocationGoogleScreen(
+                context, navController, orderViewModel,
                 origin = backStackEntry.arguments?.getString("origin") ?: "unknown",
                 id = backStackEntry.arguments?.getString("id") ?: "unknown"
             )
         }
-        /* composable(route = AppScreens.Location_Screen.route) {
-             LocationGoogleScreen(context = context,navController,addressViewModel)
-         }
-
-         */
     }
 }

@@ -15,15 +15,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,15 +32,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Dish
+import ar.edu.utn.frba.foody.ui.Classes.Order
 import ar.edu.utn.frba.foody.ui.Classes.OrderItemInfo
 import ar.edu.utn.frba.foody.ui.Classes.Restaurant
 import ar.edu.utn.frba.foody.ui.Classes.UserOrder
@@ -58,95 +59,71 @@ fun RestaurantScreen(
 ) {
     val loading = remember { mutableStateOf(true) }
     val restaurant = viewModel.getPickedRestaurant()
+    val order = orderViewModel.getPickedOrder()
     val userOrder = orderViewModel.getUserOrder(restaurant, loading)
 
-    AppScaffold(navController, restaurant.name, { BottomGroupRestaurant(navController) },
-        { TopGroupRestaurant(navController, restaurant.name, orderViewModel) }) {
+    AppScaffold(navController,
+        null,
+        { BottomGroupRestaurant(navController, order) },
+        { TopGroupRestaurant(navController) }
+    ) {
         DishesGrid(orderViewModel, restaurant.dishes, userOrder, restaurant, loading.value)
     }
 }
 
 @Composable
-fun TopGroupRestaurant(navController: NavController, restaurantName: String, orderViewModel: OrderViewModel) {
-    val button_go_back =
-        ButtonInterface(
-            resourceId = R.drawable.go_back,
-            imageDescription = "Go Back Icon",
-            route = AppScreens.Home_Screen.route,
-
-            )
-    val button_cart = ButtonInterface(
-        resourceId = R.drawable.cart_icon,
-        imageDescription = "Cart Icon",
-        route = AppScreens.Cart_Screen.route,
-    )
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colors.primarySurface),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        IconButton(
-            onClick = { navController.navigate(button_go_back.route) },
-        ) {
-            Image(
-                painter = painterResource(id = button_go_back.resourceId),
-                contentDescription = button_go_back.imageDescription,
-                modifier = Modifier.size(24.dp),
-                contentScale = ContentScale.FillBounds
-            )
-        }
-        Text(
-            restaurantName,
-            Modifier
-                .align(Alignment.CenterVertically),
-            textAlign = TextAlign.Center
-        )
-
-
-        IconButton(
-            onClick = {
-                orderViewModel.getOrder()
-                navController.navigate(AppScreens.Cart_Screen.route)
-            },
-        ) {
-            Image(
-                painter = painterResource(id = button_cart.resourceId),
-                contentDescription = button_cart.imageDescription,
-                modifier = Modifier.size(24.dp),
-                contentScale = ContentScale.FillBounds
-            )
-        }
-    }
-}
-
-@Composable
-fun BottomGroupRestaurant(navController: NavController) {
-    val buttons = listOf(
-        ButtonInterface(
-            resourceId = R.drawable.user_icon,
-            imageDescription = "User Icon",
-            route = AppScreens.Profile_Screen.route,
-        ),
-        ButtonInterface(
-            resourceId = R.drawable.order_icon,
-            imageDescription = "Order Icon",
-            route = AppScreens.Orders_Screen.route,
-        )
-    )
-
-    Row(modifier = Modifier.fillMaxWidth()) {
-        buttons.forEach {
-            IconButton(
-                onClick = { navController.navigate(it.route) },
-                modifier = Modifier.weight(1f)
-            ) {
+fun TopGroupRestaurant(navController: NavController) {
+    TopAppBar(
+        title = {
+            Text(text = stringResource(id = R.string.app_name))
+        },
+        actions = {
+            IconButton(onClick = { navController.navigate(AppScreens.Home_Screen.route) }) {
                 Image(
-                    painter = painterResource(id = it.resourceId),
-                    contentDescription = it.imageDescription,
+                    painter = painterResource(id = R.drawable.go_back),
+                    contentDescription = "Go Back Icon",
                     modifier = Modifier.size(24.dp),
                     contentScale = ContentScale.FillBounds
                 )
+            }
+        }
+    )
+}
+
+@Composable
+fun BottomGroupRestaurant(navController: NavController, order: Order) {
+    val buttons = mutableListOf(
+        ButtonInterface(
+            resourceId = R.drawable.cart_icon,
+            imageDescription = "Cart Icon",
+            route = AppScreens.Cart_Screen.createRoute(origin = "restaurant"),
+        )
+    )
+
+    if (order.group == null) {
+        buttons.add(
+            ButtonInterface(
+                resourceId = R.drawable.create_group_icon,
+                imageDescription = "Create Group Icon",
+                route = AppScreens.Create_Group_Screen.route
+            )
+        )
+    }
+
+    BottomAppBar {
+        Row(modifier = Modifier.fillMaxWidth()) {
+            buttons.forEach {
+                IconButton(
+                    onClick = { navController.navigate(it.route) },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Image(
+                        painter = painterResource(id = it.resourceId),
+                        contentDescription = it.imageDescription,
+                        modifier = Modifier.size(24.dp),
+                        contentScale = ContentScale.FillBounds
+                    )
+                }
             }
         }
     }
@@ -160,16 +137,27 @@ fun DishesGrid(
     restaurant: Restaurant,
     loading: Boolean,
 ) {
+    Image(
+        painter = painterResource(id = R.drawable.background_signup),
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = Modifier.fillMaxSize()
+    )
+    Text(
+        text = restaurant.name,
+        style = MaterialTheme.typography.h4,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.padding(top = 16.dp)
+    )
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(8.dp),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth().padding(top = 48.dp)
     ) {
         items(dishes.size) { index ->
             DishCard(
                 viewModel,
                 dishes[index],
-                userOrder,
                 userOrder.items.firstOrNull { x -> x.dish.dishId == dishes[index].dishId },
                 restaurant,
                 loading
@@ -182,7 +170,6 @@ fun DishesGrid(
 fun DishCard(
     viewModel: OrderViewModel,
     dish: Dish,
-    userOrder: UserOrder,
     userOrderItemInfo: OrderItemInfo?,
     restaurant: Restaurant,
     loading: Boolean
@@ -259,11 +246,11 @@ fun DishCard(
 }
 
 
-@Preview
+/*@Preview
 @Composable
 fun DefaultPreviewRestaurant() {
     val navController = rememberNavController()
     val viewModel = MainViewModel()
     val orderViewModel = OrderViewModel()
     RestaurantScreen(navController, viewModel, orderViewModel)
-}
+}*/

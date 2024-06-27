@@ -12,11 +12,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,153 +29,170 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import ar.edu.utn.frba.foody.R
-import ar.edu.utn.frba.foody.ui.Classes.User
-import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
-import ar.edu.utn.frba.foody.ui.dataClasses.AddressViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
-import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
-fun LoginScreen(navController: NavHostController, dbHelper: UserDataBase, orderViewModel: OrderViewModel,
-                addressViewModel: AddressViewModel,
-                mainViewModel: MainViewModel) {
+fun LoginScreen(
+    navController: NavHostController,
+    mainViewModel: MainViewModel
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var showError by remember { mutableStateOf(false) }
+    val showError by remember { mutableStateOf(false) }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize(),
-        contentAlignment = Alignment.Center
+    AppScaffold(
+        navController,
+        null,
+        null,
+        { TopGroupLogin() }
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.background_login),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
+        Box(
             modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth()
+                .fillMaxSize()
+                .padding(bottom = 56.dp),
+            contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = painterResource(id = R.drawable.foody_logo),
-                contentDescription = "Delivery Logo",
+                painter = painterResource(id = R.drawable.background_login),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
-                    .size(120.dp)
-                    .padding(bottom = 16.dp)
-            )
-
-
-            Text(
-                text = "Welcome to Foody",
-                style = MaterialTheme.typography.h5,
-                color = MaterialTheme.colors.primary,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            TextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.Transparent
-                )
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            TextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Password") },
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.Transparent
-                )
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            if (showError) {
-                Text(
-                    text = "Incorrect User or Password",
-                    color = MaterialTheme.colors.error,
-                    style = MaterialTheme.typography.body2
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-
-
-            Button(
-                onClick = {
-                    mainViewModel.fetchUserByEmail(email, password)
-                    email = ""
-                    password = ""
-                },
-                modifier = Modifier
+                    .padding(
+                        start = 16.dp,
+                        end = 16.dp,
+                        bottom = 70.dp
+                    )
                     .fillMaxWidth()
-                    .height(50.dp)
             ) {
-                Text("Login", fontSize = 18.sp)
-            }
+                Image(
+                    painter = painterResource(id = R.drawable.foody_logo),
+                    contentDescription = "Delivery Logo",
+                    modifier = Modifier
+                        .size(120.dp)
+                        .padding(bottom = 16.dp)
+                )
 
-            Spacer(modifier = Modifier.height(16.dp))
 
-            ClickableText(
-                text = AnnotatedString("Forgot Password?"),
-                onClick = { /* Aquí puedes manejar la lógica de recuperación de contraseña */ },
-                style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.primary)
-            )
+                Text(
+                    text = "Welcome to Foody",
+                    style = MaterialTheme.typography.h5,
+                    color = MaterialTheme.colors.primary,
+                    textAlign = TextAlign.Center
+                )
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("Don't have an account?", style = MaterialTheme.typography.body2)
-                Spacer(modifier = Modifier.width(4.dp))
+                TextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Username") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    singleLine = true,
+                    maxLines = 1,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.Transparent
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                TextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Password") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    singleLine = true,
+                    maxLines = 1,
+                    visualTransformation = PasswordVisualTransformation(),
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.Transparent
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                if (showError) {
+                    Text(
+                        text = "Incorrect User or Password",
+                        color = MaterialTheme.colors.error,
+                        style = MaterialTheme.typography.body2
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
+
+                Button(
+                    onClick = {
+                        mainViewModel.fetchUserByEmail(email, password)
+                        email = ""
+                        password = ""
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                ) {
+                    Text("Login", fontSize = 18.sp)
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 ClickableText(
-                    text = AnnotatedString("Sign Up"),
-                    onClick = { navController.navigate(AppScreens.SignUp_Screen.route) },
+                    text = AnnotatedString("Forgot Password?"),
+                    onClick = { /* Aquí puedes manejar la lógica de recuperación de contraseña */ },
                     style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.primary)
                 )
-            }
-            Spacer(modifier = Modifier.height(100.dp))
 
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Don't have an account?", style = MaterialTheme.typography.body2)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    ClickableText(
+                        text = AnnotatedString("Sign Up"),
+                        onClick = { navController.navigate(AppScreens.SignUp_Screen.route) },
+                        style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.primary)
+                    )
+                }
+                Spacer(modifier = Modifier.height(100.dp))
+
+            }
         }
     }
 }
 
-fun verifyexistence(dbHelper: UserDataBase, email: String, password: String): User? {
-    val users: List<User> = dbHelper.getAllUsers()
-    val user: User? = users.find { userPred: User -> userPred.email == email }
-    if (user != null && user.password == password) {
-        return user
-    }
-    return null
+@Composable
+fun TopGroupLogin() {
+    TopAppBar(
+        title = {
+            Text(text = stringResource(id = R.string.app_name))
+        }
+    )
 }
 
 /*
 @Preview
 @Composable
 fun DefaultPreviewLogin() {
-    val navController= rememberNavController()
-    LoginScreen(navController,dbHelper)
-}
-
- */
+    val navController = rememberNavController()
+    val viewModel = MainViewModel()
+    LoginScreen(navController, viewModel)
+}*/
