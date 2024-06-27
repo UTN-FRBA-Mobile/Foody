@@ -33,7 +33,7 @@ class GroupViewModel() : ViewModel() {
     fun createGroup(newGroup: Group, admin: User) {
         this.updateGroup(newGroup)
         this.addUser(admin)
-        groupDataBaseFirebase?.insertGroup(newGroup)
+        groupDataBaseFirebase?.insertGroup(group)
     }
 
     fun addUser(user: User) {
@@ -56,8 +56,7 @@ class GroupViewModel() : ViewModel() {
 
     fun verifyNameGroupExist(name : String) : Boolean
     {
-        val groups = groupDataBaseFirebase?.getGroups()
-        val group = groups?.find { itemGroup: Group -> itemGroup.name == name }
+        val group = groupDataBaseFirebase?.getGroupByName(name)
 
         return if (group != null){
             true
@@ -68,8 +67,7 @@ class GroupViewModel() : ViewModel() {
 
     fun verifyGroupExist(name : String, pass : String) : Group?
     {
-        val groups = groupDataBaseFirebase?.getGroups()
-        val group = groups?.find { itemGroup: Group -> itemGroup.name == name }
+        val group = groupDataBaseFirebase?.getGroupByName(name)
 
         return if (group != null && group.password == pass){
             group

@@ -11,12 +11,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Group
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.GroupDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.*
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun CreateGroupScreen(
@@ -30,6 +34,8 @@ fun CreateGroupScreen(
     var groupName by remember { mutableStateOf("") }
     var password by remember {mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
 
     AppScaffold(navController = navController,
         null,
@@ -103,14 +109,14 @@ fun CreateGroupScreen(
 
             Button(
                 onClick = {
-                    group.name = groupName
+                    group.groupId = groupName
                     group.password = password
 
-                    if (groupViewModel.verifyNameGroupExist(groupName))
+                    if (!groupViewModel.verifyNameGroupExist(groupName))
                     {
                         groupViewModel.createGroup(group, orderViewModel.user)
-                        orderViewModel.createGroup(group)
-                        //navController.navigate(AppScreens.Cart_Screen.route)
+                        //orderViewModel.createGroup(group)
+                        navController.navigate(AppScreens.Cart_Screen.route)
                     }else{
                         showError = true
                         groupName = ""

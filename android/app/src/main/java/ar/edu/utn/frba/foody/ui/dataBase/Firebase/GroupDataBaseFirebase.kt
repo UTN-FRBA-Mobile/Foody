@@ -10,6 +10,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.ValueEventListener
+import kotlinx.coroutines.tasks.await
 
 class GroupDataBaseFirebase(private var database: FirebaseDatabase) {
     private val TABLE_GROUPS = "groups"
@@ -18,9 +19,7 @@ class GroupDataBaseFirebase(private var database: FirebaseDatabase) {
 
     fun insertGroup(group: Group){
         val myRefGroups = database.getReference(TABLE_GROUPS)
-        val key = myRefGroups.push().key!!
 
-        group.groupId =  key.toString()
         myRefGroups.child(group.groupId).setValue(group)
 
         group.members.forEach{user:User ->
@@ -43,48 +42,52 @@ class GroupDataBaseFirebase(private var database: FirebaseDatabase) {
         }
     }
 
-    fun getGroups() : List<Group>{
+    fun getGroupByName(name : String) : Group?{
         val myRef = database.getReference(TABLE_GROUPS)
 
-        var groups = mutableListOf<Group>()
+        var res : Group? = null
 
-        myRef.addValueEventListener(object : ValueEventListener {
+        val ref = myRef.child(name)
+
+        ref.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                dataSnapshot.children.forEach { orderSnapshot ->
-                    val group = orderSnapshot.getValue(Group::class.java)
-                    if (group != null){
-                        groups.add(group)
-                    }
+                if (dataSnapshot.exists()) {
+                    val group = dataSnapshot.getValue(Group::class.java)
+                    group?.groupId = name
+                    res = group!!
+                } else{
+                    res = null
                 }
+
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                groups = emptyList<Group>().toMutableList()
+                res = null
             }
         })
 
-        return groups
+        return res
     }
     /*
-        val myRef = database.getReference(TABLE_ORDERS)
+            val myRef = database.getReference(TABLE_USER)
 
-        myRef.addValueEventListener(object : ValueEventListener {
+        val userId = email.replace(".", "")
+
+        val ref = myRef.child(userId)
+
+        ref.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val orders = mutableListOf<Order>()
-                dataSnapshot.children.forEach { orderSnapshot ->
-                    val order = orderSnapshot.getValue(Order::class.java)
-                    order?.orderId = orderSnapshot.key.toString()
-                    order?.userOrders?.forEach { userOrder ->
-                        if(userOrder.user.userId == userId) {
-                            orders.add(order)
-                        }
-                    }
+                if (dataSnapshot.exists()) {
+                    val user = dataSnapshot.getValue(User::class.java)
+                    user?.userId = userId
+                    callback(user)
+                } else {
+                    callback(null)
                 }
-                callback(orders)
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                callback(emptyList())
+                callback(null)
             }
         })
      */
