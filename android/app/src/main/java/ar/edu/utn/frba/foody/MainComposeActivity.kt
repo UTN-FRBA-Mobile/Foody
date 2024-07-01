@@ -1,6 +1,7 @@
 package ar.edu.utn.frba.foody
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -25,6 +26,7 @@ import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppNavigation
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
+import ar.edu.utn.frba.foody.ui.dataBase.FirebaseTokenService
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -51,6 +53,14 @@ class MainComposeActivity : ComponentActivity() {
 
         createTestData(dbRestaurantHelper)
 
+        //Get firebase token for this device
+        val firebaseTokenManager = FirebaseTokenService(this)
+
+        val firebaseToken = firebaseTokenManager.getTokenFromPreferences()
+        if(firebaseToken.isNullOrEmpty()) {
+            firebaseTokenManager.getAndSaveToken()
+        }
+
        ///Create instance
         val database = FirebaseDatabase.getInstance()
 
@@ -66,7 +76,6 @@ class MainComposeActivity : ComponentActivity() {
             val cardViewModel = viewModel<CardViewModel>()
             val groupViewModel = viewModel<GroupViewModel>()
             orderViewModel.setServices(dbOrderHelper, orderDataBaseFirebase, navController)
-            //groupViewModel.setDatabase(dbGroupHelper)
             groupViewModel.setServices(dbGroupHelper,groupDataBaseFirebase,navController)
             viewModel.setDataBase(userDataBaseFirebase)
 
