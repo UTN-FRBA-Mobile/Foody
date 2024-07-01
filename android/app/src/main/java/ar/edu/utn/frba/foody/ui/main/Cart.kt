@@ -184,6 +184,26 @@ fun OrdersGrid(
             }
         }
     }
+    Spacer(modifier = Modifier.width(8.dp))
+
+    Box(
+        modifier = Modifier
+            .padding(horizontal = 32.dp)
+            .fillMaxWidth()
+            .padding(bottom = 100.dp),
+        contentAlignment = Alignment.BottomCenter
+    ) {
+        Button(
+            onClick = {
+                navController.navigate(AppScreens.Payment.route)
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+        ) {
+            Text("Pagar", fontSize = 18.sp)
+        }
+    }
 }
 
 @Composable
@@ -222,24 +242,6 @@ fun OrderCard(viewModel: OrderViewModel, userOrder: UserOrder,navController: Nav
                 style = MaterialTheme.typography.h6,
                 modifier = Modifier.padding(vertical = 4.dp)
             )
-        }
-    }
-    Box(
-        modifier = Modifier
-            .padding(horizontal = 32.dp)
-            .fillMaxWidth()
-            .padding(bottom = 100.dp),
-        contentAlignment = Alignment.BottomCenter
-    ) {
-        Button(
-            onClick = {
-                navController.navigate(AppScreens.Payment.route)
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-        ) {
-            Text("Pagar", fontSize = 18.sp)
         }
     }
 }

@@ -1,5 +1,6 @@
 package ar.edu.utn.frba.foody.ui.main
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,7 +51,12 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val showError by remember { mutableStateOf(false) }
+    val canGoBack = remember { mutableStateOf(false) } // Cambia esto según tu lógica
 
+    BackHandler(enabled = !canGoBack.value) {
+        // Aquí decides qué hacer cuando se presiona el botón de retroceso
+        // Si canGoBack es false, no haces nada, por lo tanto, evitas el retroceso
+    }
     AppScaffold(
         navController,
         null,

@@ -125,13 +125,11 @@ class OrderDataBaseFirebase(private var database: FirebaseDatabase) {
                     val order = snapshot.getValue(Order::class.java)
                     if (order != null && order.estado == estado) {
                         val userOrders = order.userOrders // Asumiendo que es una lista de objetos de tipo UserOrder
-                        if (userOrders != null) {
-                            for (userOrder in userOrders) {
-                                if (userOrder.user.userId == user.userId) {
-                                    order.orderId = snapshot.key.toString()
-                                    callback(order) // Retorna la orden filtrada
-                                    return // Termina la búsqueda después de encontrar la primera coincidencia
-                                }
+                        for (userOrder in userOrders) {
+                            if (userOrder.user.userId == user.userId) {
+                                order.orderId = snapshot.key.toString()
+                                callback(order) // Retorna la orden filtrada
+                                return // Termina la búsqueda después de encontrar la primera coincidencia
                             }
                         }
                     }
@@ -144,8 +142,6 @@ class OrderDataBaseFirebase(private var database: FirebaseDatabase) {
             }
         })
     }
-
-
     fun getOrdersByUser(userId: String, callback: (List<Order>) -> Unit) {
         val myRef = database.getReference(TABLE_ORDERS)
 

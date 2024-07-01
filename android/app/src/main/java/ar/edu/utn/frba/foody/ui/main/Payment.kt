@@ -45,6 +45,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Estado
+import ar.edu.utn.frba.foody.ui.Classes.Order
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
@@ -243,11 +244,12 @@ fun PaymentScreen(navController: NavHostController,
                         onClick = {
                             //validar que se haya elegido efectivo/una tarjeta y que haya una direccion
                             var order= orderViewModel.getPickedOrder()
-                            order.estado= Estado.FINALIZADO //DEBE SER EN CAMINO PERO ESTOY HACIENDO PRUEBAS
+                            order.estado= Estado.ENCAMINO //DEBE SER EN CAMINO PERO ESTOY HACIENDO PRUEBAS
                             order.direction= direcccion
                             order.montoPagado= totalPayment
                             order.tarjetaUsada=tarjeta
                             orderViewModel.updateDataBaseOrder(order)
+                            orderViewModel.updateOrder(Order())
                             navController.navigate(AppScreens.Orders_Screen.route)
                         },
                         modifier = Modifier

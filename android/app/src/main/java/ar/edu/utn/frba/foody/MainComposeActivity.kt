@@ -6,7 +6,13 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.NonNull
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.ui.Classes.Dish
@@ -31,62 +37,61 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class MainComposeActivity : ComponentActivity() {
     lateinit var dbUserHelper: UserDataBase
+    private lateinit var dbRestaurantHelper: RestaurantDataBase
+    private lateinit var dbOrderHelper: OrderDataBase
+    private lateinit var dbGroupHelper: GroupDataBase
+    private lateinit var firebaseTokenManager: FirebaseTokenService
+    private lateinit var userDataBaseFirebase: UserDataBaseFirebase
+    private lateinit var orderDataBaseFirebase: OrderDataBaseFirebase
+    private lateinit var groupDataBaseFirebase: GroupDataBaseFirebase
+    private lateinit var tokenDataBaseFirebase: TokenDataBaseFirebase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        dbUserHelper = UserDataBase(this)
-       // dbUserHelper.createDataBase(dbUserHelper)
+        val initializationComplete =  mutableStateOf(false)
 
-        val dbRestaurantHelper = RestaurantDataBase(this)
-        dbRestaurantHelper.deleteAndCreateTables(dbUserHelper)
-
-        val dbOrderHelper = OrderDataBase(this)
-        //dbOrderHelper.deleteAndCreateTables()
-
-        //createTestData(dbRestaurantHelper)
-        val dbGroupHelper = GroupDataBase(this)
-        dbGroupHelper.createDataBase(dbGroupHelper)
-
-        createTestData(dbRestaurantHelper)
-
-        //Get firebase token for this device
-        val firebaseTokenManager = FirebaseTokenService(this)
-
-        var firebaseToken = firebaseTokenManager.getTokenFromPreferences()
-        if(firebaseToken.isNullOrEmpty()) {
-            firebaseTokenManager.getAndSaveToken()
+        lifecycleScope.launch(Dispatchers.IO) {
+            initializeDatabase()
+            withContext(Dispatchers.Main) {
+                initializationComplete.value = true
+            }
         }
-
-       ///Create instance
-        val database = FirebaseDatabase.getInstance()
-
-        //Create Firebase data base instance
-        val userDataBaseFirebase = UserDataBaseFirebase(database)
-        val orderDataBaseFirebase = OrderDataBaseFirebase(database)
-        val groupDataBaseFirebase = GroupDataBaseFirebase(database)
-        val tokenDataBaseFirebase = TokenDataBaseFirebase(database)
-
         setContent {
-            val navController = rememberNavController()
-            val viewModel = viewModel<MainViewModel>()
-            val orderViewModel = viewModel<OrderViewModel>()
-            val groupViewModel = viewModel<GroupViewModel>()
-            orderViewModel.setServices(dbOrderHelper, orderDataBaseFirebase, navController)
-            groupViewModel.setServices(dbGroupHelper,groupDataBaseFirebase,navController)
-            viewModel.setServices(userDataBaseFirebase, tokenDataBaseFirebase, navController, firebaseTokenManager)
+            MyApp(initializationComplete.value)
+        }
+    }
 
-            viewModel.user.observe(this, Observer { user ->
+    @Composable
+    fun MyApp(initializationComplete: Boolean) {
+        if (initializationComplete) {
+            val navController = rememberNavController()
+            val viewModel: MainViewModel = viewModel()
+            val orderViewModel: OrderViewModel = viewModel()
+            val groupViewModel: GroupViewModel = viewModel()
+            LaunchedEffect(Unit) {
+                orderViewModel.setServices(dbOrderHelper, orderDataBaseFirebase, navController)
+                groupViewModel.setServices(dbGroupHelper, groupDataBaseFirebase, navController)
+                viewModel.setServices(
+                    userDataBaseFirebase,
+                    tokenDataBaseFirebase,
+                    navController,
+                    firebaseTokenManager
+                )
+            }
+            viewModel.user.observe(this@MainComposeActivity, Observer { user ->
                 if (user != null) {
                     orderViewModel.user = user
                     orderViewModel.removeOrderFromSession()
                     orderViewModel.updateOrderLogin()
                     navController.navigate(AppScreens.Home_Screen.route)
                     tokenDataBaseFirebase.addUserDeviceToken(firebaseTokenManager.getTokenFromPreferences()!!, user.userId)
-                    //TODO sacar el login del stack de navegación
                 } else {
                     Toast.makeText(
                         navController.context,
@@ -97,7 +102,7 @@ class MainComposeActivity : ComponentActivity() {
             })
 
             AppNavigation(
-                this,
+                this@MainComposeActivity,
                 navController,
                 viewModel,
                 orderViewModel,
@@ -108,10 +113,43 @@ class MainComposeActivity : ComponentActivity() {
                 dbOrderHelper,
                 userDataBaseFirebase
             )
+        } else {
+            //CircularProgressIndicator()
         }
     }
 
-    fun createTestData(dbRestaurantHelper: RestaurantDataBase) {
+    private suspend fun initializeDatabase() = withContext(Dispatchers.IO) {
+        dbUserHelper = UserDataBase(this@MainComposeActivity)
+        //dbUserHelper.createDataBase(dbUserHelper)
+
+        dbRestaurantHelper = RestaurantDataBase(this@MainComposeActivity)
+        dbRestaurantHelper.deleteAndCreateTables(dbUserHelper)
+
+        dbOrderHelper = OrderDataBase(this@MainComposeActivity)
+        //dbOrderHelper.deleteAndCreateTables()
+
+        dbGroupHelper = GroupDataBase(this@MainComposeActivity)
+        dbGroupHelper.createDataBase(dbGroupHelper)
+
+        createTestData(dbRestaurantHelper)
+
+        //Get firebase token for this device
+        firebaseTokenManager = FirebaseTokenService(this@MainComposeActivity)
+        var firebaseToken = firebaseTokenManager.getTokenFromPreferences()
+        if (firebaseToken.isNullOrEmpty()) {
+            firebaseTokenManager.getAndSaveToken()
+        }
+
+        //Create instance
+        val database = FirebaseDatabase.getInstance()
+
+        //Create Firebase data base instance
+         userDataBaseFirebase = UserDataBaseFirebase(database)
+        orderDataBaseFirebase = OrderDataBaseFirebase(database)
+        groupDataBaseFirebase = GroupDataBaseFirebase(database)
+        tokenDataBaseFirebase = TokenDataBaseFirebase(database)
+    }
+        fun createTestData(dbRestaurantHelper: RestaurantDataBase) {
         val restaurant1 = Restaurant(
             name = "La Bella Italia",
             imageDescription = "A cozy Italian restaurant",

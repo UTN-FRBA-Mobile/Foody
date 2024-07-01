@@ -1,5 +1,6 @@
 package ar.edu.utn.frba.foody.ui.main
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -34,6 +35,12 @@ fun HomeScreen(
     userDataBase: UserDataBase?,
     orderViewModel: OrderViewModel
 ) {
+    val canGoBack = remember { mutableStateOf(false) } // Cambia esto según tu lógica
+
+    BackHandler(enabled = !canGoBack.value) {
+        // Aquí decides qué hacer cuando se presiona el botón de retroceso
+        // Si canGoBack es false, no haces nada, por lo tanto, evitas el retroceso
+    }
     AppScaffold(
         navController,
         null,
@@ -121,12 +128,10 @@ fun RestaurantItem(
         },
         onDismiss = { showAlert.value = false }
     )
-
     if (showRestaurant.value) {
         viewModel.updateRestaurant(restaurant)
         navController.navigate(AppScreens.Restaurant_Screen.route)
     }
-
     if (changeRestaurant.value) {
         orderViewModel.changeRestaurant(restaurant)
     }
@@ -141,7 +146,8 @@ fun RestaurantItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(onClick = {
-                    if (restaurantName != "" && restaurant != viewModel.getPickedRestaurant()) {
+                    if ((restaurantName != "" && restaurant != viewModel.getPickedRestaurant())||
+                        orderViewModel.getPickedOrder().userOrders.isNotEmpty()) {
                         showAlert.value = true
                     } else {
                         showRestaurant.value = true

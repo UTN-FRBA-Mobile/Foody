@@ -53,6 +53,9 @@ class OrderViewModel() : ViewModel() {
         this.getOrderByState(Estado.ENPROGRESO)
     }
 
+    fun updateOrder(order: Order){
+        this.order=order
+    }
     fun updateDataBaseOrder(newOrder: Order) {
         order = newOrder
         orderDataBaseFirebase?.updateOrder(order){ isSuccess -> }
@@ -218,9 +221,13 @@ class OrderViewModel() : ViewModel() {
     }
 
     fun changeRestaurant(newRestaurant: Restaurant) {
-        orderDataBaseFirebase?.deleteOrder(order.orderId) { isSuccess ->
-            createOrder(newRestaurant)
+        orderDataBaseFirebase?.getOrderByState(Estado.ENPROGRESO,user){
+                orden ->
+            if (orden!= null){
+                orderDataBaseFirebase?.deleteOrder(orden.orderId) { isSuccess ->}
+            }
         }
+        createOrder(newRestaurant)
     }
 
     fun changeItemQuantityIfExists(orderItem: OrderItemInfo?, variation: Int, dish: Dish, restaurant: Restaurant) {
@@ -263,9 +270,11 @@ class OrderViewModel() : ViewModel() {
                 order ->
             if (order!= null){
                 this.order=order
+
             }
         }
     }
+
     fun emptyUserOrder() {
         val loading = mutableStateOf(false)
         val userOrder = getAssignedUserOrder(loading)
