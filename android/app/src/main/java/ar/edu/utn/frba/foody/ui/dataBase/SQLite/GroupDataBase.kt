@@ -40,7 +40,7 @@ class GroupDataBase(private var context: Context) : SQLiteOpenHelper(
         val db = this.writableDatabase
 
         val groupValues = ContentValues().apply {
-            put(COLUMN_GROUP_NAME, group.name)
+            put(COLUMN_GROUP_NAME, group.groupId)
             put(COLUMN_GROUP_PASSWORD, group.password)
             put(COLUMN_GROUP_MEMBERS_LIMIT, group.membersLimit)
 
@@ -62,7 +62,7 @@ class GroupDataBase(private var context: Context) : SQLiteOpenHelper(
     fun updateGroup(group: Group) {
         val db = this.writableDatabase
         val contentValues = ContentValues().apply {
-            put(COLUMN_GROUP_NAME, group.name)
+            put(COLUMN_GROUP_NAME, group.groupId)
             put(COLUMN_GROUP_PASSWORD, group.password)
             put(COLUMN_GROUP_MEMBERS_LIMIT, group.membersLimit)
 
@@ -133,7 +133,7 @@ class GroupDataBase(private var context: Context) : SQLiteOpenHelper(
                 }
                 userCursor.close()
 
-                groups.add(Group(groupId, name, password, users, membersLimit))
+                groups.add(Group(name, password, users, membersLimit))
             } while (cursor.moveToNext())
         }
         cursor.close()
@@ -159,7 +159,7 @@ class GroupDataBase(private var context: Context) : SQLiteOpenHelper(
 
         val userGroupId = userCursor.getInt(userCursor.getColumnIndexOrThrow(COLUMN_USER_GROUP_ID))
 
-        return User(userId, userName, userPassword, userDirection, 0, userGroupId)
+        return User(userId, userName, userPassword, userDirection, 0, userGroupId.toString())
     }
 
     companion object {

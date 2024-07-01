@@ -264,7 +264,7 @@ class OrderDataBase(private var context: Context) : SQLiteOpenHelper(
 
                 val users = getUsersGroup(id)
 
-                val group = Group(id, name, password, users, membersLimit)
+                val group = Group(name, password, users, membersLimit)
 
                 groups.add(group)
             } while (cursor.moveToNext())

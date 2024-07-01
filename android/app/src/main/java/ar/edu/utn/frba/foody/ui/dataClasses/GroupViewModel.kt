@@ -2,8 +2,10 @@ package ar.edu.utn.frba.foody.ui.dataClasses
 
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.ui.Classes.Group
 import ar.edu.utn.frba.foody.ui.Classes.User
+import ar.edu.utn.frba.foody.ui.dataBase.Firebase.GroupDataBaseFirebase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.GroupDataBase
 
 
@@ -11,9 +13,13 @@ class GroupViewModel() : ViewModel() {
     private var group by mutableStateOf(Group())
 
     var groupDataBase: GroupDataBase? = null
+    var groupDataBaseFirebase: GroupDataBaseFirebase? = null
+    var navController: NavController? = null
 
-    fun setDatabase(groupDataBase: GroupDataBase) {
+    fun setServices(groupDataBase: GroupDataBase, groupDataBaseFirebase: GroupDataBaseFirebase, navController: NavController) {
         this.groupDataBase = groupDataBase
+        this.groupDataBaseFirebase = groupDataBaseFirebase
+        this.navController = navController
     }
 
     fun updateGroup(newGroup: Group) {
@@ -27,7 +33,7 @@ class GroupViewModel() : ViewModel() {
     fun createGroup(newGroup: Group, admin: User) {
         this.updateGroup(newGroup)
         this.addUser(admin)
-        groupDataBase?.insertGroup(newGroup)
+        groupDataBaseFirebase?.insertGroup(group)
     }
 
     fun addUser(user: User) {
@@ -39,7 +45,7 @@ class GroupViewModel() : ViewModel() {
 
     fun updateUser(user: User) {
         this.addUser(user)
-        groupDataBase?.updateGroup(group)
+        groupDataBaseFirebase?.updateGroup(group)
     }
 
     fun deleteUser(user: User): Group {
@@ -48,10 +54,26 @@ class GroupViewModel() : ViewModel() {
         return updatedGroup
     }
 
-    fun getGroups(): List<Group> {
-        if (groupDataBase != null) {
-            return groupDataBase!!.getGroups()
+    fun verifyNameGroupExist(name : String) : Boolean
+    {
+        val group = groupDataBaseFirebase?.getGroupByName(name)
+
+        return if (group != null){
+            true
+        }else{
+            false
         }
-       return emptyList()
     }
+
+    fun verifyGroupExist(name : String, pass : String) : Group?
+    {
+        val group = groupDataBaseFirebase?.getGroupByName(name)
+
+        return if (group != null && group.password == pass){
+            group
+        }else{
+            null
+        }
+    }
+
 }

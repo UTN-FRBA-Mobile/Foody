@@ -74,7 +74,7 @@ class OrderViewModel() : ViewModel() {
 
     fun updateGroup(newGroup: Group) {
         order = order.copy(group = newGroup)
-        orderDataBase?.updateGroup(newGroup.groupId, order.orderId)
+        //orderDataBase?.updateGroup(newGroup.groupId.toInt(), order.orderId)
     }
 
     fun hasItems(newOrder: Order): Boolean {

@@ -1,5 +1,6 @@
 package ar.edu.utn.frba.foody.ui.main
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -13,12 +14,16 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Group
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.GroupDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.*
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun CreateGroupScreen(
@@ -27,12 +32,13 @@ fun CreateGroupScreen(
     groupViewModel: GroupViewModel,
     groupDataBase: GroupDataBase
 ) {
+    var group = Group()
     val order = orderViewModel.getPickedOrder()
-    val group = Group()
     var groupName by remember { mutableStateOf("") }
-    var password by remember {
-        mutableStateOf("")
-    }
+    var password by remember {mutableStateOf("") }
+    var showError by remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
 
     AppScaffold(navController = navController,
         null,
@@ -139,13 +145,36 @@ fun CreateGroupScreen(
                 .padding(bottom = 100.dp),
             contentAlignment = Alignment.BottomCenter
         ) {
+
+            if (showError) {
+                Text(
+                    text = "Name already Exist",
+                    color = MaterialTheme.colors.error,
+                    style = MaterialTheme.typography.body2
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
             Button(
                 onClick = {
-                    group.name = groupName
+                    group.groupId = groupName
                     group.password = password
-                    orderViewModel.createGroup(group)
-                    groupViewModel.createGroup(group, orderViewModel.user)
-                    navController.navigate(AppScreens.Cart_Screen.route)
+
+                    if (!groupViewModel.verifyNameGroupExist(groupName))
+                    {
+                        groupViewModel.createGroup(group, orderViewModel.user)
+                        //orderViewModel.createGroup(group)
+                        navController.navigate(AppScreens.Cart_Screen.route)
+                    }else{
+                        showError = true
+                        groupName = ""
+                        password = ""
+                        Toast.makeText(
+                            navController.context,
+                            "Name already Exist",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()

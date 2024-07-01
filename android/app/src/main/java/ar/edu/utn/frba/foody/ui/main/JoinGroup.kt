@@ -24,6 +24,9 @@ import ar.edu.utn.frba.foody.ui.dataBase.SQLite.OrderDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun JoinGroupScreen(
@@ -36,6 +39,9 @@ fun JoinGroupScreen(
     var name by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
+
 
     AppScaffold(navController = navController,
         null,
@@ -111,10 +117,10 @@ fun JoinGroupScreen(
 
                 Button(
                     onClick = {
-                        val group = verifyGroupExist(groupViewModel, name, password)
-                        if (group != null) {
+                        val group = groupViewModel.verifyGroupExist(name, password)
+                        if (group != null ) {
                             orderViewModel.removeOrderFromSession()
-                            orderViewModel.updateGroup(group)
+                            //orderViewModel.updateGroup(group)
                             groupViewModel.updateUser(orderViewModel.user)
                             navController.navigate(AppScreens.Home_Screen.route)
                         } else {
@@ -161,11 +167,11 @@ fun TopGroupJoinGroup(navController: NavController) {
     )
 }
 
-fun verifyGroupExist(groupViewModel: GroupViewModel, name: String, password: String): Group? {
+/*fun verifyGroupExist(groupViewModel: GroupViewModel, name: String, password: String): Group? {
     val groups: List<Group> = groupViewModel.getGroups()
     val group: Group? = groups.find { groupPred: Group -> groupPred.name == name }
     if (group != null && group.password == password) {
         return group
     }
     return null
-}
+}*/

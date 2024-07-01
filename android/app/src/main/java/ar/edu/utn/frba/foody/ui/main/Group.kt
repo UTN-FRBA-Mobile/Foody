@@ -55,7 +55,7 @@ fun GroupScreen(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = group.name,
+                    text = group.groupId,
                     style = MaterialTheme.typography.h5,
                     color = MaterialTheme.colors.primary,
                     textAlign = TextAlign.Center,
