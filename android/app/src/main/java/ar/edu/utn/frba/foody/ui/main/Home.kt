@@ -38,7 +38,7 @@ fun HomeScreen(
         navController,
         null,
         { BottomGroupHome(navController, orderViewModel) },
-        { TopGroupHome(navController) }
+        { TopGroupHome(navController, viewModel) }
     ) {
         Image(
             painter = painterResource(id = R.drawable.background_signup),
@@ -222,13 +222,13 @@ fun BottomGroupHome(navController: NavController, orderViewModel: OrderViewModel
 }
 
 @Composable
-fun TopGroupHome(navController: NavController) {
+fun TopGroupHome(navController: NavController, viewModel: MainViewModel) {
     TopAppBar(
         title = {
             Text(text = stringResource(id = R.string.app_name))
         },
         actions = {
-            IconButton(onClick = { navController.navigate(AppScreens.Login_Screen.route) }) {
+            IconButton(onClick = { viewModel.logout() }) {
                 Image(
                     painter = painterResource(id = R.drawable.logout_icon),
                     contentDescription = "Logout Icon",
