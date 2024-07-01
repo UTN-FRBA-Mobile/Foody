@@ -14,6 +14,7 @@ import ar.edu.utn.frba.foody.ui.Classes.Restaurant
 import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.dataBase.Firebase.GroupDataBaseFirebase
 import ar.edu.utn.frba.foody.ui.dataBase.Firebase.OrderDataBaseFirebase
+import ar.edu.utn.frba.foody.ui.dataBase.Firebase.TokenDataBaseFirebase
 import ar.edu.utn.frba.foody.ui.dataBase.Firebase.UserDataBaseFirebase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.GroupDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.OrderDataBase
@@ -56,7 +57,7 @@ class MainComposeActivity : ComponentActivity() {
         //Get firebase token for this device
         val firebaseTokenManager = FirebaseTokenService(this)
 
-        val firebaseToken = firebaseTokenManager.getTokenFromPreferences()
+        var firebaseToken = firebaseTokenManager.getTokenFromPreferences()
         if(firebaseToken.isNullOrEmpty()) {
             firebaseTokenManager.getAndSaveToken()
         }
@@ -68,6 +69,7 @@ class MainComposeActivity : ComponentActivity() {
         val userDataBaseFirebase = UserDataBaseFirebase(database)
         val orderDataBaseFirebase = OrderDataBaseFirebase(database)
         val groupDataBaseFirebase = GroupDataBaseFirebase(database)
+        val tokenDataBaseFirebase = TokenDataBaseFirebase(database)
 
         setContent {
             val navController = rememberNavController()
@@ -77,13 +79,15 @@ class MainComposeActivity : ComponentActivity() {
             val groupViewModel = viewModel<GroupViewModel>()
             orderViewModel.setServices(dbOrderHelper, orderDataBaseFirebase, navController)
             groupViewModel.setServices(dbGroupHelper,groupDataBaseFirebase,navController)
-            viewModel.setDataBase(userDataBaseFirebase)
+            viewModel.setServices(userDataBaseFirebase, tokenDataBaseFirebase, navController, firebaseTokenManager)
 
             viewModel.user.observe(this, Observer { user ->
                 if (user != null) {
                     orderViewModel.user = user
                     orderViewModel.removeOrderFromSession()
                     navController.navigate(AppScreens.Home_Screen.route)
+                    tokenDataBaseFirebase.addUserDeviceToken(firebaseTokenManager.getTokenFromPreferences()!!, user.userId)
+                    //TODO sacar el login del stack de navegación
                 } else {
                     Toast.makeText(
                         navController.context,

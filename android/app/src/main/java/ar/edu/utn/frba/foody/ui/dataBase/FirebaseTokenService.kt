@@ -12,7 +12,6 @@ class FirebaseTokenService(private val context: Context) {
             .addOnSuccessListener { token ->
                 if (!token.isNullOrEmpty()) {
                     storeToken(token)
-                    Log.d(TAG, "Token obtenido: $token")
                 } else {
                     Log.w(TAG, "Error al obtener token")
                 }
