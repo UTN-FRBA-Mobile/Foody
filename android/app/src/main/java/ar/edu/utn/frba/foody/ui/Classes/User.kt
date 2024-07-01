@@ -7,5 +7,6 @@ data class User(
     var direccion: Address.AddressInfo = Address.AddressInfo(),
     var numeroContacto: Int = 0,
     var groupId: String = "",
-    var admin: Boolean = false
+    var admin: Boolean = false,
+    var tarjetas: MutableList<Card.CardInfo> = mutableListOf()
 )

@@ -37,8 +37,9 @@ import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
-fun ProgressOrderScreen(navController: NavController, orderViewModel: OrderViewModel) {
-    val order = orderViewModel.getPickedOrder()
+fun ProgressOrderScreen(navController: NavController, orderViewModel: OrderViewModel,
+                        order_id:String) {
+    val order = orderViewModel.getOrderById(order_id)
 
     AppScaffold(navController = navController,
         null,
@@ -65,7 +66,7 @@ fun ProgressOrderScreen(navController: NavController, orderViewModel: OrderViewM
                     elevation = 4.dp
                 ) {
                     Column(verticalArrangement = Arrangement.Center) {
-                        TextInfo(text = "Estado", align = true)
+                        TextInfo(text = "Estado: ${order.estado}", align = true)
                         Row(verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.padding(16.dp, 0.dp)
                         ) {
@@ -82,6 +83,7 @@ fun ProgressOrderScreen(navController: NavController, orderViewModel: OrderViewM
                         Spacer(modifier = Modifier.height(32.dp))
                         StateDescriptions(order.orderStates)
                     }
+
 
                 }
             }

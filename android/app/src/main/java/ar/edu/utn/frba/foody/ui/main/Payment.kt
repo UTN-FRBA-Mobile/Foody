@@ -1,7 +1,6 @@
 package ar.edu.utn.frba.foody.ui.main
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,16 +13,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
 import androidx.compose.material.RadioButtonDefaults
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,17 +44,23 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import ar.edu.utn.frba.foody.R
-import ar.edu.utn.frba.foody.ui.dataClasses.CardViewModel
+import ar.edu.utn.frba.foody.ui.Classes.Estado
+import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
+import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
-fun PaymentScreen(navController: NavHostController, viewModel: CardViewModel) {
-    val totalAmount = 200.0
-    val deliveryFee = 10.0
-    var address by remember { mutableStateOf("") }
+fun PaymentScreen(navController: NavHostController,
+                  mainViewModel: MainViewModel,orderViewModel: OrderViewModel) {
+    var totalAmount = orderViewModel.getTotal()
+    var deliveryFee = 500.0
+    val user = orderViewModel.user
+    var address by remember { mutableStateOf(user.direccion) }
     var paymentMethod by remember { mutableStateOf("Efectivo") }
+    var tarjeta by remember { mutableStateOf("Efectivo")}
     val paymentOptions = listOf("Efectivo", "Tarjeta")
     val totalPayment = totalAmount + deliveryFee
+    var cards = orderViewModel.user.tarjetas
 
     AppScaffold(navController,
         null,
@@ -75,24 +82,40 @@ fun PaymentScreen(navController: NavHostController, viewModel: CardViewModel) {
                     .padding(16.dp),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
+                var direcccion = "${address.calle} ${address.numero}, ${address.localidad}, ${address.region}"
                 Column {
-                    Text(
-                        text = "Dirección de Entrega",
-                        style = MaterialTheme.typography.h6,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
-                    BasicTextField(
-                        value = address,
-                        onValueChange = { address = it },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                            .background(Color.LightGray, shape = MaterialTheme.shapes.small)
-                            .padding(16.dp),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    TextField(
+                        value = direcccion ,
+                        onValueChange = {},
+                        label = {
+                            Text(
+                                text = "Direccion",
+                                modifier = Modifier.padding(start = 16.dp)
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         singleLine = true,
-                        maxLines = 1,
+                        colors = TextFieldDefaults.textFieldColors(
+                            backgroundColor = Color.Transparent
+                        ),
+                        enabled = false  // Deshabilitar la edición del TextField
                     )
+
+                    IconButton(onClick = {
+                        navController.navigate(
+                            AppScreens.Location_Screen.createRoute(
+                                "payment",
+                                user.userId
+                            )
+                        )
+                    }) {
+                        Icon(
+                            modifier = Modifier.size(36.dp),
+                            painter = painterResource(id = R.drawable.address_add_location),
+                            contentDescription = null,
+                            tint = MaterialTheme.colors.primary
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -110,6 +133,9 @@ fun PaymentScreen(navController: NavHostController, viewModel: CardViewModel) {
                                 .padding(vertical = 4.dp)
                                 .clickable {
                                     paymentMethod = option
+                                    if(paymentMethod=="Efectivo"){
+                                        tarjeta="Efectivo"
+                                    }
                                 }
                         ) {
                             RadioButton(
@@ -124,9 +150,37 @@ fun PaymentScreen(navController: NavHostController, viewModel: CardViewModel) {
                         }
                     }
 
-                    if (paymentMethod == "Tarjeta") {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        viewModel.cards.forEach { card ->
+                if (paymentMethod == "Tarjeta") {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Selecciona una tarjeta:",
+                        style = MaterialTheme.typography.subtitle1,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    cards.forEach { card ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                                .clickable {tarjeta=card.cardNumber}
+                        ) {
+                            RadioButton(
+                                selected = tarjeta.equals(card.cardNumber),
+                                onClick = { tarjeta= card.cardNumber },
+                                colors = RadioButtonDefaults.colors(
+                                    selectedColor = MaterialTheme.colors.primary,
+                                    unselectedColor = MaterialTheme.colors.onSurface
+                                )
+                            )
+                            Text(
+                                text = "**** **** **** ${card.cardNumber.takeLast(4)} - ${card.firstName} ${card.lastName}",
+                                style = MaterialTheme.typography.body1
+                            )
+                        }
+
+                        /*cards.forEach { card ->
                             Text(
                                 text = "**** **** **** ${
                                     card.cardNumber.takeLast(4)
@@ -136,27 +190,30 @@ fun PaymentScreen(navController: NavHostController, viewModel: CardViewModel) {
                                     .fillMaxWidth()
                                     .padding(vertical = 4.dp)
                             )
-                            Text(
-                                text = "Borrar tarjeta",
-                                style = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.primary),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 4.dp)
-                                    .clickable {
-                                        viewModel.removeCard(card)
-                                        navController.navigate("Payment")
-                                    }
-                            )
-                        }
+
+                         */
                         Text(
-                            text = "Añadir nueva tarjeta",
+                            text = "Borrar tarjeta",
                             style = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.primary),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 4.dp)
-                                .clickable { navController.navigate("Card") }
+                                .clickable {
+                                    orderViewModel.user.tarjetas.remove(card)
+                                    mainViewModel.updateUser(orderViewModel.user)
+                                    navController.navigate("Payment");
+                                }
                         )
                     }
+                    Text(
+                        text = "Añadir nueva tarjeta",
+                        style = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.primary),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                            .clickable { navController.navigate("Card") }
+                    )
+                }
 
                     Spacer(modifier = Modifier.height(25.dp))
 
@@ -183,7 +240,16 @@ fun PaymentScreen(navController: NavHostController, viewModel: CardViewModel) {
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
                     Button(
-                        onClick = { /* Manejar acción de pagar */ },
+                        onClick = {
+                            //validar que se haya elegido efectivo/una tarjeta y que haya una direccion
+                            var order= orderViewModel.getPickedOrder()
+                            order.estado= Estado.FINALIZADO //DEBE SER EN CAMINO PERO ESTOY HACIENDO PRUEBAS
+                            order.direction= direcccion
+                            order.montoPagado= totalPayment
+                            order.tarjetaUsada=tarjeta
+                            orderViewModel.updateDataBaseOrder(order)
+                            navController.navigate(AppScreens.Orders_Screen.route)
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
@@ -221,7 +287,8 @@ fun TopGroupPayment(navController: NavController) {
 @Composable
 fun DefaultPreviewPayment() {
     val navController = rememberNavController()
-    val cardViewModel = CardViewModel()
+    val viewModel= MainViewModel()
+    val orderViewModel = OrderViewModel()
 
-    PaymentScreen(navController, cardViewModel)
+    PaymentScreen(navController, viewModel,orderViewModel)
 }*/

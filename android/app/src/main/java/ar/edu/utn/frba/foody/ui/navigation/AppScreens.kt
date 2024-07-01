@@ -14,8 +14,12 @@ sealed class AppScreens(val route: String) {
     }
     object Orders_Screen: AppScreens("Orders")
     object Restaurant_Screen: AppScreens("Restaurant")
-    object Order_Screen: AppScreens("Order")
-    object Progress_Order_Screen: AppScreens("Progress Order")
+    object Order_Screen: AppScreens("Order/{order_id}"){
+        fun createRoute(order_id:String) = "Order/$order_id"
+    }
+    object Progress_Order_Screen: AppScreens("Progress Order/{order_id}"){
+        fun createRoute(order_id: String) = "Progress Order/$order_id"
+    }
     object Group_Screen: AppScreens("Group")
     object Create_Group_Screen: AppScreens("Create Group")
     object Join_Group_Screen: AppScreens("Join Group")

@@ -1,7 +1,6 @@
 package ar.edu.utn.frba.foody.ui.dataClasses
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -13,6 +12,7 @@ import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Address
 import ar.edu.utn.frba.foody.ui.Classes.Dish
+import ar.edu.utn.frba.foody.ui.Classes.Estado
 import ar.edu.utn.frba.foody.ui.Classes.Group
 import ar.edu.utn.frba.foody.ui.Classes.Order
 import ar.edu.utn.frba.foody.ui.Classes.OrderItemInfo
@@ -22,13 +22,13 @@ import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.Classes.UserOrder
 import ar.edu.utn.frba.foody.ui.dataBase.Firebase.OrderDataBaseFirebase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.OrderDataBase
-import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 import java.util.Calendar
 
 
 class OrderViewModel() : ViewModel() {
     private var order by mutableStateOf(Order(""))
     private var orders by mutableStateOf(listOf<Order>())
+    private var orderDetail by mutableStateOf(Order(""))
 
     var orderDataBase: OrderDataBase? = null
     var orderDataBaseFirebase: OrderDataBaseFirebase? = null
@@ -48,9 +48,15 @@ class OrderViewModel() : ViewModel() {
         this.orderDataBaseFirebase = orderDataBaseFirebase
         this.navController = navController
     }
+    fun updateOrderLogin(){
+        this.findAllOrdersForUser()
+        this.getOrderByState(Estado.ENPROGRESO)
+    }
 
-    fun updateOrder(newOrder: Order) {
+    fun updateDataBaseOrder(newOrder: Order) {
         order = newOrder
+        orderDataBaseFirebase?.updateOrder(order){ isSuccess -> }
+
     }
 
     fun getPickedOrder(): Order {
@@ -83,6 +89,7 @@ class OrderViewModel() : ViewModel() {
     }
 
     fun getAssignedUserOrder(loading: MutableState<Boolean>): UserOrder {
+
         val userOrder = order.userOrders.firstOrNull() { x -> x.user.userId == this.user.userId }
         if(userOrder == null) {
             return createUserOrder(order, loading)
@@ -242,7 +249,23 @@ class OrderViewModel() : ViewModel() {
             }
         }
     }
-
+    fun getOrderById(order_id:String):Order{
+        orderDataBaseFirebase?.getOrderById(order_id){
+            order ->
+            if (order!= null){
+                this.orderDetail=order
+            }
+        }
+        return orderDetail
+    }
+    fun getOrderByState(estado:Estado){
+        orderDataBaseFirebase?.getOrderByState(estado,user){
+                order ->
+            if (order!= null){
+                this.order=order
+            }
+        }
+    }
     fun emptyUserOrder() {
         val loading = mutableStateOf(false)
         val userOrder = getAssignedUserOrder(loading)

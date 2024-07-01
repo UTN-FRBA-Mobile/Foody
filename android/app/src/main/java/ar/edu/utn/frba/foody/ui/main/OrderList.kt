@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
+import ar.edu.utn.frba.foody.ui.Classes.Estado
 import ar.edu.utn.frba.foody.ui.Classes.Order
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
@@ -71,11 +72,13 @@ fun OrdersScreen(navController: NavController, viewModel: OrderViewModel) {
                 orders.forEach { order ->
                     item {
                         if (viewModel.hasItems(order)) {
-                            OrderItem(
-                                navController = navController,
-                                viewModel = viewModel,
-                                order = order
-                            )
+                            if (!order.estado.equals(Estado.ENPROGRESO)) {
+                                OrderItem(
+                                    navController = navController,
+                                    viewModel = viewModel,
+                                    order = order
+                                )
+                            }
                         }
                     }
                 }
@@ -127,19 +130,25 @@ fun OrderItem(navController: NavController, viewModel: OrderViewModel, order: Or
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    IconButton(onClick = { viewModel.updateOrder(order)
-                        navController.navigate(AppScreens.Order_Screen.route) }
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.details_icon),
-                            contentDescription = "View Details Icon",
-                            modifier = Modifier.size(32.dp, 20.dp),
-                            contentScale = ContentScale.FillBounds
-                        )
+                    if( order.estado.equals(Estado.FINALIZADO)) {
+                        IconButton(onClick = { //viewModel.updateOrder(order)
+                            navController.navigate(AppScreens.Order_Screen.createRoute(order.orderId))
+                        }
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.details_icon),
+                                contentDescription = "View Details Icon",
+                                modifier = Modifier.size(32.dp, 20.dp),
+                                contentScale = ContentScale.FillBounds
+                            )
+                        }
                     }
-                    if (order.inProgress) {
-                        IconButton(onClick = { viewModel.updateOrder(order)
-                            navController.navigate(AppScreens.Progress_Order_Screen.route) }) {
+                    else if (order.estado.equals(Estado.ENCAMINO)) {
+                        IconButton(onClick = {
+                            //viewModel.updateOrder(order)
+                            navController.navigate(
+                                AppScreens.Progress_Order_Screen.createRoute(order.orderId)
+                            ) }) {
                             Image(
                                 painter = painterResource(id = R.drawable.order_progress_icon),
                                 contentDescription = "Order Progress Icon",

@@ -1,7 +1,9 @@
 package ar.edu.utn.frba.foody.ui.dataBase.Firebase
 
+import ar.edu.utn.frba.foody.ui.Classes.Estado
 import ar.edu.utn.frba.foody.ui.Classes.Order
 import ar.edu.utn.frba.foody.ui.Classes.OrderItemInfo
+import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.Classes.UserOrder
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -92,6 +94,12 @@ class OrderDataBaseFirebase(private var database: FirebaseDatabase) {
             callback(task.isSuccessful)
         }
     }
+    fun updateOrder(order: Order, callback: (Boolean) -> Unit){
+        val orderRef= FirebaseDatabase.getInstance().getReference(TABLE_ORDERS).child(order.orderId)
+        orderRef.setValue(order).addOnCompleteListener { task ->
+            callback(task.isSuccessful)
+        }
+    }
 
     fun getOrderById(orderId: String, callback: (Order?) -> Unit) {
         val myRef = database.getReference(TABLE_ORDERS)
@@ -108,6 +116,35 @@ class OrderDataBaseFirebase(private var database: FirebaseDatabase) {
             }
         })
     }
+    fun getOrderByState(estado: Estado,user: User, callback: (Order?) -> Unit) {
+        val myRef = database.getReference(TABLE_ORDERS)
+
+        myRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for (snapshot in dataSnapshot.children) {
+                    val order = snapshot.getValue(Order::class.java)
+                    if (order != null && order.estado == estado) {
+                        val userOrders = order.userOrders // Asumiendo que es una lista de objetos de tipo UserOrder
+                        if (userOrders != null) {
+                            for (userOrder in userOrders) {
+                                if (userOrder.user.userId == user.userId) {
+                                    order.orderId = snapshot.key.toString()
+                                    callback(order) // Retorna la orden filtrada
+                                    return // Termina la búsqueda después de encontrar la primera coincidencia
+                                }
+                            }
+                        }
+                    }
+                }
+                callback(null) // Si no se encuentra ninguna orden, retorna null
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                callback(null)
+            }
+        })
+    }
+
 
     fun getOrdersByUser(userId: String, callback: (List<Order>) -> Unit) {
         val myRef = database.getReference(TABLE_ORDERS)

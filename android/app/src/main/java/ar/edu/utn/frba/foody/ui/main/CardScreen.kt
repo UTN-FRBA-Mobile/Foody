@@ -28,18 +28,22 @@ import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 import ar.edu.utn.frba.foody.ui.Classes.*
-import ar.edu.utn.frba.foody.ui.dataClasses.CardViewModel
+import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
+import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import java.util.Calendar
 
 
 @Composable
-fun CardInfoScreen(navController: NavHostController, viewModel: CardViewModel) {
+fun CardInfoScreen(navController: NavHostController, mainViewModel: MainViewModel,
+                   orderViewModel: OrderViewModel
+) {
     AppScaffold(navController,
         null,
         null,
-        { TopGroupCard(navController) }
-    ) {
+        { TopGroupCard(navController)}
+    ){
         var cardInfo by remember { mutableStateOf(Card.CardInfo()) }
+        val user= orderViewModel.user
 
         val context = LocalContext.current
 
@@ -164,13 +168,15 @@ fun CardInfoScreen(navController: NavHostController, viewModel: CardViewModel) {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Save button
-                Button(
-                    onClick = {
-                        if (validator(cardInfo, context) == true) {
-                            viewModel.addCard(cardInfo)
-                            navController.popBackStack() // Replace with your next screen navigation
-                        }
+        // Save button
+        Button(
+            onClick = {
+                if (validator(cardInfo, context) == true){
+                    //viewModel.addCard(cardInfo)
+                    user.tarjetas.add(cardInfo)
+                    mainViewModel.updateUser(user)
+                    navController.popBackStack() // Replace with your next screen navigation
+                }
 
                     },
                     modifier = Modifier
@@ -280,7 +286,10 @@ class ExpiryDateVisualTransformation : VisualTransformation {
 @Preview
 @Composable
 fun DefaultPreviewCardInfo() {
-    val navController = rememberNavController()
-    val cardViewModel = CardViewModel()
-    CardInfoScreen(navController, cardViewModel)
-}*/
+    val navController= rememberNavController()
+    val mainViewModel = MainViewModel()
+    val orderViewModel = OrderViewModel()
+   CardInfoScreen(navController,mainViewModel,orderViewModel)
+}
+
+ */
