@@ -27,6 +27,7 @@ import ar.edu.utn.frba.foody.ui.main.LoginScreen
 import ar.edu.utn.frba.foody.ui.main.OrderScreen
 import ar.edu.utn.frba.foody.ui.main.OrdersScreen
 import ar.edu.utn.frba.foody.ui.main.PaymentScreen
+import ar.edu.utn.frba.foody.ui.main.PendingOrderScreen
 import ar.edu.utn.frba.foody.ui.main.ProfileScreen
 import ar.edu.utn.frba.foody.ui.main.ProgressOrderScreen
 import ar.edu.utn.frba.foody.ui.main.RestaurantScreen
@@ -149,6 +150,9 @@ fun AppNavigation(
                 origin = backStackEntry.arguments?.getString("origin") ?: "unknown",
                 id = backStackEntry.arguments?.getString("id") ?: "unknown"
             )
+        }
+        composable(route = AppScreens.PendingOrder.route) {
+            PendingOrderScreen(navController = navController,viewModel,orderViewModel)
         }
     }
 }

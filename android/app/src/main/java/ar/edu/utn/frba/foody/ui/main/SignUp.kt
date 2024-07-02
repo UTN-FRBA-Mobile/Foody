@@ -19,6 +19,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.RadioButton
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -35,6 +36,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role.Companion.RadioButton
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -61,6 +63,7 @@ fun SignUpScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var numero by remember { mutableStateOf("") }
+    var repartidor by remember { mutableStateOf("No")}
 
     AppScaffold(
         navController,
@@ -188,6 +191,22 @@ fun SignUpScreen(
 
                 Spacer(modifier = Modifier.height(60.dp))
 
+                Text(text = "Repartidor:", fontSize = 24.sp, modifier = Modifier.padding(bottom = 16.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                     RadioButton(
+                            selected = repartidor == "Si",
+                            onClick = { repartidor = "Si" }
+                        )
+                        Text(text = "Sí", fontSize = 18.sp, modifier = Modifier.padding(horizontal = 8.dp))
+                        RadioButton(
+                            selected = repartidor == "No",
+                            onClick = { repartidor = "No" }
+                        )
+                        Text(text = "No", fontSize = 18.sp, modifier = Modifier.padding(horizontal = 8.dp))
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(text = "Seleccionaste $repartidor", fontSize = 18.sp)
+                Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
                         user.email = email
@@ -201,8 +220,9 @@ fun SignUpScreen(
                                 user.email,
                                 user.password,
                                 address,
-                                user.numeroContacto
-                            )
+                                user.numeroContacto,
+                                repartidor
+                                )
 
                             viewModel.emptyAddress()
                             navController.navigate(AppScreens.Login_Screen.route)

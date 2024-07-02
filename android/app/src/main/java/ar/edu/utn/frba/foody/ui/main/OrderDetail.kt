@@ -30,7 +30,7 @@ fun OrderScreen(
 
     AppScaffold(navController,
         null,
-        { BottomGroupOrder(orderViewModel = viewModel) },
+       null,
         { TopGroupOrder(navController) }) {
         OrderDetailGrid(order.userOrders,order)
     }
@@ -118,7 +118,7 @@ fun OrderDetailCard(userOrder: UserOrder,order:Order) {
         ) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = userOrder.user.email,
+                text = order.restaurant.name ,
                 style = MaterialTheme.typography.h6,
                 modifier = Modifier.padding(vertical = 4.dp)
             )

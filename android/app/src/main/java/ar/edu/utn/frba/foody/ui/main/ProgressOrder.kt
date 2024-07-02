@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -57,15 +58,50 @@ fun ProgressOrderScreen(navController: NavController, orderViewModel: OrderViewM
             )
             Column {
                 TextInfo(text = "Direccion: " + order.direction)
-                TextInfo(text = "Hora estimada: " + order.estimatedHour)
-                Card(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth()
-                        .height(300.dp),
-                    elevation = 4.dp
-                ) {
-                    Column(verticalArrangement = Arrangement.Center) {
+                //TextInfo(text = "Hora estimada: " + order.estimatedHour)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Total Sin Envio: $" + order.userOrders.sumOf {
+                        userOrder->userOrder.items.sumOf {
+                            x -> x.quantity * x.dish.price }}
+                        .toString(),
+                    style = MaterialTheme.typography.h6,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Total : $" + order.montoPagado.toString(),
+                    style = MaterialTheme.typography.h6,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Dirección de entrega : " + order.direction,
+                    style = MaterialTheme.typography.h6,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                if (order.tarjetaUsada.equals("Efectivo")){
+                    Text(
+                        text = "Pago Realizado en Efectivo",
+                        style = MaterialTheme.typography.body1,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                    )
+                }
+                else {
+                    Text(
+                        text = "Tarjeta usada : **** **** **** ${
+                            order.tarjetaUsada.takeLast(4)
+                        }",
+                        style = MaterialTheme.typography.body1,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                    )
+                }
+                Column(verticalArrangement = Arrangement.Center) {
                         TextInfo(text = "Estado: ${order.estado}", align = true)
                         Row(verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.padding(16.dp, 0.dp)
@@ -83,9 +119,6 @@ fun ProgressOrderScreen(navController: NavController, orderViewModel: OrderViewM
                         Spacer(modifier = Modifier.height(32.dp))
                         StateDescriptions(order.orderStates)
                     }
-
-
-                }
             }
         }
 

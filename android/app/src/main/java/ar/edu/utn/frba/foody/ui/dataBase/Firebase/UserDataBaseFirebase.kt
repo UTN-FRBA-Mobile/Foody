@@ -10,10 +10,12 @@ import com.google.firebase.database.ValueEventListener
 class UserDataBaseFirebase(private var database: FirebaseDatabase) {
     private val TABLE_USER = "users"
 
-    fun addUser(email: String, password: String, direccion: Address.AddressInfo, numeroContacto: Int): User {
+    fun addUser(email: String, password: String, direccion: Address.AddressInfo,
+                numeroContacto: Int,repartidor: String): User {
         val myRef = database.getReference(TABLE_USER)
 
-        val user = User(email = email, password = password, direccion = direccion, numeroContacto = numeroContacto)
+        val user = User(email = email, password = password, direccion = direccion,
+            numeroContacto = numeroContacto,repartidor =repartidor )
 
         user.userId = email.replace(".", "")
 

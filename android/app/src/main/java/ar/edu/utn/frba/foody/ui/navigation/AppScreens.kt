@@ -25,4 +25,5 @@ sealed class AppScreens(val route: String) {
     object Join_Group_Screen: AppScreens("Join Group")
     object Card_Screen: AppScreens("Card")
     object Payment: AppScreens("Payment")
+    object PendingOrder: AppScreens("PendingOrder")
 }

@@ -41,6 +41,7 @@ fun HomeScreen(
         // Aquí decides qué hacer cuando se presiona el botón de retroceso
         // Si canGoBack es false, no haces nada, por lo tanto, evitas el retroceso
     }
+    orderViewModel.findAllOrdersByState()
     AppScaffold(
         navController,
         null,
@@ -233,7 +234,18 @@ fun TopGroupHome(navController: NavController, viewModel: MainViewModel) {
         title = {
             Text(text = stringResource(id = R.string.app_name))
         },
+
         actions = {
+            if (viewModel.user.value?.repartidor.equals("Si")) {
+            IconButton(onClick = { navController.navigate(AppScreens.PendingOrder.route) }) {
+                    Image(
+                        painter = painterResource(id = R.drawable.repartidor),
+                        contentDescription = "Repartidor Icon",
+                        modifier = Modifier.size(30.dp),
+                        contentScale = ContentScale.FillBounds
+                    )
+                }
+            }
             IconButton(onClick = { viewModel.logout() }) {
                 Image(
                     painter = painterResource(id = R.drawable.logout_icon),

@@ -185,23 +185,25 @@ fun OrdersGrid(
         }
     }
     Spacer(modifier = Modifier.width(8.dp))
-
-    Box(
-        modifier = Modifier
-            .padding(horizontal = 32.dp)
-            .fillMaxWidth()
-            .padding(bottom = 100.dp),
-        contentAlignment = Alignment.BottomCenter
-    ) {
-        Button(
-            onClick = {
-                navController.navigate(AppScreens.Payment.route)
-            },
+    if(viewModel.getPickedOrder().userOrders.isNotEmpty() ||
+        viewModel.getPickedOrder().userOrders.any { userOrder -> userOrder.items.isNotEmpty()}){
+        Box(
             modifier = Modifier
+                .padding(horizontal = 32.dp)
                 .fillMaxWidth()
-                .height(50.dp)
+                .padding(bottom = 100.dp),
+            contentAlignment = Alignment.BottomCenter
         ) {
-            Text("Pagar", fontSize = 18.sp)
+            Button(
+                onClick = {
+                    navController.navigate(AppScreens.Payment.route)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+            ) {
+                Text("Pagar", fontSize = 18.sp)
+            }
         }
     }
 }

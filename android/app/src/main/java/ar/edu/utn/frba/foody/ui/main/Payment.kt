@@ -1,5 +1,7 @@
 package ar.edu.utn.frba.foody.ui.main
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -35,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -46,6 +49,7 @@ import androidx.navigation.NavHostController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Estado
 import ar.edu.utn.frba.foody.ui.Classes.Order
+import ar.edu.utn.frba.foody.ui.Classes.Restaurant
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
@@ -62,6 +66,8 @@ fun PaymentScreen(navController: NavHostController,
     val paymentOptions = listOf("Efectivo", "Tarjeta")
     val totalPayment = totalAmount + deliveryFee
     var cards = orderViewModel.user.tarjetas
+    val context = LocalContext.current
+
 
     AppScaffold(navController,
         null,
@@ -134,9 +140,7 @@ fun PaymentScreen(navController: NavHostController,
                                 .padding(vertical = 4.dp)
                                 .clickable {
                                     paymentMethod = option
-                                    if(paymentMethod=="Efectivo"){
-                                        tarjeta="Efectivo"
-                                    }
+                                    tarjeta=paymentMethod
                                 }
                         ) {
                             RadioButton(
@@ -242,15 +246,18 @@ fun PaymentScreen(navController: NavHostController,
                     )
                     Button(
                         onClick = {
-                            //validar que se haya elegido efectivo/una tarjeta y que haya una direccion
-                            var order= orderViewModel.getPickedOrder()
-                            order.estado= Estado.ENCAMINO //DEBE SER EN CAMINO PERO ESTOY HACIENDO PRUEBAS
-                            order.direction= direcccion
-                            order.montoPagado= totalPayment
-                            order.tarjetaUsada=tarjeta
-                            orderViewModel.updateDataBaseOrder(order)
-                            orderViewModel.updateOrder(Order())
-                            navController.navigate(AppScreens.Orders_Screen.route)
+                            var order = orderViewModel.getPickedOrder()
+                            if (validatePayment(order,tarjeta,context)) {
+                                order.estado =
+                                    Estado.PENDIENTE
+                                order.direction = direcccion
+                                order.montoPagado = totalPayment
+                                order.tarjetaUsada = tarjeta
+                                orderViewModel.updateDataBaseOrder(order)
+                                orderViewModel.updateOrder(Order())
+                                mainViewModel.updateRestaurant(Restaurant())
+                                navController.navigate(AppScreens.Orders_Screen.route)
+                            }
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -265,7 +272,17 @@ fun PaymentScreen(navController: NavHostController,
 
     }
 }
-
+fun validatePayment(order: Order,tarjeta:String,context: Context):Boolean{
+    if(order.direction==""){
+        Toast.makeText(context, "Falta completar la dirección.", Toast.LENGTH_SHORT).show()
+        return false
+    }
+    if(tarjeta.equals("Tarjeta")){
+        Toast.makeText(context, "Falta seleccionar la tarjeta.", Toast.LENGTH_SHORT).show()
+        return false
+    }
+    return true
+}
 @Composable
 fun TopGroupPayment(navController: NavController) {
     TopAppBar(
