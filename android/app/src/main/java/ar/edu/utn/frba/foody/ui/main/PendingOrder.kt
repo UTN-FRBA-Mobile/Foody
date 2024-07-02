@@ -25,8 +25,10 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
+import ar.edu.utn.frba.foody.ui.Classes.Estado
 import ar.edu.utn.frba.foody.ui.Classes.Order
 import ar.edu.utn.frba.foody.ui.Classes.Restaurant
 import ar.edu.utn.frba.foody.ui.composables.SimpleAlert
@@ -55,10 +58,12 @@ fun PendingOrderScreen(
     viewModel: MainViewModel,
     orderViewModel: OrderViewModel
 ) {
+    var refreshState by remember { mutableStateOf(false) }
+
     AppScaffold(
         navController,
         null,
-        { BottomGroupPendingOrder(navController, orderViewModel) },
+        { BottomGroupPendingOrder(navController) },
         { TopGroupPendingOrder(navController, viewModel) }
     ) {
         Image(
@@ -97,9 +102,9 @@ fun PendingOrderScreen(
                         item {
                             OrderPending(
                                 navController = navController,
-                                viewModel = viewModel,
                                 orderViewModel = orderViewModel,
-                                order = order
+                                order = order,
+                                onRechazarClick = { refreshState = !refreshState }
                             )
                         }
                     }
@@ -117,9 +122,9 @@ fun PendingOrderScreen(
 @Composable
 fun OrderPending(
     navController: NavController,
-    viewModel: MainViewModel,
     orderViewModel: OrderViewModel,
-    order: Order
+    order: Order,
+    onRechazarClick: () -> Unit
 ) {
     val showAlert = remember {
         mutableStateOf(false)
@@ -127,8 +132,6 @@ fun OrderPending(
     val showAccept = remember {
         mutableStateOf(false)
     }
-
-    val restaurantName = viewModel.getPickedRestaurantName()
 
     SimpleAlert(
         show = showAlert.value,
@@ -139,7 +142,15 @@ fun OrderPending(
         onDismiss = { showAlert.value = false }
     )
     if (showAccept.value) {
-        //cambiar estado a en camino y hacer que aparezca solo esa orden y puedas pasarla a finalizado
+        order.estado=Estado.ENCAMINO
+        order.repartidor= orderViewModel.user
+        orderViewModel.updateDataBaseOrder(order)
+        var orders =orderViewModel.getPendingsOrders()
+        orders= orders.filter { ordernew -> ordernew.orderId!= order.orderId }
+        orderViewModel.updatePendingOrders(orders)
+        orderViewModel.findOrdersDeliveredById()
+
+        navController.navigate(AppScreens.OnTheWayOrders.route)
     }
     Card(
         shape = RoundedCornerShape(8.dp),
@@ -162,53 +173,50 @@ fun OrderPending(
                 Text(text = "Dirección: ${order.direction}", fontSize = 16.sp, modifier = Modifier.padding(vertical = 4.dp))
             }
             Spacer(modifier = Modifier.width(16.dp))
-            Column(
-                verticalArrangement = Arrangement.SpaceEvenly,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                IconButton(onClick = { showAlert.value=true }) {
-                    Image(
-                        painter = painterResource(id = R.drawable.check), // Asegúrate de tener un recurso de ícono para el tilde
-                        contentDescription = "Aceptar",
-                        modifier = Modifier.size(24.dp),
-                        contentScale = ContentScale.FillBounds
-                    )
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                IconButton(onClick = { /* Acción para la cruz */ }) {
-                    Image(
-                        painter = painterResource(id = R.drawable.wrong), // Asegúrate de tener un recurso de ícono para la cruz
-                        contentDescription = "Rechazar",
-                        modifier = Modifier.size(24.dp),
-                        contentScale = ContentScale.FillBounds
-                    )
+            if(showAccept.value == false) {
+                Column(
+                    verticalArrangement = Arrangement.SpaceEvenly,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    IconButton(onClick = { showAlert.value = true }) {
+                        Image(
+                            painter = painterResource(id = R.drawable.check),
+                            contentDescription = "Aceptar",
+                            modifier = Modifier.size(24.dp),
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    IconButton(onClick = {
+                        var orders=orderViewModel.getPendingsOrders()
+                        orders=orders.filter { ordernew -> ordernew.orderId!=order.orderId }
+                        orderViewModel.updatePendingOrders(orders)
+                        onRechazarClick()
+                    }) {
+                        Image(
+                            painter = painterResource(id = R.drawable.wrong),
+                            contentDescription = "Rechazar",
+                            modifier = Modifier.size(24.dp),
+                            contentScale = ContentScale.FillBounds
+                        )
+                    }
                 }
             }
         }
     }
 }
 @Composable
-fun BottomGroupPendingOrder(navController: NavController, orderViewModel: OrderViewModel) {
+fun BottomGroupPendingOrder(navController: NavController) {
     val buttons = listOf(
         ButtonInterface(
-            resourceId = R.drawable.user_icon,
-            imageDescription = "User Icon",
-            route = AppScreens.Profile_Screen.route,
+            resourceId = R.drawable.order_pending,
+            imageDescription = "Order Pending",
+            route = AppScreens.OnTheWayOrders.route
         ),
         ButtonInterface(
-            resourceId = R.drawable.cart_icon,
-            imageDescription = "Cart Icon",
-            route = AppScreens.Cart_Screen.createRoute(origin = "home")
-        ),
-        ButtonInterface(
-            resourceId = R.drawable.order_icon,
-            imageDescription = "Order Icon",
-            route = AppScreens.Orders_Screen.route
-        ),
-        ButtonInterface(
-            resourceId = R.drawable.create_group_icon,
-            imageDescription = "Join Group Icon",
-            route = AppScreens.Join_Group_Screen.route
+            resourceId = R.drawable.order_accept,
+            imageDescription = "Order Delivered",
+            route = AppScreens.OrdersDeliverd.route
         )
     )
 
@@ -222,7 +230,7 @@ fun BottomGroupPendingOrder(navController: NavController, orderViewModel: OrderV
                     Image(
                         painter = painterResource(id = it.resourceId),
                         contentDescription = it.imageDescription,
-                        modifier = Modifier.size(24.dp),
+                        modifier = Modifier.size(45.dp),
                         contentScale = ContentScale.FillBounds
                     )
                 }

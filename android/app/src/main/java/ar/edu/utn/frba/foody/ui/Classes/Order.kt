@@ -11,5 +11,6 @@ data class Order(
     val orderStates: List<OrderState> = emptyList(),
     var group: Group? = null,
     var montoPagado: Double = 0.0,
-    var tarjetaUsada: String = ""
+    var tarjetaUsada: String = "",
+    var repartidor: User? = null
 )

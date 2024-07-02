@@ -24,26 +24,31 @@ import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 fun OrderScreen(
     navController: NavHostController,
     viewModel: OrderViewModel,
-    order_id: String
+    order_id: String,
+    origin: String
 ) {
     val order = viewModel.getOrderById(order_id)
 
     AppScaffold(navController,
         null,
        null,
-        { TopGroupOrder(navController) }) {
-        OrderDetailGrid(order.userOrders,order)
+        { TopGroupOrder(navController,origin) }) {
+        OrderDetailGrid(order.userOrders,order,origin,viewModel,navController)
     }
 }
 
 @Composable
-fun TopGroupOrder(navController: NavController) {
+fun TopGroupOrder(navController: NavController,origin: String) {
     TopAppBar(
         title = {
             Text(text = stringResource(id = R.string.app_name))
         },
         actions = {
-            IconButton(onClick = { navController.navigate(AppScreens.Orders_Screen.route) }) {
+            IconButton(onClick = { when (origin) {
+                "ordersList" -> navController.navigate(AppScreens.Orders_Screen.route)
+                "ordersDelivered" -> navController.navigate(AppScreens.OrdersDeliverd.route)
+                "ordersOnTheWay" -> navController.navigate(AppScreens.OnTheWayOrders.route)
+            }}) {
                 Image(
                     painter = painterResource(id = R.drawable.go_back),
                     contentDescription = "Go Back Icon",
@@ -80,7 +85,10 @@ fun BottomGroupOrder(
 @Composable
 fun OrderDetailGrid(
     userOrders: List<UserOrder>,
-    order: Order
+    order: Order,
+    origin: String,
+    orderViewModel: OrderViewModel,
+    navController: NavController
 ) {
     Image(
         painter = painterResource(id = R.drawable.background_signup),
@@ -96,14 +104,16 @@ fun OrderDetailGrid(
         ) {
         items(userOrders.size) { index ->
             if (userOrders[index].items.isNotEmpty()) {
-                OrderDetailCard(userOrders[index], order)
+                OrderDetailCard(userOrders[index], order, origin,
+                    orderViewModel,navController )
             }
         }
     }
 }
 
 @Composable
-fun OrderDetailCard(userOrder: UserOrder,order:Order) {
+fun OrderDetailCard(userOrder: UserOrder,order:Order,origin: String,
+                    orderViewModel: OrderViewModel,navController: NavController) {
     val heightContent = if (userOrder.items.size > 1) 170.dp else 90.dp
 
     Card(
@@ -170,6 +180,39 @@ fun OrderDetailCard(userOrder: UserOrder,order:Order) {
                         .fillMaxWidth()
                         .padding(vertical = 4.dp)
                 )
+            }
+            if(origin=="ordersOnTheWay" || origin=="ordersList"){
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Usuario Comprador : " + order.userOrders.get(0).user.userId,
+                    style = MaterialTheme.typography.h6,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+            }
+            else{
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Repartidor Asignado: " + order.repartidor?.userId,
+                    style = MaterialTheme.typography.h6,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+            }
+
+            if(origin=="ordersOnTheWay") {
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                    onClick = {
+                        order.estado=Estado.FINALIZADO
+                        orderViewModel.updateDataBaseOrder(order)
+                        navController.navigate(AppScreens.OnTheWayOrders.route)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Text("Entregado", fontSize = 18.sp)
+                }
             }
 
         }

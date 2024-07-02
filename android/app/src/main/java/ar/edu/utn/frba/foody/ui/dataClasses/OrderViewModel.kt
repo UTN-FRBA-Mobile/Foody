@@ -29,6 +29,7 @@ class OrderViewModel() : ViewModel() {
     private var order by mutableStateOf(Order(""))
     private var orders by mutableStateOf(listOf<Order>())
     private var pendingOrders by mutableStateOf(listOf<Order>())
+    private var orderByDeliveryMan by mutableStateOf(listOf<Order>())
     private var orderDetail by mutableStateOf(Order(""))
 
     var orderDataBase: OrderDataBase? = null
@@ -52,6 +53,12 @@ class OrderViewModel() : ViewModel() {
     fun updateOrderLogin(){
         this.findAllOrdersForUser()
         this.getOrderByState(Estado.ENPROGRESO)
+    }
+    fun getPendingsOrders():List<Order>{
+        return pendingOrders
+    }
+    fun updatePendingOrders(orders: List<Order>){
+        this.pendingOrders=orders
     }
 
     fun updateOrder(order: Order){
@@ -280,6 +287,17 @@ class OrderViewModel() : ViewModel() {
                 this.pendingOrders= orders.toMutableList()
             }
         }
+    }
+    fun findOrdersDeliveredById(){
+        orderDataBaseFirebase?.getOrdersByDeliveredId(user.userId) { orders ->
+            if(orders.isNotEmpty()) {
+                this.orderByDeliveryMan= orders.toMutableList()
+            }
+        }
+    }
+
+    fun getAllOrdersDeliveredById():List<Order>{
+        return orderByDeliveryMan
     }
     fun getAllOrdersByState():List<Order>{
         return pendingOrders

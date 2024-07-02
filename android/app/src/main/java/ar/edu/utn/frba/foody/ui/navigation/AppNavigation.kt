@@ -25,6 +25,8 @@ import ar.edu.utn.frba.foody.ui.main.JoinGroupScreen
 import ar.edu.utn.frba.foody.ui.main.LocationGoogleScreen
 import ar.edu.utn.frba.foody.ui.main.LoginScreen
 import ar.edu.utn.frba.foody.ui.main.OrderScreen
+import ar.edu.utn.frba.foody.ui.main.OrdersDeliveredScreen
+import ar.edu.utn.frba.foody.ui.main.OrdersOnTheWayScreen
 import ar.edu.utn.frba.foody.ui.main.OrdersScreen
 import ar.edu.utn.frba.foody.ui.main.PaymentScreen
 import ar.edu.utn.frba.foody.ui.main.PendingOrderScreen
@@ -95,11 +97,13 @@ fun AppNavigation(
         }
         composable(
             route = AppScreens.Order_Screen.route,
-            arguments = listOf(navArgument("order_id") { type = NavType.StringType })
+            arguments = listOf(navArgument("order_id") { type = NavType.StringType },
+                navArgument("origin") { type = NavType.StringType })
         ) {
                 backStackEntry ->
             OrderScreen(navController = navController, viewModel = orderViewModel,
-                backStackEntry.arguments?.getString("order_id") ?: "unknown")
+                backStackEntry.arguments?.getString("order_id") ?: "unknown",
+                backStackEntry.arguments?.getString("origin") ?: "unknown")
         }
         composable(
             route = AppScreens.Progress_Order_Screen.route,
@@ -154,5 +158,12 @@ fun AppNavigation(
         composable(route = AppScreens.PendingOrder.route) {
             PendingOrderScreen(navController = navController,viewModel,orderViewModel)
         }
+        composable(route = AppScreens.OrdersDeliverd.route) {
+            OrdersDeliveredScreen(navController = navController,orderViewModel)
+        }
+        composable(route = AppScreens.OnTheWayOrders.route) {
+            OrdersOnTheWayScreen(navController = navController,orderViewModel)
+        }
+
     }
 }

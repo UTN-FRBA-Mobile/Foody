@@ -14,8 +14,8 @@ sealed class AppScreens(val route: String) {
     }
     object Orders_Screen: AppScreens("Orders")
     object Restaurant_Screen: AppScreens("Restaurant")
-    object Order_Screen: AppScreens("Order/{order_id}"){
-        fun createRoute(order_id:String) = "Order/$order_id"
+    object Order_Screen: AppScreens("Order/{order_id}/{origin}"){
+        fun createRoute(order_id:String,origin: String) = "Order/$order_id/$origin"
     }
     object Progress_Order_Screen: AppScreens("Progress Order/{order_id}"){
         fun createRoute(order_id: String) = "Progress Order/$order_id"
@@ -26,4 +26,9 @@ sealed class AppScreens(val route: String) {
     object Card_Screen: AppScreens("Card")
     object Payment: AppScreens("Payment")
     object PendingOrder: AppScreens("PendingOrder")
+    object OrdersDeliverd: AppScreens("ordersDelivered")
+    object OnTheWayOrders: AppScreens("onTheWayOrders")
+
+
+
 }

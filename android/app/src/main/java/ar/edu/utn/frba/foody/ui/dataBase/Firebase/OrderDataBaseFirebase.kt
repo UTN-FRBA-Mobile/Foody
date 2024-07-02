@@ -185,4 +185,45 @@ class OrderDataBaseFirebase(private var database: FirebaseDatabase) {
             }
         })
     }
+    fun getOrdersByDeliveredId(deliverId:String,callback: (List<Order>) -> Unit) {
+        val myRef = database.getReference(TABLE_ORDERS)
+
+        myRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val orders = mutableListOf<Order>()
+                dataSnapshot.children.forEach { orderSnapshot ->
+                    val order = orderSnapshot.getValue(Order::class.java)
+                    if (order != null && order.repartidor?.userId.equals(deliverId)) {
+                        orders.add(order)
+                    }
+                }
+                callback(orders)
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                callback(emptyList())
+            }
+        })
+    }
+    fun getOrdersOnTheWayId(deliverId:String,callback: (List<Order>) -> Unit) {
+        val myRef = database.getReference(TABLE_ORDERS)
+
+        myRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val orders = mutableListOf<Order>()
+                dataSnapshot.children.forEach { orderSnapshot ->
+                    val order = orderSnapshot.getValue(Order::class.java)
+                    if (order != null && order.repartidor?.userId.equals(deliverId) &&
+                        order.estado.equals(Estado.ENCAMINO)) {
+                        orders.add(order)
+                    }
+                }
+                callback(orders)
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                callback(emptyList())
+            }
+        })
+    }
 }

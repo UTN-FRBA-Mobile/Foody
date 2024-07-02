@@ -34,13 +34,14 @@ import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
-fun OrdersScreen(navController: NavController, viewModel: OrderViewModel) {
-    val orders = viewModel.getAllOrdersForUser()
+fun OrdersDeliveredScreen(navController: NavController, viewModel: OrderViewModel) {
+    viewModel.findOrdersDeliveredById()
+    val orders = viewModel.getAllOrdersDeliveredById()
 
     AppScaffold(navController = navController,
         null,
         null,
-        { TopGroupOrderList(navController = navController)}
+        { TopGroupOrderListDelivered(navController = navController)}
     ) {
         Box(
             contentAlignment = Alignment.Center,
@@ -57,7 +58,7 @@ fun OrdersScreen(navController: NavController, viewModel: OrderViewModel) {
                 .padding(top = 32.dp)
                 .fillMaxWidth()
             ) {
-                Text(text = "Orders",
+                Text(text = "Orders Delivered",
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
                     fontSize = 24.sp
@@ -72,11 +73,11 @@ fun OrdersScreen(navController: NavController, viewModel: OrderViewModel) {
                 orders.forEach { order ->
                     item {
                         if (viewModel.hasItems(order)) {
-                            if (!order.estado.equals(Estado.ENPROGRESO)) {
-                                OrderItem(
+                            if (order.estado.equals(Estado.FINALIZADO)) {
+                                OrderItemDelivered(
                                     navController = navController,
-                                    viewModel = viewModel,
-                                    order = order
+                                    order = order,
+                                    title = "ordersDelivered"
                                 )
                             }
                         }
@@ -88,13 +89,13 @@ fun OrdersScreen(navController: NavController, viewModel: OrderViewModel) {
 }
 
 @Composable
-fun TopGroupOrderList(navController: NavController) {
+fun TopGroupOrderListDelivered(navController: NavController) {
     TopAppBar(
         title = {
             Text(text = stringResource(id = R.string.app_name))
         },
         actions = {
-            IconButton(onClick = { navController.navigate(AppScreens.Home_Screen.route) }) {
+            IconButton(onClick = { navController.navigate(AppScreens.PendingOrder.route) }) {
                 Image(
                     painter = painterResource(id = R.drawable.go_back),
                     contentDescription = "Go Back Icon",
@@ -107,7 +108,8 @@ fun TopGroupOrderList(navController: NavController) {
 }
 
 @Composable
-fun OrderItem(navController: NavController, viewModel: OrderViewModel, order: Order) {
+fun OrderItemDelivered(navController: NavController, order: Order,
+                       title:String) {
     Card(modifier = Modifier
         .fillMaxSize(),
         backgroundColor = Color.Transparent,
@@ -130,10 +132,9 @@ fun OrderItem(navController: NavController, viewModel: OrderViewModel, order: Or
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    if( order.estado.equals(Estado.FINALIZADO)) {
-                        IconButton(onClick = { //viewModel.updateOrder(order)
+                        IconButton(onClick = {
                             navController.navigate(AppScreens.Order_Screen.createRoute(
-                                order.orderId, "ordersList"))
+                                order.orderId,title))
                         }
                         ) {
                             Image(
@@ -143,34 +144,9 @@ fun OrderItem(navController: NavController, viewModel: OrderViewModel, order: Or
                                 contentScale = ContentScale.FillBounds
                             )
                         }
-                    }
-                    else if (order.estado.equals(Estado.ENCAMINO)) {
-                        IconButton(onClick = {
-                            //viewModel.updateOrder(order)
-                            navController.navigate(
-                                AppScreens.Progress_Order_Screen.createRoute(order.orderId)
-                            ) }) {
-                            Image(
-                                painter = painterResource(id = R.drawable.order_progress_icon),
-                                contentDescription = "Order Progress Icon",
-                                modifier = Modifier.size(24.dp),
-                                contentScale = ContentScale.FillBounds
-                            )
-                        }
-                    }
                 }
             }
         }
         Divider()
     }
 }
-
-/*
-@Preview
-@Composable
-fun Default() {
-    val navController= rememberNavController()
-    val viewModel = OrderViewModel()
-    OrdersScreen(navController, viewModel)
-}
- */
