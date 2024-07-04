@@ -83,6 +83,11 @@ fun OrdersDeliveredScreen(navController: NavController, viewModel: OrderViewMode
                         }
                     }
                 }
+                if (orders.isNotEmpty()) {
+                    item {
+                        Divider()
+                    }
+                }
             }
         }
     }

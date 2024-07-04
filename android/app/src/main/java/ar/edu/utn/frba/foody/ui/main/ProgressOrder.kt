@@ -1,12 +1,11 @@
 package ar.edu.utn.frba.foody.ui.main
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,9 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -38,16 +37,20 @@ import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
-fun ProgressOrderScreen(navController: NavController, orderViewModel: OrderViewModel,
-                        order_id:String) {
+fun ProgressOrderScreen(
+    navController: NavController, orderViewModel: OrderViewModel, order_id: String
+) {
     val order = orderViewModel.getOrderById(order_id)
 
     AppScaffold(navController = navController,
         null,
         null,
-        { TopGroupProgressOrder(navController = navController)}
+        { TopGroupProgressOrder(navController = navController) }
     ) {
-        Box(modifier = Modifier.fillMaxHeight(),
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 56.dp),
             contentAlignment = Alignment.Center
         ) {
             Image(
@@ -56,72 +59,70 @@ fun ProgressOrderScreen(navController: NavController, orderViewModel: OrderViewM
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
-            Column {
-                TextInfo(text = "Direccion: " + order.direction)
-                //TextInfo(text = "Hora estimada: " + order.estimatedHour)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Total Sin Envio: $" + order.userOrders.sumOf {
-                        userOrder->userOrder.items.sumOf {
-                            x -> x.quantity * x.dish.price }}
-                        .toString(),
-                    style = MaterialTheme.typography.h6,
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Total : $" + order.montoPagado.toString(),
-                    style = MaterialTheme.typography.h6,
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Dirección de entrega : " + order.direction,
-                    style = MaterialTheme.typography.h6,
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                if (order.tarjetaUsada.equals("Efectivo")){
-                    Text(
-                        text = "Pago Realizado en Efectivo",
-                        style = MaterialTheme.typography.body1,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                    )
+
+            Column(modifier = Modifier.fillMaxWidth()) {
+                if (order.orderStates.isNotEmpty() && order.orderStates[1].completed) {
+                    TextInfo(text = "Repartidor Asignado: " + order.repartidor?.email)
                 }
-                else {
-                    Text(
-                        text = "Tarjeta usada : **** **** **** ${
+
+                TextInfo(text = "Total Sin Envio: $" + order.userOrders.sumOf { userOrder ->
+                    userOrder.items.sumOf { x -> x.quantity * x.dish.price }
+                }.toString())
+
+                TextInfo(text = "Total : $" + order.montoPagado.toString())
+
+                TextInfo(text = "Dirección de Entrega : " + order.direction)
+
+                if (order.tarjetaUsada.equals("Efectivo")) {
+                    TextInfo(text = "Pago Realizado en Efectivo")
+                } else {
+                    TextInfo(
+                        text = "Tarjeta Usada : **** **** **** ${
                             order.tarjetaUsada.takeLast(4)
-                        }",
-                        style = MaterialTheme.typography.body1,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
+                        }"
                     )
                 }
-                Column(verticalArrangement = Arrangement.Center) {
-                        TextInfo(text = "Estado: ${order.estado}", align = true)
-                        Row(verticalAlignment = Alignment.CenterVertically,
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Card(
+                    modifier = Modifier
+                        .padding(
+                            start = 74.dp,
+                            end = 74.dp
+                        ),
+                    shape = RoundedCornerShape(8.dp),
+                    elevation = 4.dp
+                ) {
+                    Column {
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.padding(16.dp, 0.dp)
                         ) {
-                            order.orderStates.forEach{
-                                StateProgressLine(state = it.completed,
-                                    last = it.firstState
+                            order.orderStates.forEach {
+                                StateProgressLine(
+                                    state = it.completed, last = it.firstState
                                 )
-                                StateIcon(image = it.resourceId,
+
+                                StateIcon(
+                                    image = it.resourceId,
                                     imageDescription = it.imageDescription,
                                     state = it.completed
                                 )
                             }
                         }
+
                         Spacer(modifier = Modifier.height(32.dp))
+
                         StateDescriptions(order.orderStates)
                     }
+
+                }
+
             }
         }
-
     }
 }
 
@@ -129,7 +130,7 @@ fun ProgressOrderScreen(navController: NavController, orderViewModel: OrderViewM
 fun StateDescriptions(states: List<OrderState>) {
     Column(modifier = Modifier.padding(16.dp, 0.dp)) {
         var textColor: Color
-        states.forEach{
+        states.forEach {
             textColor = if (it.current) {
                 Color.Black
             } else if (it.completed) {
@@ -137,11 +138,13 @@ fun StateDescriptions(states: List<OrderState>) {
             } else {
                 Color.LightGray
             }
-            Row(verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
+            Row(
+                verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()
             ) {
                 if (it.completed) {
-                    CompletedStateDescription(textDescription = it.description, textColor = textColor)
+                    CompletedStateDescription(
+                        textDescription = it.description, textColor = textColor
+                    )
                 } else {
                     PendingStateDescription(textDescription = it.description, textColor = textColor)
                 }
@@ -160,8 +163,8 @@ fun CompletedStateDescription(textDescription: String, textColor: Color) {
         contentScale = ContentScale.FillBounds,
     )
     Spacer(modifier = Modifier.width(8.dp))
-    Text(text = textDescription,
-        color = textColor
+    Text(
+        text = textDescription, color = textColor
     )
 }
 
@@ -175,14 +178,15 @@ fun PendingStateDescription(textDescription: String, textColor: Color) {
         contentScale = ContentScale.FillBounds,
     )
     Spacer(modifier = Modifier.width(14.dp))
-    Text(text = textDescription,
-        color = textColor
+    Text(
+        text = textDescription, color = textColor
     )
 }
 
 @Composable
 fun TextInfo(text: String, align: Boolean = false) {
-    Text(text = text,
+    Text(
+        text = text,
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 16.dp),
@@ -229,21 +233,18 @@ fun StateProgressLine(state: Boolean, last: Boolean) {
 
 @Composable
 fun TopGroupProgressOrder(navController: NavController) {
-    TopAppBar(
-        title = {
-            Text(text = stringResource(id = R.string.app_name))
-        },
-        actions = {
-            IconButton(onClick = { navController.navigate(AppScreens.Orders_Screen.route) }) {
-                Image(
-                    painter = painterResource(id = R.drawable.go_back),
-                    contentDescription = "Go Back Icon",
-                    modifier = Modifier.size(24.dp),
-                    contentScale = ContentScale.FillBounds
-                )
-            }
+    TopAppBar(title = {
+        Text(text = stringResource(id = R.string.app_name))
+    }, actions = {
+        IconButton(onClick = { navController.navigate(AppScreens.Orders_Screen.route) }) {
+            Image(
+                painter = painterResource(id = R.drawable.go_back),
+                contentDescription = "Go Back Icon",
+                modifier = Modifier.size(24.dp),
+                contentScale = ContentScale.FillBounds
+            )
         }
-    )
+    })
 }
 
 /*

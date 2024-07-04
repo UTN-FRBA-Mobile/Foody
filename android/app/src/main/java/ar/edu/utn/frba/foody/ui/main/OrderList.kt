@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
-import ar.edu.utn.frba.foody.ui.Classes.Estado
 import ar.edu.utn.frba.foody.ui.Classes.Order
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
@@ -40,7 +39,7 @@ fun OrdersScreen(navController: NavController, viewModel: OrderViewModel) {
     AppScaffold(navController = navController,
         null,
         null,
-        { TopGroupOrderList(navController = navController)}
+        { TopGroupOrderList(navController = navController) }
     ) {
         Box(
             contentAlignment = Alignment.Center,
@@ -52,19 +51,25 @@ fun OrdersScreen(navController: NavController, viewModel: OrderViewModel) {
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
-            Box(modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 32.dp)
-                .fillMaxWidth()
+
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 32.dp)
+                    .fillMaxWidth()
             ) {
-                Text(text = "Orders",
+                Text(
+                    text = "Orders",
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
                     fontSize = 24.sp
                 )
             }
+
             Spacer(modifier = Modifier.height(16.dp))
-            LazyColumn(horizontalAlignment = Alignment.CenterHorizontally,
+
+            LazyColumn(
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(505.dp)
@@ -72,14 +77,19 @@ fun OrdersScreen(navController: NavController, viewModel: OrderViewModel) {
                 orders.forEach { order ->
                     item {
                         if (viewModel.hasItems(order)) {
-                            if (!order.estado.equals(Estado.ENPROGRESO)) {
-                                OrderItem(
-                                    navController = navController,
-                                    viewModel = viewModel,
-                                    order = order
-                                )
-                            }
+
+                            OrderItem(
+                                navController = navController,
+                                viewModel = viewModel,
+                                order = order
+                            )
+
                         }
+                    }
+                }
+                if (orders.isNotEmpty()) {
+                    item {
+                        Divider()
                     }
                 }
             }
@@ -108,59 +118,69 @@ fun TopGroupOrderList(navController: NavController) {
 
 @Composable
 fun OrderItem(navController: NavController, viewModel: OrderViewModel, order: Order) {
-    Card(modifier = Modifier
-        .fillMaxSize(),
+    Card(
+        modifier = Modifier
+            .fillMaxSize(),
         backgroundColor = Color.Transparent,
-        elevation = 0.dp) {
-        Row (modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp, 4.dp),
+        elevation = 0.dp
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp, 4.dp),
             horizontalArrangement = Arrangement.Center
         ) {
-            Box(modifier = Modifier.align(Alignment.CenterVertically)
-                .weight(0.7f),
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .weight(0.7f),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = order.name,
+                Text(
+                    text = order.name + " (" + order.estado.descripcion + ")",
                     textAlign = TextAlign.Center
                 )
             }
+
             Box(modifier = Modifier.weight(0.3f)) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    if( order.estado.equals(Estado.FINALIZADO)) {
-                        IconButton(onClick = { //viewModel.updateOrder(order)
-                            navController.navigate(AppScreens.Order_Screen.createRoute(
-                                order.orderId, "ordersList"))
-                        }
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.details_icon),
-                                contentDescription = "View Details Icon",
-                                modifier = Modifier.size(32.dp, 20.dp),
-                                contentScale = ContentScale.FillBounds
-                            )
-                        }
+                    IconButton(onClick = {
+                        //viewModel.updateOrder(order)
+                        navController.navigate(
+                            AppScreens.Progress_Order_Screen.createRoute(order.orderId)
+                        )
+                    }) {
+                        Image(
+                            painter = painterResource(id = R.drawable.order_progress_icon),
+                            contentDescription = "Order Progress Icon",
+                            modifier = Modifier.size(24.dp),
+                            contentScale = ContentScale.FillBounds
+                        )
                     }
-                    else if (order.estado.equals(Estado.ENCAMINO)) {
-                        IconButton(onClick = {
-                            //viewModel.updateOrder(order)
-                            navController.navigate(
-                                AppScreens.Progress_Order_Screen.createRoute(order.orderId)
-                            ) }) {
-                            Image(
-                                painter = painterResource(id = R.drawable.order_progress_icon),
-                                contentDescription = "Order Progress Icon",
-                                modifier = Modifier.size(24.dp),
-                                contentScale = ContentScale.FillBounds
+
+                    IconButton(onClick = {
+                        //viewModel.updateOrder(order)
+                        navController.navigate(
+                            AppScreens.Order_Screen.createRoute(
+                                order.orderId, "ordersList"
                             )
-                        }
+                        )
+                    }
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.details_icon),
+                            contentDescription = "View Details Icon",
+                            modifier = Modifier.size(32.dp, 20.dp),
+                            contentScale = ContentScale.FillBounds
+                        )
                     }
                 }
             }
         }
+
         Divider()
     }
 }
