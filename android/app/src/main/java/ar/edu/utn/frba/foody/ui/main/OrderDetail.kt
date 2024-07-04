@@ -11,7 +11,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.*
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.*
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import androidx.navigation.*
 import ar.edu.utn.frba.foody.R
@@ -31,24 +30,33 @@ fun OrderScreen(
 
     AppScaffold(navController,
         null,
-       null,
-        { TopGroupOrder(navController,origin) }) {
-        OrderDetailGrid(order.userOrders,order,origin,viewModel,navController)
+        null,
+        { TopGroupOrder(navController, origin) }
+    ) {
+        OrderDetailGrid(
+            order.userOrders,
+            order,
+            origin,
+            viewModel,
+            navController
+        )
     }
 }
 
 @Composable
-fun TopGroupOrder(navController: NavController,origin: String) {
+fun TopGroupOrder(navController: NavController, origin: String) {
     TopAppBar(
         title = {
             Text(text = stringResource(id = R.string.app_name))
         },
         actions = {
-            IconButton(onClick = { when (origin) {
-                "ordersList" -> navController.navigate(AppScreens.Orders_Screen.route)
-                "ordersDelivered" -> navController.navigate(AppScreens.OrdersDeliverd.route)
-                "ordersOnTheWay" -> navController.navigate(AppScreens.OnTheWayOrders.route)
-            }}) {
+            IconButton(onClick = {
+                when (origin) {
+                    "ordersList" -> navController.navigate(AppScreens.Orders_Screen.route)
+                    "ordersDelivered" -> navController.navigate(AppScreens.OrdersDeliverd.route)
+                    "ordersOnTheWay" -> navController.navigate(AppScreens.OnTheWayOrders.route)
+                }
+            }) {
                 Image(
                     painter = painterResource(id = R.drawable.go_back),
                     contentDescription = "Go Back Icon",
@@ -58,28 +66,6 @@ fun TopGroupOrder(navController: NavController,origin: String) {
             }
         }
     )
-}
-
-@Composable
-fun BottomGroupOrder(
-    orderViewModel: OrderViewModel,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .padding(8.dp)
-    ) {
-        Text(
-            text = "Total: $" + orderViewModel.getTotal(),
-            modifier = Modifier
-                .padding(vertical = 8.dp)
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-            style = MaterialTheme.typography.h6,
-            textAlign = TextAlign.Center
-        )
-    }
 }
 
 @Composable
@@ -96,6 +82,7 @@ fun OrderDetailGrid(
         contentScale = ContentScale.Crop,
         modifier = Modifier.fillMaxSize()
     )
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(1),
         contentPadding = PaddingValues(8.dp),
@@ -104,16 +91,98 @@ fun OrderDetailGrid(
         ) {
         items(userOrders.size) { index ->
             if (userOrders[index].items.isNotEmpty()) {
-                OrderDetailCard(userOrders[index], order, origin,
-                    orderViewModel,navController )
+                OrderDetailCard(
+                    userOrders[index],
+                    order,
+                    origin
+                )
+            }
+        }
+
+        item {
+            Column {
+                if (origin == "ordersOnTheWay" || origin == "ordersDelivered") {
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "Total Sin Envio: $" + order.userOrders.sumOf { userOrder ->
+                            userOrder.items.sumOf { x -> x.quantity * x.dish.price }
+                        }
+                            .toString(),
+                        style = MaterialTheme.typography.h6,
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "Total : $" + order.montoPagado.toString(),
+                        style = MaterialTheme.typography.h6,
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "Dirección de entrega : " + order.direction,
+                        style = MaterialTheme.typography.h6,
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    if (order.tarjetaUsada.equals("Efectivo")) {
+                        Text(
+                            text = "Pago Realizado en Efectivo",
+                            style = MaterialTheme.typography.body1,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                        )
+                    } else {
+                        Text(
+                            text = "Tarjeta usada : **** **** **** ${
+                                order.tarjetaUsada.takeLast(4)
+                            }",
+                            style = MaterialTheme.typography.body1,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                        )
+                    }
+                }
+
+                if (origin == "ordersOnTheWay") {
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Button(
+                        onClick = {
+                            order.estado = Estado.FINALIZADO
+                            order.orderStates[1].current = false
+                            order.orderStates[2].completed = true
+                            order.orderStates[2].current = true
+                            orderViewModel.updateDataBaseOrder(order)
+                            navController.navigate(AppScreens.OnTheWayOrders.route)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        Text("Entregado", fontSize = 18.sp)
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-fun OrderDetailCard(userOrder: UserOrder,order:Order,origin: String,
-                    orderViewModel: OrderViewModel,navController: NavController) {
+fun OrderDetailCard(
+    userOrder: UserOrder,
+    order: Order,
+    origin: String
+) {
     val heightContent = if (userOrder.items.size > 1) 170.dp else 90.dp
 
     Card(
@@ -127,11 +196,13 @@ fun OrderDetailCard(userOrder: UserOrder,order:Order,origin: String,
                 .padding(16.dp, 8.dp)
         ) {
             Spacer(modifier = Modifier.height(8.dp))
+
             Text(
-                text = order.restaurant.name ,
+                text = order.restaurant.name,
                 style = MaterialTheme.typography.h6,
                 modifier = Modifier.padding(vertical = 4.dp)
             )
+
             LazyVerticalGrid(
                 columns = GridCells.Fixed(1),
                 contentPadding = PaddingValues(8.dp),
@@ -141,80 +212,16 @@ fun OrderDetailCard(userOrder: UserOrder,order:Order,origin: String,
                     OrderDetailItem(userOrder.items[index])
                 }
             }
+
             Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Total Sin Envio: $" + userOrder.items.sumOf { x -> x.quantity * x.dish.price }
-                    .toString(),
-                style = MaterialTheme.typography.h6,
-                modifier = Modifier.padding(vertical = 4.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Total : $" + order.montoPagado.toString(),
-                style = MaterialTheme.typography.h6,
-                modifier = Modifier.padding(vertical = 4.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Dirección de entrega : " + order.direction,
-                style = MaterialTheme.typography.h6,
-                modifier = Modifier.padding(vertical = 4.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            if (order.tarjetaUsada.equals("Efectivo")){
+
+            if (order.group != null || (origin == "ordersOnTheWay" || origin == "ordersDelivered")) {
                 Text(
-                    text = "Pago Realizado en Efectivo",
-                    style = MaterialTheme.typography.body1,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                )
-            }
-            else {
-                Text(
-                    text = "Tarjeta usada : **** **** **** ${
-                        order.tarjetaUsada.takeLast(4)
-                    }",
-                    style = MaterialTheme.typography.body1,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                )
-            }
-            if(origin=="ordersOnTheWay" || origin=="ordersList"){
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Usuario Comprador : " + order.userOrders.get(0).user.userId,
+                    text = "Usuario Comprador: " + userOrder.user.userId,
                     style = MaterialTheme.typography.h6,
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
             }
-            else{
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Repartidor Asignado: " + order.repartidor?.userId,
-                    style = MaterialTheme.typography.h6,
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
-            }
-
-            if(origin=="ordersOnTheWay") {
-                Spacer(modifier = Modifier.height(8.dp))
-                Button(
-                    onClick = {
-                        order.estado=Estado.FINALIZADO
-                        orderViewModel.updateDataBaseOrder(order)
-                        navController.navigate(AppScreens.OnTheWayOrders.route)
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Text("Entregado", fontSize = 18.sp)
-                }
-            }
-
         }
     }
 }

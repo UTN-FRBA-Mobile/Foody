@@ -70,6 +70,19 @@ class OrderViewModel() : ViewModel() {
 
     }
 
+    fun createOrderWithStates(direccion: String, totalPayment: Double, tarjeta: String): Order {
+        return order.copy(
+            estado = Estado.PENDIENTE,
+            direction =  direccion,
+            montoPagado = totalPayment,
+            tarjetaUsada = tarjeta,
+            orderStates = listOf(
+            OrderState(R.drawable.order_icon, "Order Icon", "Hemos tomado tu pedido", true, true, true),
+            OrderState(R.drawable.delivery_icon, "Delivery Icon", "Tu pedido está en camino", false, false, false),
+            OrderState(R.drawable.finished_icon, "Finished Icon", "Entregamos tu pedido", false, false, false),
+        ))
+    }
+
     fun getPickedOrder(): Order {
         return order
     }

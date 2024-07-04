@@ -1,9 +1,7 @@
 package ar.edu.utn.frba.foody.ui.main
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,7 +18,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
-import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -31,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -44,10 +40,7 @@ import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Estado
 import ar.edu.utn.frba.foody.ui.Classes.Order
-import ar.edu.utn.frba.foody.ui.Classes.Restaurant
 import ar.edu.utn.frba.foody.ui.composables.SimpleAlert
-import ar.edu.utn.frba.foody.ui.dataBase.SQLite.RestaurantDataBase
-import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
@@ -99,19 +92,19 @@ fun PendingOrderScreen(
                     .height(505.dp)
             ) {
                 for (order in orderViewModel.getAllOrdersByState()) {
-                        item {
-                            OrderPending(
-                                navController = navController,
-                                orderViewModel = orderViewModel,
-                                order = order,
-                                onRechazarClick = { refreshState = !refreshState }
-                            )
-                        }
-                    }
                     item {
-                        if (orderViewModel.getAllOrdersByState().isNotEmpty())
-                            Divider()
+                        OrderPending(
+                            navController = navController,
+                            orderViewModel = orderViewModel,
+                            order = order,
+                            onRechazarClick = { refreshState = !refreshState }
+                        )
                     }
+                }
+                item {
+                    if (orderViewModel.getAllOrdersByState().isNotEmpty())
+                        Divider()
+                }
 
             }
         }
@@ -142,11 +135,14 @@ fun OrderPending(
         onDismiss = { showAlert.value = false }
     )
     if (showAccept.value) {
-        order.estado=Estado.ENCAMINO
-        order.repartidor= orderViewModel.user
+        order.estado = Estado.ENCAMINO
+        order.repartidor = orderViewModel.user
+        order.orderStates.get(0).current = false
+        order.orderStates.get(1).completed = true
+        order.orderStates.get(1).current = true
         orderViewModel.updateDataBaseOrder(order)
-        var orders =orderViewModel.getPendingsOrders()
-        orders= orders.filter { ordernew -> ordernew.orderId!= order.orderId }
+        var orders = orderViewModel.getPendingsOrders()
+        orders = orders.filter { ordernew -> ordernew.orderId != order.orderId }
         orderViewModel.updatePendingOrders(orders)
         orderViewModel.findOrdersDeliveredById()
 
@@ -167,13 +163,29 @@ fun OrderPending(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = "Restaurante: ${order.restaurant.name}", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                Text(text = "Cliente: ${order.userOrders.get(0).user.userId}", fontSize = 16.sp, modifier = Modifier.padding(vertical = 4.dp))
-                Text(text = "Monto Pagado: ${order.montoPagado}", fontSize = 16.sp, modifier = Modifier.padding(vertical = 4.dp))
-                Text(text = "Dirección: ${order.direction}", fontSize = 16.sp, modifier = Modifier.padding(vertical = 4.dp))
+                Text(
+                    text = "Restaurante: ${order.restaurant.name}",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "Cliente: ${order.userOrders.get(0).user.userId}",
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+                Text(
+                    text = "Monto Pagado: ${order.montoPagado}",
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+                Text(
+                    text = "Dirección: ${order.direction}",
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
             }
             Spacer(modifier = Modifier.width(16.dp))
-            if(showAccept.value == false) {
+            if (showAccept.value == false) {
                 Column(
                     verticalArrangement = Arrangement.SpaceEvenly,
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -188,8 +200,8 @@ fun OrderPending(
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     IconButton(onClick = {
-                        var orders=orderViewModel.getPendingsOrders()
-                        orders=orders.filter { ordernew -> ordernew.orderId!=order.orderId }
+                        var orders = orderViewModel.getPendingsOrders()
+                        orders = orders.filter { ordernew -> ordernew.orderId != order.orderId }
                         orderViewModel.updatePendingOrders(orders)
                         onRechazarClick()
                     }) {
@@ -205,6 +217,7 @@ fun OrderPending(
         }
     }
 }
+
 @Composable
 fun BottomGroupPendingOrder(navController: NavController) {
     val buttons = listOf(
