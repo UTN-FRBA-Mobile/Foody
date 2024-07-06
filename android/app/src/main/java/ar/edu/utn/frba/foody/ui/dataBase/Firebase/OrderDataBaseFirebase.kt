@@ -2,7 +2,6 @@ package ar.edu.utn.frba.foody.ui.dataBase.Firebase
 
 import ar.edu.utn.frba.foody.ui.Classes.Estado
 import ar.edu.utn.frba.foody.ui.Classes.Order
-import ar.edu.utn.frba.foody.ui.Classes.OrderItemInfo
 import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.Classes.UserOrder
 import com.google.firebase.database.DataSnapshot
@@ -13,17 +12,18 @@ import com.google.firebase.database.ValueEventListener
 class OrderDataBaseFirebase(private var database: FirebaseDatabase) {
     private val TABLE_ORDERS = "orders"
     private val TABLE_USER_ORDERS = "userOrders"
+    private val TABLE_GROUPS = "group"
 
     fun addOrder(order: Order): String {
         val myRef = database.getReference(TABLE_ORDERS)
 
         val key = myRef.push().key!!
 
-        order.orderId = key.toString()
+        order.orderId = key
 
         myRef.child(order.orderId).setValue(order)
 
-        return key;
+        return key
     }
 
     fun addUserOrderToOrder(orderId: String, userOrder: UserOrder, callback: (Boolean) -> Unit) {
@@ -116,6 +116,31 @@ class OrderDataBaseFirebase(private var database: FirebaseDatabase) {
             }
         })
     }
+
+
+    fun getOrderByGroup(groupId: String, callback: (Order?) -> Unit) {
+        val ordersRef = database.getReference(TABLE_ORDERS)
+
+        val query = ordersRef.orderByChild(TABLE_GROUPS + "/groupId").equalTo(groupId).limitToFirst(1)
+
+        query.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    val order = snapshot.children.first().getValue(Order::class.java)
+                    order?.orderId =
+                        snapshot.children.first().key.toString()
+                    callback(order)
+                } else {
+                    callback(null)
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                callback(null)
+            }
+        })
+    }
+
     fun getOrderByState(estado: Estado,user: User, callback: (Order?) -> Unit) {
         val myRef = database.getReference(TABLE_ORDERS)
 
