@@ -16,7 +16,11 @@ class GroupViewModel() : ViewModel() {
     var groupDataBaseFirebase: GroupDataBaseFirebase? = null
     var navController: NavController? = null
 
-    fun setServices(groupDataBase: GroupDataBase, groupDataBaseFirebase: GroupDataBaseFirebase, navController: NavController) {
+    fun setServices(
+        groupDataBase: GroupDataBase,
+        groupDataBaseFirebase: GroupDataBaseFirebase,
+        navController: NavController
+    ) {
         this.groupDataBase = groupDataBase
         this.groupDataBaseFirebase = groupDataBaseFirebase
         this.navController = navController
@@ -30,10 +34,13 @@ class GroupViewModel() : ViewModel() {
         return group
     }
 
-    fun createGroup(newGroup: Group, admin: User) {
+    fun createGroup(newGroup: Group, admin: User): Group {
         this.updateGroup(newGroup)
+        admin.admin = true
         this.addUser(admin)
         groupDataBaseFirebase?.insertGroup(group)
+
+        return group
     }
 
     fun addUser(user: User) {
@@ -45,7 +52,7 @@ class GroupViewModel() : ViewModel() {
 
     fun updateUser(user: User) {
         this.addUser(user)
-        groupDataBaseFirebase?.updateGroup(group)
+        groupDataBaseFirebase?.updateGroup(group, user)
     }
 
     fun deleteUser(user: User): Group {
@@ -54,25 +61,23 @@ class GroupViewModel() : ViewModel() {
         return updatedGroup
     }
 
-    fun verifyNameGroupExist(name : String) : Boolean
-    {
-        val group = groupDataBaseFirebase?.getGroupByName(name)
-
-        return if (group != null){
-            true
-        }else{
-            false
+    fun verifyNameGroupExist(name: String, callback: (Group?) -> Unit) {
+        groupDataBaseFirebase?.getGroupByName(name) { group ->
+            if (group != null) {
+                callback(group)
+            } else {
+                callback(null)
+            }
         }
     }
 
-    fun verifyGroupExist(name : String, pass : String) : Group?
-    {
-        val group = groupDataBaseFirebase?.getGroupByName(name)
-
-        return if (group != null && group.password == pass){
-            group
-        }else{
-            null
+    fun verifyGroupExist(name: String, pass: String, callback: (Group?) -> Unit) {
+        groupDataBaseFirebase?.getGroupByName(name) { group ->
+            if (group != null && group.password == pass) {
+                callback(group)
+            } else {
+                callback(null)
+            }
         }
     }
 

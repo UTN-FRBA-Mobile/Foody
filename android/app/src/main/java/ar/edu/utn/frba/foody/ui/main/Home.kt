@@ -93,7 +93,7 @@ fun HomeScreen(
                     }
                     item {
                         if (restaurantDataBase.getAllRestaurants(userDataBase).isNotEmpty())
-                        Divider()
+                            Divider()
                     }
                 }
             }
@@ -119,7 +119,7 @@ fun RestaurantItem(
         mutableStateOf(false)
     }
 
-    val restaurantName = viewModel.getPickedRestaurantName()
+    val restaurantName = orderViewModel.getPickedOrder().restaurant.name
 
     SimpleAlert(
         show = showAlert.value,
@@ -147,8 +147,9 @@ fun RestaurantItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(onClick = {
-                    if ((restaurantName != "" && restaurant != viewModel.getPickedRestaurant())||
-                        orderViewModel.getPickedOrder().userOrders.isNotEmpty()) {
+                    if (restaurantName != "" &&
+                        restaurant.name != restaurantName
+                    ) {
                         showAlert.value = true
                     } else {
                         showRestaurant.value = true
@@ -237,7 +238,7 @@ fun TopGroupHome(navController: NavController, viewModel: MainViewModel) {
 
         actions = {
             if (viewModel.user.value?.repartidor.equals("Si")) {
-            IconButton(onClick = { navController.navigate(AppScreens.PendingOrder.route) }) {
+                IconButton(onClick = { navController.navigate(AppScreens.PendingOrder.route) }) {
                     Image(
                         painter = painterResource(id = R.drawable.repartidor),
                         contentDescription = "Repartidor Icon",
