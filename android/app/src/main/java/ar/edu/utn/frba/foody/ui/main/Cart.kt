@@ -205,6 +205,7 @@ fun OrdersGrid(
                 onClick = {
                     navController.navigate(AppScreens.Payment.route)
                 },
+                enabled = viewModel.enablePayOrder(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
@@ -279,9 +280,12 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = {
+            IconButton(
+                onClick = {
                 viewModel.deleteItem(orderItem.dish.dishId)
-            }) {
+                },
+                enabled = viewModel.enableChangeUserOrderButton(userOrder.user.userId)
+            ) {
                 Icon(imageVector = Icons.Default.Clear, contentDescription = "Remove")
             }
 
@@ -291,9 +295,12 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            IconButton(onClick = {
+            IconButton(
+                onClick = {
                 viewModel.changeItemQuantity(orderItem.dish.dishId, 1)
-            }) {
+                },
+                enabled = viewModel.enableChangeUserOrderButton(userOrder.user.userId)
+            ) {
                 Icon(imageVector = Icons.Default.KeyboardArrowUp, contentDescription = "Increase")
             }
 
@@ -301,7 +308,9 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
 
             IconButton(onClick = {
                 viewModel.changeItemQuantity(orderItem.dish.dishId, -1)
-            }) {
+                },
+                enabled = viewModel.enableChangeUserOrderButton(userOrder.user.userId)
+            ) {
                 Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "Decrease")
             }
         }

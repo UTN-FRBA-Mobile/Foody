@@ -195,12 +195,3 @@ fun TopGroupLogin() {
         }
     )
 }
-
-/*
-@Preview
-@Composable
-fun DefaultPreviewLogin() {
-    val navController = rememberNavController()
-    val viewModel = MainViewModel()
-    LoginScreen(navController, viewModel)
-}*/
