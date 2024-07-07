@@ -198,7 +198,7 @@ fun OrdersGrid(
                 onClick = {
                     navController.navigate(AppScreens.Payment.route)
                 },
-                enabled = viewModel.isAdmin(),
+                enabled = viewModel.enablePayOrder(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)

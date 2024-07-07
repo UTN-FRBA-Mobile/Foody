@@ -417,8 +417,20 @@ class OrderViewModel() : ViewModel() {
         return isAdmin() || user.userId == userId
     }
 
+    fun enablePayOrder(): Boolean {
+        return isAdmin() && orderIsNotEmpty()
+    }
+
     fun isAdmin(): Boolean {
-        return user.admin
+        return order.group == null || user.admin
+    }
+
+    fun orderIsNotEmpty(): Boolean {
+        return order.userOrders.any {
+            x -> x.items.any {
+                y -> y.quantity > 0
+            }
+        }
     }
 
     fun updateAddress(newAddress: Address.AddressInfo) {
