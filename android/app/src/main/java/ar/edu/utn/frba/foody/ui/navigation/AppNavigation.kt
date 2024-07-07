@@ -1,5 +1,6 @@
 package ar.edu.utn.frba.foody.ui.navigation
 
+import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
@@ -7,6 +8,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import ar.edu.utn.frba.foody.ui.dataBase.Firebase.UserDataBaseFirebase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.GroupDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.OrderDataBase
@@ -98,7 +100,13 @@ fun AppNavigation(
         composable(
             route = AppScreens.Order_Screen.route,
             arguments = listOf(navArgument("order_id") { type = NavType.StringType },
-                navArgument("origin") { type = NavType.StringType })
+                navArgument("origin") { type = NavType.StringType }),
+            /*deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "foody://utn-frba-dmm-foody/{order_id}"
+                    action = Intent.ACTION_VIEW
+                }
+            )*/
         ) {
                 backStackEntry ->
             OrderScreen(navController = navController, viewModel = orderViewModel,
@@ -107,7 +115,7 @@ fun AppNavigation(
         }
         composable(
             route = AppScreens.Progress_Order_Screen.route,
-            arguments = listOf(navArgument("order_id") { type = NavType.StringType })
+            arguments = listOf(navArgument("order_id") { type = NavType.StringType }),
 
         ) {backStackEntry->
             ProgressOrderScreen(navController = navController, orderViewModel = orderViewModel,

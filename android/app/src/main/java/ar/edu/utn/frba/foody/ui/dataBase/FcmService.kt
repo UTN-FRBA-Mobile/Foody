@@ -1,6 +1,8 @@
 package ar.edu.utn.frba.foody.ui.dataBase
 
 import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
@@ -20,11 +22,15 @@ class FcmService : FirebaseMessagingService() {
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun showNotification(message: RemoteMessage) {
+        val clickIntent = Intent(this, MainComposeActivity::class.java)
+        val clickPendingIntent = PendingIntent.getActivity(this,1,clickIntent,PendingIntent.FLAG_IMMUTABLE)
+
         val notificationManager = getSystemService(NotificationManager::class.java)
         val notification = NotificationCompat.Builder(this, MainComposeActivity.NOTIFICATION_CHANNEL_ID)
             .setContentTitle(message.notification?.title)
             .setContentText(message.notification?.body)
             .setSmallIcon(R.drawable.notification_smallicon)
+            .setContentIntent(clickPendingIntent)
             .setAutoCancel(true)
             .build()
         notificationManager.notify(1, notification)
