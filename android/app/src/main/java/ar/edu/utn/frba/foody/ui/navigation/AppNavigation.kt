@@ -101,12 +101,6 @@ fun AppNavigation(
             route = AppScreens.Order_Screen.route,
             arguments = listOf(navArgument("order_id") { type = NavType.StringType },
                 navArgument("origin") { type = NavType.StringType }),
-            /*deepLinks = listOf(
-                navDeepLink {
-                    uriPattern = "foody://utn-frba-dmm-foody/{order_id}"
-                    action = Intent.ACTION_VIEW
-                }
-            )*/
         ) {
                 backStackEntry ->
             OrderScreen(navController = navController, viewModel = orderViewModel,
