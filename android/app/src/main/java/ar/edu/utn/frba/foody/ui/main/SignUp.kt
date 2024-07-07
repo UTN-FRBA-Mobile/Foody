@@ -48,6 +48,7 @@ import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.dataBase.Firebase.UserDataBaseFirebase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
+import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
@@ -55,15 +56,17 @@ import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 fun SignUpScreen(
     navController: NavController,
     viewModel: OrderViewModel,
+    mainViewModel: MainViewModel,
     dbUserDataBase: UserDataBase?,
     dbUserDataBaseFirebase: UserDataBaseFirebase
 ) {
     val user = User()
     val context = LocalContext.current
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var numero by remember { mutableStateOf("") }
-    var repartidor by remember { mutableStateOf("No")}
+
+    val email = mainViewModel.email.value
+    val password = mainViewModel.password.value
+    val contactNumber = mainViewModel.contactNumber.value
+    val delivery = mainViewModel.delivery.value
 
     AppScaffold(
         navController,
@@ -98,7 +101,7 @@ fun SignUpScreen(
 
                 TextField(
                     value = email,
-                    onValueChange = { email = it },
+                    { mainViewModel.updateEmail(it) },
                     label = { Text(text = "Username", modifier = Modifier.padding(start = 16.dp)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     singleLine = true,
@@ -112,7 +115,8 @@ fun SignUpScreen(
                 )
 
                 TextField(
-                    value = password, onValueChange = { password = it },
+                    value = password,
+                    { mainViewModel.updatePassword(it) },
                     label = { Text(text = "Password", modifier = Modifier.padding(start = 16.dp)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     singleLine = true,
@@ -127,7 +131,8 @@ fun SignUpScreen(
                 )
 
                 TextField(
-                    value = numero, onValueChange = { numero = it },
+                    value = contactNumber,
+                    onValueChange = { mainViewModel.updateContactNumber(it) },
                     label = {
                         Text(
                             text = "Numero Contacto",
@@ -194,25 +199,25 @@ fun SignUpScreen(
                 Text(text = "Repartidor:", fontSize = 24.sp, modifier = Modifier.padding(bottom = 16.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                      RadioButton(
-                            selected = repartidor == "Si",
-                            onClick = { repartidor = "Si" }
+                            selected = delivery == "Si",
+                            onClick = { mainViewModel.updateDelivery("Si") }
                         )
                         Text(text = "Sí", fontSize = 18.sp, modifier = Modifier.padding(horizontal = 8.dp))
                         RadioButton(
-                            selected = repartidor == "No",
-                            onClick = { repartidor = "No" }
+                            selected = delivery == "No",
+                            onClick = { mainViewModel.updateDelivery("No") }
                         )
                         Text(text = "No", fontSize = 18.sp, modifier = Modifier.padding(horizontal = 8.dp))
                     }
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text(text = "Seleccionaste $repartidor", fontSize = 18.sp)
+                    Text(text = "Seleccionaste $delivery", fontSize = 18.sp)
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
                         user.email = email
                         user.password = password
-                        if (validateAnyUserEmpty(user, numero, context)) {
-                            user.numeroContacto = numero.toInt()
+                        if (validateAnyUserEmpty(user, contactNumber, context)) {
+                            user.numeroContacto = contactNumber.toInt()
 
                             val address = viewModel.user.direccion
 
@@ -221,7 +226,7 @@ fun SignUpScreen(
                                 user.password,
                                 address,
                                 user.numeroContacto,
-                                repartidor
+                                delivery
                                 )
 
                             viewModel.emptyAddress()

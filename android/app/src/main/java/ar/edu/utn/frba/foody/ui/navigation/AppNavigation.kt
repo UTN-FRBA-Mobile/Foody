@@ -68,6 +68,7 @@ fun AppNavigation(
             SignUpScreen(
                 navController = navController,
                 viewModel = orderViewModel,
+                mainViewModel = viewModel,
                 dbUserHelper,
                 dbUserDataBaseFirebase
             )
