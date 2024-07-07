@@ -413,6 +413,26 @@ class OrderViewModel() : ViewModel() {
         }
     }
 
+    fun enableChangeUserOrderButton(userId: String): Boolean {
+        return isAdmin() || user.userId == userId
+    }
+
+    fun enablePayOrder(): Boolean {
+        return isAdmin() && orderIsNotEmpty()
+    }
+
+    fun isAdmin(): Boolean {
+        return order.group == null || user.admin
+    }
+
+    fun orderIsNotEmpty(): Boolean {
+        return order.userOrders.any {
+            x -> x.items.any {
+                y -> y.quantity > 0
+            }
+        }
+    }
+
     fun updateAddress(newAddress: Address.AddressInfo) {
         user.direccion = newAddress
     }
@@ -443,30 +463,6 @@ class OrderViewModel() : ViewModel() {
                 || address.latitud == 0.0
                 || address.longitud == 0.0
     }
-
-    val defaultOrderStates: List<OrderState> = listOf(
-        OrderState(
-            resourceId = R.drawable.order_icon,
-            imageDescription = "Order Icon",
-            description = "Recibimos tu pedido",
-            firstState = true
-        ),
-        OrderState(
-            resourceId = R.drawable.store_icon,
-            imageDescription = "Store Icon",
-            description = "Estamos preparando tu pedido",
-        ),
-        OrderState(
-            resourceId = R.drawable.delivery_icon,
-            imageDescription = "Delivery Icon",
-            description = "Tu pedido está en camino",
-        ),
-        OrderState(
-            resourceId = R.drawable.finished_icon,
-            imageDescription = "Finished Icon",
-            description = "Entregamos tu pedido",
-        ),
-    )
 }
 
 @SuppressLint("DefaultLocale")

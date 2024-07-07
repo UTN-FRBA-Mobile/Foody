@@ -55,7 +55,8 @@ import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
 fun PaymentScreen(navController: NavHostController,
-                  mainViewModel: MainViewModel,orderViewModel: OrderViewModel) {
+                  mainViewModel: MainViewModel,
+                  orderViewModel: OrderViewModel) {
     var totalAmount = orderViewModel.getTotal()
     var deliveryFee = 500.0
     val user = orderViewModel.user
@@ -257,7 +258,8 @@ fun PaymentScreen(navController: NavHostController,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
-                        shape = MaterialTheme.shapes.medium
+                        shape = MaterialTheme.shapes.medium,
+                        enabled = orderViewModel.enablePayOrder()
                     ) {
                         Text("Pagar", fontSize = 18.sp)
                     }
