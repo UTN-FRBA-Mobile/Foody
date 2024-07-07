@@ -52,13 +52,36 @@ class GroupViewModel() : ViewModel() {
 
     fun updateUser(user: User) {
         this.addUser(user)
-        groupDataBaseFirebase?.updateGroup(group, user)
+        groupDataBaseFirebase?.addUser(group, user)
     }
 
-    fun deleteUser(user: User): Group {
-        val updatedGroup = group.copy(members = group.members.filter { it != user })
-        group = updatedGroup
-        return updatedGroup
+    fun deleteUser(user: User, callback: (Group?) -> Unit) {
+        groupDataBaseFirebase?.removeUser(group.groupId, user) {
+            val updatedGroup: Group
+
+            if (user.admin) {
+                val newGroup = reasignAdmin(group)
+                updatedGroup = group.copy(members = newGroup.members.filter { it != user })
+            } else {
+                updatedGroup = group.copy(members = group.members.filter { it != user })
+            }
+
+            this.updateGroup(updatedGroup)
+            callback(updatedGroup)
+        }
+    }
+
+    fun reasignAdmin(newGroup: Group): Group {
+        var adminFound = false
+
+        newGroup.members.forEach { member ->
+            if (!member.admin && !adminFound) {
+                member.admin = true
+                adminFound = true
+            }
+        }
+
+        return newGroup
     }
 
     fun verifyNameGroupExist(name: String, callback: (Group?) -> Unit) {

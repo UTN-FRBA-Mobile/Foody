@@ -131,11 +131,23 @@ class OrderViewModel() : ViewModel() {
         //orderDataBase?.updateGroup(newGroup.groupId.toInt(), order.orderId)
     }
 
-    fun getOrderByGroup(groupId: String) {
+    fun getOrderByGroup(groupId: String, callback: (Order?) -> Unit) {
         orderDataBaseFirebase?.getOrderByGroup(groupId) { order ->
             if (order != null) {
                 this.updateOrder(order)
+                callback(order)
             }
+        }
+    }
+
+    fun addUser() {
+        val updatedMembers = order.group?.members?.toMutableList()
+        updatedMembers?.add(user)
+        val updatedOrder =
+            order.copy(group = updatedMembers?.let { order.group?.copy(members = it.toList()) })
+
+        orderDataBaseFirebase?.updateOrder(updatedOrder) {
+            this.updateOrder(updatedOrder)
         }
     }
 
@@ -147,11 +159,13 @@ class OrderViewModel() : ViewModel() {
         if (order.orderId == "") {
             createOrder(restaurant)
         }
+
         return getAssignedUserOrder(loading)
     }
 
     fun getAssignedUserOrder(loading: MutableState<Boolean>): UserOrder {
-
+        println(user)
+        println(order.userOrders)
         val userOrder = order.userOrders.firstOrNull() { x -> x.user.userId == this.user.userId }
         if (userOrder == null) {
             return updateUserOrder(order)
@@ -206,9 +220,7 @@ class OrderViewModel() : ViewModel() {
 
         order = newOrder.copy(userOrders = updatedUserOrders)
 
-        orderDataBaseFirebase?.addUserOrderToOrder(newOrder.orderId, userOrder) { isSuccess ->
-            _addUserOrderResult.postValue(isSuccess)
-        }
+        orderDataBaseFirebase?.updateOrder(order) { }
 
         return userOrder
     }
@@ -393,10 +405,10 @@ class OrderViewModel() : ViewModel() {
         ) { isSuccess -> }
     }
 
-    fun createOrderGroup(group: Group): Order {
+    fun createOrderGroup(group: Group, restaurant: Restaurant): Order {
         this.deleteCurrentOrder()
 
-        val createdOrder = Order(orderId = "", group = group)
+        val createdOrder = Order(orderId = "", group = group, restaurant = restaurant)
         createdOrder.orderId = orderDataBaseFirebase?.addOrder(createdOrder) ?: ""
 
         val loading = mutableStateOf(false)
@@ -442,6 +454,28 @@ class OrderViewModel() : ViewModel() {
                 || address.numero == 0
                 || address.latitud == 0.0
                 || address.longitud == 0.0
+    }
+
+    fun updateUserOrders(user: User) {
+        val updatedUserOrders =
+            order.userOrders.filter { it.user.userId != user.userId }
+        val updatedOrder = order.copy(userOrders = updatedUserOrders.toMutableList())
+        this.removeOrderFromSession()
+
+        orderDataBaseFirebase?.updateOrder(updatedOrder) {}
+    }
+
+    fun reasignAdmin(newGroup: Group): Group {
+        var adminFound = false
+
+        newGroup.members.forEach { member ->
+            if (!member.admin && !adminFound) {
+                member.admin = true
+                adminFound = true
+            }
+        }
+
+        return newGroup
     }
 
     val defaultOrderStates: List<OrderState> = listOf(

@@ -24,9 +24,9 @@ import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 @Composable
 fun CreateGroupScreen(
     navController: NavController,
+    mainViewModel: MainViewModel,
     orderViewModel: OrderViewModel,
     groupViewModel: GroupViewModel,
-    groupDataBase: GroupDataBase
 ) {
     val group = Group()
     val order = orderViewModel.getPickedOrder()
@@ -169,8 +169,9 @@ fun CreateGroupScreen(
                         } else {
                             val createdGroup =
                                 groupViewModel.createGroup(group, orderViewModel.user)
-                            orderViewModel.createOrderGroup(createdGroup)
-                            navController.navigate(AppScreens.Cart_Screen.route)
+                            val restaurant = mainViewModel.getPickedRestaurant()
+                            orderViewModel.createOrderGroup(createdGroup, restaurant)
+                            navController.navigate(AppScreens.Home_Screen.route)
                         }
                     }
                 },

@@ -82,6 +82,7 @@ fun AppNavigation(
             CartScreen(
                 navController = navController,
                 viewModel = orderViewModel,
+                groupViewModel = groupViewModel,
                 origin = backStackEntry.arguments?.getString("origin") ?: "unknown",
             )
         }
@@ -124,16 +125,15 @@ fun AppNavigation(
         composable(route = AppScreens.Create_Group_Screen.route) {
             CreateGroupScreen(
                 navController = navController,
+                mainViewModel = viewModel,
                 orderViewModel = orderViewModel,
                 groupViewModel = groupViewModel,
-                groupDataBase = dbGroupHelper
             )
         }
         composable(route = AppScreens.Join_Group_Screen.route) {
             JoinGroupScreen(
                 navController = navController,
-                dbHelper = dbGroupHelper,
-                dbOrderHelper = dbOrderHelper,
+                mainViewModel = viewModel,
                 orderViewModel = orderViewModel,
                 groupViewModel = groupViewModel
             )

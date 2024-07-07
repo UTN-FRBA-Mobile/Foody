@@ -25,13 +25,97 @@ class GroupDataBaseFirebase(private var database: FirebaseDatabase) {
 
     }
 
-    fun updateGroup(group: Group, user: User) {
+    fun addUser(group: Group, user: User) {
         val myRef = database.getReference(TABLE_GROUPS)
         myRef.child(group.groupId).setValue(group)
 
         val myRefUsers = database.getReference(TABLE_USERS)
         user.groupId = group.groupId
         myRefUsers.child(user.userId).setValue(user)
+    }
+
+    fun removeUser(groupId: String, user: User, callback: (Boolean) -> Unit) {
+        val membersRef = database.getReference(TABLE_GROUPS).child(groupId).child("members")
+
+        if (user.admin) {
+            reassignAdmin(groupId) { userReassigned ->
+                if (userReassigned != null) {
+                    changeUserRole(userReassigned, true)
+                    changeUserRole(user, false)
+                }
+            }
+
+        }
+
+        membersRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var userFound = false
+
+                for (memberSnapshot in snapshot.children) {
+                    val memberUserId = memberSnapshot.child("userId").getValue(String::class.java)
+
+                    if (memberUserId == user.userId) {
+                        memberSnapshot.ref.removeValue().addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+
+                                val usersRef = database.getReference(TABLE_USERS).child(user.userId)
+                                usersRef.child("groupId").setValue("")
+
+                                callback(true)
+                            } else {
+                                callback(false)
+                            }
+                        }
+                        userFound = true
+                        break
+                    }
+                }
+
+                if (!userFound) {
+                    callback(false)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                callback(false)
+            }
+        })
+    }
+
+    private fun changeUserRole(userReassigned: User, adminRole: Boolean) {
+        database.getReference(TABLE_USERS).child(userReassigned.userId).child("admin")
+            .setValue(adminRole)
+    }
+
+    private fun reassignAdmin(groupId: String, callback: (User?) -> Unit) {
+        val groupRef = database.getReference(TABLE_GROUPS).child(groupId).child("members")
+
+        groupRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var firstNonAdminFound = false
+
+                snapshot.children.forEach { memberSnapshot ->
+                    val isAdmin = memberSnapshot.child("admin").getValue(Boolean::class.java)
+
+                    if (isAdmin != true && !firstNonAdminFound) {
+                        memberSnapshot.ref.child("admin").setValue(true)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    firstNonAdminFound = true
+                                    val user = memberSnapshot.getValue(User::class.java)
+                                    callback(user)
+                                } else {
+                                    callback(null)
+                                }
+                            }
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                callback(null)
+            }
+        })
     }
 
     fun getGroupByName(name: String, callback: (Group?) -> Unit) {
