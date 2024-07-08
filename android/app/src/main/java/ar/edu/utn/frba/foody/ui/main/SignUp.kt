@@ -60,6 +60,9 @@ fun SignUpScreen(
     val password = mainViewModel.password.value
     val contactNumber = mainViewModel.contactNumber.value
     val delivery = mainViewModel.delivery.value
+    val direccionText = if (viewModel.user.address.street != null && viewModel.user.address.street != "")
+        viewModel.user.address.let { "${it.street} ${it.number}, ${it.location}, ${it.country}" }
+    else ""
 
     AppScaffold(
         null,
@@ -147,9 +150,7 @@ fun SignUpScreen(
                         .fillMaxWidth()
                         .padding(top = 16.dp)
                 ) {
-                    val direccionText = if (viewModel.user.address.street != null && viewModel.user.address.street != "")
-                        viewModel.user.address.let { "${it.street} ${it.number}, ${it.location}, ${it.country}" }
-                    else ""
+
 
                     TextField(
                         value = direccionText,
@@ -208,7 +209,7 @@ fun SignUpScreen(
                     onClick = {
                         user.email = email
                         user.password = password
-                        if (validateAnyUserEmpty(user, contactNumber, context,mainViewModel)) {
+                        if (validateAnyUserEmpty(user, contactNumber, direccionText, context,mainViewModel)) {
                             user.contactNumber = contactNumber.toInt()
 
                             val address = viewModel.user.address
@@ -271,6 +272,7 @@ fun TopGroupSignUp() {
 fun validateAnyUserEmpty(
     user: User,
     numero: String,
+    address: String,
     context: Context,
     mainViewModel: MainViewModel
 ): Boolean {
@@ -292,6 +294,10 @@ fun validateAnyUserEmpty(
     }
     if (user.password.length < 8) {
         Toast.makeText(context, "La contraseña debe tener al menos 8 caracteres.", Toast.LENGTH_SHORT).show()
+        return false
+    }
+    if (address == "") {
+        Toast.makeText(context, "Falta completar la direccion.", Toast.LENGTH_SHORT).show()
         return false
     }
 
