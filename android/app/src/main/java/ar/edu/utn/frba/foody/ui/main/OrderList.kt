@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
-import ar.edu.utn.frba.foody.ui.Classes.Estado
+import ar.edu.utn.frba.foody.ui.Classes.Status
 import ar.edu.utn.frba.foody.ui.Classes.Order
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
@@ -37,8 +37,7 @@ import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 fun OrdersScreen(navController: NavController, viewModel: OrderViewModel) {
     val orders = viewModel.getAllOrdersForUser()
 
-    AppScaffold(navController = navController,
-        null,
+    AppScaffold(
         null,
         { TopGroupOrderList(navController = navController) }
     ) {
@@ -77,7 +76,7 @@ fun OrdersScreen(navController: NavController, viewModel: OrderViewModel) {
             ) {
                 orders.forEach { order ->
                     item {
-                        if (viewModel.hasItems(order) && order.estado != Estado.ENPROGRESO) {
+                        if (viewModel.hasItems(order) && order.status != Status.INPROGRESS) {
                             OrderItem(
                                 navController = navController,
                                 viewModel = viewModel,
@@ -136,7 +135,7 @@ fun OrderItem(navController: NavController, viewModel: OrderViewModel, order: Or
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = order.name + " (" + order.estado.descripcion + ")",
+                    text = order.name + " (" + order.status.description + ")",
                     textAlign = TextAlign.Center
                 )
             }

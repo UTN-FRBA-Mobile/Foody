@@ -47,19 +47,17 @@ import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 @Composable
 fun LoginScreen(
     navController: NavHostController,
-    mainViewModel: MainViewModel) {
+    mainViewModel: MainViewModel,
+    orderViewModel: OrderViewModel) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val showError by remember { mutableStateOf(false) }
     val canGoBack = remember { mutableStateOf(false) } // Cambia esto según tu lógica
-
     BackHandler(enabled = !canGoBack.value) {
         // Aquí decides qué hacer cuando se presiona el botón de retroceso
         // Si canGoBack es false, no haces nada, por lo tanto, evitas el retroceso
     }
     AppScaffold(
-        navController,
-        null,
         null,
         { TopGroupLogin() }
     ) {
@@ -176,7 +174,11 @@ fun LoginScreen(
                     Spacer(modifier = Modifier.width(4.dp))
                     ClickableText(
                         text = AnnotatedString("Sign Up"),
-                        onClick = { navController.navigate(AppScreens.SignUp_Screen.route) },
+                        onClick = {
+                            orderViewModel.emptyAddress()
+                            navController.navigate(AppScreens.SignUp_Screen.route)
+                            mainViewModel.clearSignUpFields()
+                        },
                         style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.primary)
                     )
                 }

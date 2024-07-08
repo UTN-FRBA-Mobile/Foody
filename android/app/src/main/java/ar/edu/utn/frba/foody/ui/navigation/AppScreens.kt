@@ -30,7 +30,4 @@ sealed class AppScreens(val route: String) {
     object PendingOrder: AppScreens("PendingOrder")
     object OrdersDeliverd: AppScreens("ordersDelivered")
     object OnTheWayOrders: AppScreens("onTheWayOrders")
-
-
-
 }

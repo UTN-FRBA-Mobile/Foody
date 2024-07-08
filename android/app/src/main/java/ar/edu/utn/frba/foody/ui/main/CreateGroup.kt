@@ -17,16 +17,15 @@ import androidx.compose.ui.unit.*
 import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Group
-import ar.edu.utn.frba.foody.ui.dataBase.SQLite.GroupDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.*
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
 fun CreateGroupScreen(
     navController: NavController,
+    mainViewModel: MainViewModel,
     orderViewModel: OrderViewModel,
     groupViewModel: GroupViewModel,
-    groupDataBase: GroupDataBase
 ) {
     val group = Group()
     val order = orderViewModel.getPickedOrder()
@@ -34,10 +33,7 @@ fun CreateGroupScreen(
     var password by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
 
-    val scope = rememberCoroutineScope()
-
-    AppScaffold(navController = navController,
-        null,
+    AppScaffold(
         null,
         { TopGroupCreateGroup(navController = navController) }
     ) {
@@ -115,7 +111,7 @@ fun CreateGroupScreen(
                     enabled = false
                 )
                 TextField(
-                    value = order.direction,
+                    value = order.address,
                     onValueChange = { },
                     label = {
                         Text(text = "Address")
@@ -169,8 +165,9 @@ fun CreateGroupScreen(
                         } else {
                             val createdGroup =
                                 groupViewModel.createGroup(group, orderViewModel.user)
-                            orderViewModel.createOrderGroup(createdGroup)
-                            navController.navigate(AppScreens.Cart_Screen.route)
+                            val restaurant = mainViewModel.getPickedRestaurant()
+                            orderViewModel.createOrderGroup(createdGroup, restaurant)
+                            navController.navigate(AppScreens.Home_Screen.route)
                         }
                     }
                 },

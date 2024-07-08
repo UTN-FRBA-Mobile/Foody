@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
-import ar.edu.utn.frba.foody.ui.Classes.Estado
+import ar.edu.utn.frba.foody.ui.Classes.Status
 import ar.edu.utn.frba.foody.ui.Classes.Order
 import ar.edu.utn.frba.foody.ui.composables.SimpleAlert
 import ar.edu.utn.frba.foody.ui.dataBase.StoreUserSession.StoreUserSession
@@ -59,8 +59,6 @@ fun PendingOrderScreen(
     var refreshState by remember { mutableStateOf(false) }
 
     AppScaffold(
-        navController,
-        null,
         { BottomGroupPendingOrder(navController) },
         { TopGroupPendingOrder(navController, viewModel) }
     ) {
@@ -140,8 +138,8 @@ fun OrderPending(
         onDismiss = { showAlert.value = false }
     )
     if (showAccept.value) {
-        order.estado = Estado.ENCAMINO
-        order.repartidor = orderViewModel.user
+        order.status = Status.ONTHEWAY
+        order.delivery = orderViewModel.user
         order.orderStates.get(0).current = false
         order.orderStates.get(1).completed = true
         order.orderStates.get(1).current = true
@@ -179,12 +177,12 @@ fun OrderPending(
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
                 Text(
-                    text = "Monto Pagado: ${order.montoPagado}",
+                    text = "Monto Pagado: ${order.amount}",
                     fontSize = 16.sp,
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
                 Text(
-                    text = "Dirección: ${order.direction}",
+                    text = "Dirección: ${order.address}",
                     fontSize = 16.sp,
                     modifier = Modifier.padding(vertical = 4.dp)
                 )

@@ -16,7 +16,6 @@ class TokenDataBaseFirebase(private var database: FirebaseDatabase) {
 
         myRef.child(user.userId).setValue(user)
     }
-
     fun deleteUserDeviceToken(token: String, userId: String) {
         val myRef = database.getReference(TABLE)
 
@@ -31,7 +30,6 @@ class TokenDataBaseFirebase(private var database: FirebaseDatabase) {
                     }
                 }
             }
-
             override fun onCancelled(databaseError: DatabaseError) {
             }
         })

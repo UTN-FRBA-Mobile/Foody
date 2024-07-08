@@ -37,8 +37,7 @@ import java.util.Calendar
 fun CardInfoScreen(navController: NavHostController, mainViewModel: MainViewModel,
                    orderViewModel: OrderViewModel
 ) {
-    AppScaffold(navController,
-        null,
+    AppScaffold(
         null,
         { TopGroupCard(navController)}
     ){
@@ -173,7 +172,7 @@ fun CardInfoScreen(navController: NavHostController, mainViewModel: MainViewMode
             onClick = {
                 if (validator(cardInfo, context) == true){
                     //viewModel.addCard(cardInfo)
-                    user.tarjetas.add(cardInfo)
+                    user.cards.add(cardInfo)
                     mainViewModel.updateUser(user)
                     navController.popBackStack() // Replace with your next screen navigation
                 }

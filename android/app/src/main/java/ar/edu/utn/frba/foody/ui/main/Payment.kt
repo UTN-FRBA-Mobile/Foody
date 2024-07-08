@@ -49,28 +49,71 @@ import androidx.navigation.NavHostController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Order
 import ar.edu.utn.frba.foody.ui.Classes.Restaurant
+import ar.edu.utn.frba.foody.ui.composables.InputAlert
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
-fun PaymentScreen(navController: NavHostController,
-                  mainViewModel: MainViewModel,
-                  orderViewModel: OrderViewModel) {
-    var totalAmount = orderViewModel.getTotal()
-    var deliveryFee = 500.0
+fun PaymentScreen(
+    navController: NavHostController,
+    mainViewModel: MainViewModel,
+    orderViewModel: OrderViewModel
+) {
+    val totalAmount = orderViewModel.getTotal()
+    val deliveryFee = 500.0
     val user = orderViewModel.user
-    var address by remember { mutableStateOf(user.direccion) }
+    var address by remember { mutableStateOf(user.address) }
     var paymentMethod by remember { mutableStateOf("Efectivo") }
-    var tarjeta by remember { mutableStateOf("Efectivo")}
+    var tarjeta by remember { mutableStateOf("Efectivo") }
     val paymentOptions = listOf("Efectivo", "Tarjeta")
     val totalPayment = totalAmount + deliveryFee
-    var cards = orderViewModel.user.tarjetas
+    var cards = orderViewModel.user.cards
     val context = LocalContext.current
+    val showDialog = remember { mutableStateOf(false) }
+    val addressComplete = "${address.street} ${address.number}, ${address.location}, ${address.country}"
+    val showError = remember { mutableStateOf(false) }
+    val deleteCard = remember { mutableStateOf(false) }
 
+    InputAlert(
+        show = showDialog.value,
+        text = "Por favor ingrese el cvv para validar su tarjeta",
+        validInputValue = tarjeta,
+        onConfirm = {
+            val order = orderViewModel.getPickedOrder()
+            if (order.address == "") {
+                Toast.makeText(context, "Falta completar la dirección.", Toast.LENGTH_SHORT).show()
+            } else {
+                val updatedOrder = orderViewModel.createOrderWithStates(
+                    addressComplete,
+                    totalPayment,
+                    tarjeta
+                )
+                orderViewModel.updateDataBaseOrder(updatedOrder)
+                orderViewModel.updateOrder(Order())
+                mainViewModel.updateRestaurant(Restaurant())
+                Toast.makeText(
+                    navController.context,
+                    "Pago validado",
+                    Toast.LENGTH_SHORT
+                ).show()
+                navController.navigate(AppScreens.Orders_Screen.route)
+            }
+        },
+        invalidInputCondition = deleteCard,
+        error = showError
+    ) {
+        showDialog.value = false
+    }
 
-    AppScaffold(navController,
-        null,
+    if (deleteCard.value) {
+        println("Card deleted")
+        val filteredCards = cards.filter { it.cvv != tarjeta }
+        println(filteredCards)
+        orderViewModel.updateUser(user.copy(cards = filteredCards.toMutableList()))
+    }
+
+    AppScaffold(
         null,
         { TopGroupPayment(navController) }
     ) {
@@ -89,10 +132,9 @@ fun PaymentScreen(navController: NavHostController,
                     .padding(16.dp),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                var direcccion = "${address.calle} ${address.numero}, ${address.localidad}, ${address.region}"
                 Column {
                     TextField(
-                        value = direcccion ,
+                        value = addressComplete,
                         onValueChange = {},
                         label = {
                             Text(
@@ -140,7 +182,7 @@ fun PaymentScreen(navController: NavHostController,
                                 .padding(vertical = 4.dp)
                                 .clickable {
                                     paymentMethod = option
-                                    tarjeta=paymentMethod
+                                    tarjeta = paymentMethod
                                 }
                         ) {
                             RadioButton(
@@ -155,46 +197,48 @@ fun PaymentScreen(navController: NavHostController,
                         }
                     }
 
-                if (paymentMethod == "Tarjeta") {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "Selecciona una tarjeta:",
-                        style = MaterialTheme.typography.subtitle1,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    cards.forEach { card ->
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp)
-                                .clickable {tarjeta=card.cardNumber}
-                        ) {
-                            RadioButton(
-                                selected = tarjeta.equals(card.cardNumber),
-                                onClick = { tarjeta= card.cardNumber },
-                                colors = RadioButtonDefaults.colors(
-                                    selectedColor = MaterialTheme.colors.primary,
-                                    unselectedColor = MaterialTheme.colors.onSurface
-                                )
-                            )
+                    if (paymentMethod == "Tarjeta") {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        if (cards.isNotEmpty()) {
                             Text(
-                                text = "**** **** **** ${card.cardNumber.takeLast(4)} - ${card.firstName} ${card.lastName}",
-                                style = MaterialTheme.typography.body1
+                                text = "Selecciona una tarjeta:",
+                                style = MaterialTheme.typography.subtitle1,
+                                modifier = Modifier.padding(vertical = 8.dp)
                             )
+                            Spacer(modifier = Modifier.height(16.dp))
                         }
-
-                        /*cards.forEach { card ->
-                            Text(
-                                text = "**** **** **** ${
-                                    card.cardNumber.takeLast(4)
-                                } - ${card.firstName} ${card.lastName}",
-                                style = MaterialTheme.typography.body1,
+                        cards.forEach { card ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(vertical = 4.dp)
-                            )
+                                    .clickable { tarjeta = card.cvv }
+                            ) {
+                                RadioButton(
+                                    selected = tarjeta.equals(card.cvv),
+                                    onClick = { tarjeta = card.cvv },
+                                    colors = RadioButtonDefaults.colors(
+                                        selectedColor = MaterialTheme.colors.primary,
+                                        unselectedColor = MaterialTheme.colors.onSurface
+                                    )
+                                )
+                                Text(
+                                    text = "**** **** **** ${card.cardNumber.takeLast(4)} - ${card.firstName} ${card.lastName}",
+                                    style = MaterialTheme.typography.body1
+                                )
+                            }
+
+                            /*cards.forEach { card ->
+                                Text(
+                                    text = "**** **** **** ${
+                                        card.cardNumber.takeLast(4)
+                                    } - ${card.firstName} ${card.lastName}",
+                                    style = MaterialTheme.typography.body1,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 4.dp)
+                                )
 
                          */
                         Text(
@@ -204,7 +248,7 @@ fun PaymentScreen(navController: NavHostController,
                                 .fillMaxWidth()
                                 .padding(vertical = 4.dp)
                                 .clickable {
-                                    orderViewModel.user.tarjetas.remove(card)
+                                    orderViewModel.user.cards.remove(card)
                                     mainViewModel.updateUser(orderViewModel.user)
                                     navController.navigate("Payment");
                                 }
@@ -246,13 +290,16 @@ fun PaymentScreen(navController: NavHostController,
                     )
                     Button(
                         onClick = {
-                            var order = orderViewModel.getPickedOrder()
-                            if (validatePayment(order,tarjeta,context)) {
-                                val updatedOrder = orderViewModel.createOrderWithStates(direcccion, totalPayment, tarjeta)
-                                orderViewModel.updateDataBaseOrder(updatedOrder)
-                                orderViewModel.updateOrder(Order())
-                                mainViewModel.updateRestaurant(Restaurant())
-                                navController.navigate(AppScreens.Orders_Screen.route)
+                            if (paymentMethod == "Tarjeta") {
+                                if (tarjeta == "Efectivo") {
+                                    Toast.makeText(
+                                        context,
+                                        "Falta seleccionar la tarjeta.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    showDialog.value = true
+                                }
                             }
                         },
                         modifier = Modifier
@@ -263,22 +310,19 @@ fun PaymentScreen(navController: NavHostController,
                     ) {
                         Text("Pagar", fontSize = 18.sp)
                     }
+
+                    if (showError.value) {
+                        Toast.makeText(
+                            navController.context,
+                            "Se ha borrado su tarjeta. Carguela nuevamente",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
         }
 
     }
-}
-fun validatePayment(order: Order,tarjeta:String,context: Context):Boolean{
-    if(order.direction==""){
-        Toast.makeText(context, "Falta completar la dirección.", Toast.LENGTH_SHORT).show()
-        return false
-    }
-    if(tarjeta.equals("Tarjeta")){
-        Toast.makeText(context, "Falta seleccionar la tarjeta.", Toast.LENGTH_SHORT).show()
-        return false
-    }
-    return true
 }
 @Composable
 fun TopGroupPayment(navController: NavController) {

@@ -13,25 +13,21 @@ class RestaurantDataBase(private var context: Context) : SQLiteOpenHelper(
     DATABASE_NAME, null,
     DATABASE_VERSION
 ) {
-
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(SQL_CREATE_TABLE_RESTAURANT)
         db.execSQL(SQL_CREATE_TABLE_DISH)
     }
-
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         db.execSQL("DROP TABLE IF EXISTS dish")
         db.execSQL("DROP TABLE IF EXISTS restaurant")
         onCreate(db)
     }
-
-    fun deleteAndCreateTables(userDataBase: UserDataBase) {
-        val db = userDataBase.writableDatabase
+    fun deleteAndCreateTables(restaurantDataBase: RestaurantDataBase) {
+        val db = restaurantDataBase.writableDatabase
         db.execSQL("DROP TABLE IF EXISTS dish")
         db.execSQL("DROP TABLE IF EXISTS restaurant")
         onCreate(db)
     }
-
     companion object {
         private const val DATABASE_NAME = "mydatabase.db"
         private const val DATABASE_VERSION = 1
@@ -49,7 +45,6 @@ class RestaurantDataBase(private var context: Context) : SQLiteOpenHelper(
         const val COLUMN_DISH_DESCRIPTION = "description"
         const val COLUMN_DISH_PRICE = "price"
         const val COLUMN_DISH_IMAGE_RESOURCE_ID = "imageId"
-
 
         private const val SQL_CREATE_TABLE_RESTAURANT = """
             CREATE TABLE restaurant (
@@ -72,9 +67,8 @@ class RestaurantDataBase(private var context: Context) : SQLiteOpenHelper(
             )
         """
     }
-
-    fun insertRestaurant(restaurant: Restaurant, userDataBase: UserDataBase): Long {
-        val db = userDataBase.writableDatabase
+    fun insertRestaurant(restaurant: Restaurant, restaurantDataBase: RestaurantDataBase): Long {
+        val db = restaurantDataBase.writableDatabase
         val values = ContentValues().apply {
             put(COLUMN_RESTAURANT_NAME, restaurant.name)
             put(COLUMN_RESTAURANT_IMAGE_DESCRIPTION, restaurant.imageDescription)
@@ -92,19 +86,15 @@ class RestaurantDataBase(private var context: Context) : SQLiteOpenHelper(
             }
             db.insert(TABLE_DISH, null, dishValues)
         }
-
         db.close()
         return restaurantId
     }
-
-    fun getAllRestaurants(userDataBase: UserDataBase?): List<Restaurant> {
-        return getRestaurants(userDataBase, null)
+    fun getAllRestaurants(restaurantDataBase: RestaurantDataBase?): List<Restaurant> {
+        return getRestaurants(restaurantDataBase, null)
     }
-
-    fun getRestaurants(userDataBase: UserDataBase?, restaurantId: Int?): List<Restaurant> {
-        if (userDataBase != null) {
-            val db = userDataBase.readableDatabase
-
+    fun getRestaurants(restaurantDataBase: RestaurantDataBase?, restaurantId: Int?): List<Restaurant> {
+        if (restaurantDataBase != null) {
+            val db = restaurantDataBase.readableDatabase
             val cursor = if (restaurantId != null) {
                 db.rawQuery(
                     "SELECT * FROM $TABLE_RESTAURANT WHERE $COLUMN_RESTAURANT_ID = ?",
@@ -113,12 +103,10 @@ class RestaurantDataBase(private var context: Context) : SQLiteOpenHelper(
             } else {
                 db.rawQuery("SELECT * FROM $TABLE_RESTAURANT", null)
             }
-
             val restaurants = mutableListOf<Restaurant>()
-
             if (cursor.moveToFirst()) {
                 do {
-                    val restaurantId =
+                    val idRestaurant =
                         cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_RESTAURANT_ID))
                     val name =
                         cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_RESTAURANT_NAME))
@@ -129,28 +117,24 @@ class RestaurantDataBase(private var context: Context) : SQLiteOpenHelper(
 
                     val dishesCursor = db.rawQuery(
                         "SELECT * FROM $TABLE_DISH WHERE $COLUMN_DISH_RESTAURANT_ID = ?",
-                        arrayOf(restaurantId.toString())
+                        arrayOf(idRestaurant.toString())
                     )
                     val dishes = mutableListOf<Dish>()
 
                     if (dishesCursor.moveToFirst()) {
                         do {
-
                             val dishId =
                                 dishesCursor.getInt(
                                     dishesCursor.getColumnIndexOrThrow(
                                         COLUMN_DISH_ID
                                     )
                                 )
-
                             val dish = getDishFromCursor(dishesCursor, dishId)
-
                             dishes.add(dish)
                         } while (dishesCursor.moveToNext())
                     }
                     dishesCursor.close()
-
-                    restaurants.add(Restaurant(restaurantId, name, imageDescription, image, dishes))
+                    restaurants.add(Restaurant(idRestaurant, name, imageDescription, image, dishes))
                 } while (cursor.moveToNext())
             }
             cursor.close()
@@ -159,51 +143,6 @@ class RestaurantDataBase(private var context: Context) : SQLiteOpenHelper(
         }
         return mutableListOf()
     }
-
-    fun getRestaurant(userDataBase: UserDataBase?, restaurantId: Int): Restaurant? {
-        if (userDataBase != null) {
-            val db = userDataBase.readableDatabase
-
-            val cursor =
-                db.rawQuery(
-                    "SELECT * FROM $TABLE_RESTAURANT WHERE $COLUMN_RESTAURANT_ID = ?",
-                    arrayOf(restaurantId.toString())
-                )
-            val restaurant = Restaurant()
-
-            val restaurantId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_RESTAURANT_ID))
-            val name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_RESTAURANT_NAME))
-            val imageDescription = cursor.getString(
-                cursor.getColumnIndexOrThrow(COLUMN_RESTAURANT_IMAGE_DESCRIPTION)
-            )
-            val image = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_RESTAURANT_IMAGE))
-
-            val dishesCursor = db.rawQuery(
-                "SELECT * FROM $TABLE_DISH WHERE $COLUMN_DISH_RESTAURANT_ID = ?",
-                arrayOf(restaurantId.toString())
-            )
-            val dishes = mutableListOf<Dish>()
-
-            if (dishesCursor.moveToFirst()) {
-                do {
-
-                    val dishId =
-                        dishesCursor.getInt(dishesCursor.getColumnIndexOrThrow(COLUMN_DISH_ID))
-
-                    val dish = getDishFromCursor(dishesCursor, dishId)
-
-                    dishes.add(dish)
-                } while (dishesCursor.moveToNext())
-            }
-            dishesCursor.close()
-
-            Restaurant(restaurantId, name, imageDescription, image, dishes)
-
-            return restaurant
-        }
-        return null
-    }
-
     fun getDishFromCursor(dishCursor: Cursor, dishId: Int): Dish {
         val dishName = dishCursor.getString(dishCursor.getColumnIndexOrThrow(COLUMN_DISH_NAME))
         val dishDescription =

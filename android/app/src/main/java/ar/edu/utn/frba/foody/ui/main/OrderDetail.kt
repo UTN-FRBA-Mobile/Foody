@@ -28,8 +28,7 @@ fun OrderScreen(
 ) {
     val order = viewModel.getOrderById(order_id)
 
-    AppScaffold(navController,
-        null,
+    AppScaffold(
         null,
         { TopGroupOrder(navController, origin) }
     ) {
@@ -116,7 +115,7 @@ fun OrderDetailGrid(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "Total : $" + order.montoPagado.toString(),
+                        text = "Total : $" + order.amount.toString(),
                         style = MaterialTheme.typography.h6,
                         modifier = Modifier.padding(vertical = 4.dp)
                     )
@@ -124,14 +123,14 @@ fun OrderDetailGrid(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "Dirección de entrega : " + order.direction,
+                        text = "Dirección de entrega : " + order.address,
                         style = MaterialTheme.typography.h6,
                         modifier = Modifier.padding(vertical = 4.dp)
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    if (order.tarjetaUsada.equals("Efectivo")) {
+                    if (order.card.equals("Efectivo")) {
                         Text(
                             text = "Pago Realizado en Efectivo",
                             style = MaterialTheme.typography.body1,
@@ -142,7 +141,7 @@ fun OrderDetailGrid(
                     } else {
                         Text(
                             text = "Tarjeta usada : **** **** **** ${
-                                order.tarjetaUsada.takeLast(4)
+                                order.card.takeLast(4)
                             }",
                             style = MaterialTheme.typography.body1,
                             modifier = Modifier
@@ -157,7 +156,7 @@ fun OrderDetailGrid(
 
                     Button(
                         onClick = {
-                            order.estado = Estado.FINALIZADO
+                            order.status = Status.FINALIZED
                             order.orderStates[1].current = false
                             order.orderStates[2].completed = true
                             order.orderStates[2].current = true

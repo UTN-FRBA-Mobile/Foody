@@ -60,10 +60,9 @@ fun RestaurantScreen(
     val loading = remember { mutableStateOf(true) }
     val restaurant = viewModel.getPickedRestaurant()
     val order = orderViewModel.getPickedOrder()
-    val userOrder = orderViewModel.getUserOrder(restaurant, loading)
+    val userOrder = orderViewModel.getUserOrder(restaurant)
 
-    AppScaffold(navController,
-        null,
+    AppScaffold(
         { BottomGroupRestaurant(navController, order) },
         { TopGroupRestaurant(navController) }
     ) {
@@ -159,7 +158,6 @@ fun DishesGrid(
                 viewModel,
                 dishes[index],
                 userOrder.items.firstOrNull { x -> x.dish.dishId == dishes[index].dishId },
-                restaurant,
                 loading
             )
         }
@@ -171,7 +169,6 @@ fun DishCard(
     viewModel: OrderViewModel,
     dish: Dish,
     userOrderItemInfo: OrderItemInfo?,
-    restaurant: Restaurant,
     loading: Boolean
 ) {
     val showDialog = remember { mutableStateOf(false) }
@@ -217,9 +214,7 @@ fun DishCard(
                     viewModel.changeItemQuantityIfExists(
                         userOrderItemInfo,
                         1,
-                        dish,
-                        restaurant
-                    )
+                        dish)
                 }) {
                     Icon(
                         imageVector = Icons.Default.KeyboardArrowUp,
@@ -231,8 +226,7 @@ fun DishCard(
                     viewModel.changeItemQuantityIfExists(
                         userOrderItemInfo,
                         -1,
-                        dish,
-                        restaurant
+                        dish
                     )
                 }) {
                     Icon(

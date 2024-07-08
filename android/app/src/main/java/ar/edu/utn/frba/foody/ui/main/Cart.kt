@@ -44,6 +44,7 @@ import ar.edu.utn.frba.foody.ui.Classes.Order
 import ar.edu.utn.frba.foody.ui.Classes.OrderItemInfo
 import ar.edu.utn.frba.foody.ui.Classes.UserOrder
 import ar.edu.utn.frba.foody.ui.composables.DishAlert
+import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
@@ -51,11 +52,16 @@ import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 fun CartScreen(
     navController: NavHostController,
     viewModel: OrderViewModel,
+    groupViewModel: GroupViewModel,
     origin: String,
 ) {
     val order = viewModel.getPickedOrder()
-    AppScaffold(navController,
-        null,
+
+    if (order.group != null) {
+        groupViewModel.updateGroup(order.group!!)
+    }
+
+    AppScaffold(
         { BottomGroupCart(navController, orderViewModel = viewModel, order = order) },
         { TopGroupCart(navController, origin) }) {
         OrdersGrid(viewModel, order.userOrders,navController)
