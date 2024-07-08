@@ -24,7 +24,7 @@ Foody es tu servicio de pedido de comidas. Elige entre una variedad de restauran
 ## Capturas de Pantalla
 
 <p float="left">
-  <img style="margin-left:10px;margin-right:10px" src="https://github.com/UTN-FRBA-Mobile/Foody/blob/fixes/android/app/src/main/res/drawable/screenshots/Screenshot%202024-07-08%20122604.png" width="30%" />
+  <img style="margin-left:10px;margin-right:10px" src="https://github.com/UTN-FRBA-Mobile/Foody/blob/fixes/android/app/src/main/res/drawable/screenshots/Screenshot%202024-07-08%20184239.png" width="30%" />
   <img style="margin-left:10px;margin-right:10px" src="https://github.com/UTN-FRBA-Mobile/Foody/blob/fixes/android/app/src/main/res/drawable/screenshots/Screenshot%202024-07-08%20184511.png" width="30%" />
   <img style="margin-left:10px;margin-right:10px" src="https://github.com/UTN-FRBA-Mobile/Foody/blob/fixes/android/app/src/main/res/drawable/screenshots/Screenshot%202024-07-08%20184707.png" width="30%" />
 </p>
