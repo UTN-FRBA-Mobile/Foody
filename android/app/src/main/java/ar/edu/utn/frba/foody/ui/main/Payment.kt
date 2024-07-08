@@ -63,15 +63,15 @@ fun PaymentScreen(
     val totalAmount = orderViewModel.getTotal()
     val deliveryFee = 500.0
     val user = orderViewModel.user
-    val address by remember { mutableStateOf(user.direccion) }
+    var address by remember { mutableStateOf(user.address) }
     var paymentMethod by remember { mutableStateOf("Efectivo") }
     var tarjeta by remember { mutableStateOf("Efectivo") }
     val paymentOptions = listOf("Efectivo", "Tarjeta")
     val totalPayment = totalAmount + deliveryFee
-    val cards = orderViewModel.user.tarjetas
+    var cards = orderViewModel.user.cards
     val context = LocalContext.current
     val showDialog = remember { mutableStateOf(false) }
-    val direction = "${address.calle} ${address.numero}, ${address.localidad}, ${address.region}"
+    val addressComplete = "${address.street} ${address.number}, ${address.location}, ${address.country}"
     val showError = remember { mutableStateOf(false) }
     val deleteCard = remember { mutableStateOf(false) }
 
@@ -81,11 +81,11 @@ fun PaymentScreen(
         validInputValue = tarjeta,
         onConfirm = {
             val order = orderViewModel.getPickedOrder()
-            if (order.direction == "") {
+            if (order.address == "") {
                 Toast.makeText(context, "Falta completar la dirección.", Toast.LENGTH_SHORT).show()
             } else {
                 val updatedOrder = orderViewModel.createOrderWithStates(
-                    direction,
+                    addressComplete,
                     totalPayment,
                     tarjeta
                 )
@@ -108,11 +108,10 @@ fun PaymentScreen(
 
     if (deleteCard.value) {
         val filteredCards = cards.filter { it.cvv != tarjeta }
-        orderViewModel.updateUser(user.copy(tarjetas = filteredCards.toMutableList()))
+        orderViewModel.updateUser(user.copy(cards = filteredCards.toMutableList()))
     }
 
-    AppScaffold(navController,
-        null,
+    AppScaffold(
         null,
         { TopGroupPayment(navController) }
     ) {
@@ -133,7 +132,7 @@ fun PaymentScreen(
             ) {
                 Column {
                     TextField(
-                        value = direction,
+                        value = addressComplete,
                         onValueChange = {},
                         label = {
                             Text(
@@ -239,29 +238,29 @@ fun PaymentScreen(
                                         .padding(vertical = 4.dp)
                                 )
 
-                             */
-                            Text(
-                                text = "Borrar tarjeta",
-                                style = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.primary),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 4.dp)
-                                    .clickable {
-                                        orderViewModel.user.tarjetas.remove(card)
-                                        mainViewModel.updateUser(orderViewModel.user)
-                                        navController.navigate("Payment");
-                                    }
-                            )
-                        }
+                         */
                         Text(
-                            text = "Añadir nueva tarjeta",
+                            text = "Borrar tarjeta",
                             style = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.primary),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 4.dp)
-                                .clickable { navController.navigate("Card") }
+                                .clickable {
+                                    orderViewModel.user.cards.remove(card)
+                                    mainViewModel.updateUser(orderViewModel.user)
+                                    navController.navigate("Payment");
+                                }
                         )
                     }
+                    Text(
+                        text = "Añadir nueva tarjeta",
+                        style = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.primary),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                            .clickable { navController.navigate("Card") }
+                    )
+                }
 
                     Spacer(modifier = Modifier.height(25.dp))
 
@@ -323,7 +322,6 @@ fun PaymentScreen(
 
     }
 }
-
 @Composable
 fun TopGroupPayment(navController: NavController) {
     TopAppBar(

@@ -41,7 +41,6 @@ import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Address
 import ar.edu.utn.frba.foody.ui.Classes.User
-import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
@@ -49,18 +48,16 @@ import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 @Composable
 fun ProfileScreen(
     navController: NavController, viewModel: MainViewModel,
-    dbUserDataBase: UserDataBase?, orderViewModel: OrderViewModel
+    orderViewModel: OrderViewModel
 ) {
     val user = orderViewModel.user
     var email by remember { mutableStateOf(user.email) }
     var password by remember { mutableStateOf(user.password) }
-    var numero by remember { mutableStateOf(user.numeroContacto.toString()) }
-    val direccion by remember { mutableStateOf(user.direccion) }
+    var numero by remember { mutableStateOf(user.contactNumber.toString()) }
+    val direccion by remember { mutableStateOf(user.address) }
     val context = LocalContext.current
 
     AppScaffold(
-        navController,
-        null,
         null,
         { TopGroupProfile(navController) }
     ) {
@@ -142,7 +139,7 @@ fun ProfileScreen(
                         .padding(top = 16.dp)
                 ) {
                     TextField(
-                        value = "${direccion.calle} ${direccion.numero}, ${direccion.localidad}, ${direccion.region}",
+                        value = "${direccion.street} ${direccion.number}, ${direccion.location}, ${direccion.country}",
                         onValueChange = {},
                         label = {
                             Text(
@@ -181,8 +178,8 @@ fun ProfileScreen(
                     onClick = {
                         user.email = email
                         user.password = password
-                        if (validateAnyUserEmptyProf(user, user.direccion, context)) {
-                            user.numeroContacto = numero.toInt()
+                        if (validateAnyUserEmptyProf(user, user.address, context)) {
+                            user.contactNumber = numero.toInt()
 
                             viewModel.updateUser(user)
                             navController.navigate(AppScreens.Home_Screen.route)
@@ -225,8 +222,8 @@ fun validateAnyUserEmptyProf(
     direccion: Address.AddressInfo,
     context: Context
 ): Boolean {
-    if (direccion.calle == "" || direccion.region == "" || direccion.localidad == ""
-        || direccion.numero == 0 || direccion.latitud == 0.0 || direccion.longitud == 0.0
+    if (direccion.street == "" || direccion.country == "" || direccion.location == ""
+        || direccion.number == 0 || direccion.latitude == 0.0 || direccion.longitude == 0.0
     ) {
         Toast.makeText(context, "Dirección Invalida.", Toast.LENGTH_SHORT).show()
         return false
@@ -239,7 +236,7 @@ fun validateAnyUserEmptyProf(
         Toast.makeText(context, "Falta completar la contraseña.", Toast.LENGTH_SHORT).show()
         return false
     }
-    if (user.numeroContacto == 0) {
+    if (user.contactNumber == 0) {
         Toast.makeText(context, "Falta completar el numero de contacto.", Toast.LENGTH_SHORT).show()
         return false
     }

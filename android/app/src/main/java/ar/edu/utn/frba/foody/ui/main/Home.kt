@@ -2,41 +2,59 @@ package ar.edu.utn.frba.foody.ui.main
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.BottomAppBar
+import androidx.compose.material.Card
+import androidx.compose.material.Divider
+import androidx.compose.material.IconButton
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.*
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Restaurant
 import ar.edu.utn.frba.foody.ui.composables.SimpleAlert
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.RestaurantDataBase
-import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
+import ar.edu.utn.frba.foody.ui.dataBase.StoreUserSession.StoreUserSession
 import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
     navController: NavController,
     viewModel: MainViewModel,
     restaurantDataBase: RestaurantDataBase?,
-    userDataBase: UserDataBase?,
     orderViewModel: OrderViewModel,
     groupViewModel: GroupViewModel
 ) {
@@ -47,12 +65,10 @@ fun HomeScreen(
         // Si canGoBack es false, no haces nada, por lo tanto, evitas el retroceso
     }
     orderViewModel.findAllOrdersByState()
-    groupViewModel.findGroupByuserId()
+    groupViewModel.findGroupByUserId()
 
     AppScaffold(
-        navController,
-        null,
-        { BottomGroupHome(navController, orderViewModel) },
+        { BottomGroupHome(navController,orderViewModel) },
         { TopGroupHome(navController, viewModel) }
     ) {
         Image(
@@ -88,7 +104,7 @@ fun HomeScreen(
                     .height(505.dp)
             ) {
                 if (restaurantDataBase != null) {
-                    for (restaurant in restaurantDataBase.getAllRestaurants(userDataBase)) {
+                    for (restaurant in restaurantDataBase.getAllRestaurants(restaurantDataBase)) {
                         item {
                             RestaurantItem(
                                 navController = navController,
@@ -99,7 +115,7 @@ fun HomeScreen(
                         }
                     }
                     item {
-                        if (restaurantDataBase.getAllRestaurants(userDataBase).isNotEmpty())
+                        if (restaurantDataBase.getAllRestaurants(restaurantDataBase).isNotEmpty())
                             Divider()
                     }
                 }
@@ -209,7 +225,7 @@ data class ButtonInterface(
 
 
 @Composable
-fun BottomGroupHome(navController: NavController, orderViewModel: OrderViewModel) {
+fun BottomGroupHome(navController: NavController,orderViewModel: OrderViewModel) {
     val buttons = mutableListOf(
         ButtonInterface(
             resourceId = R.drawable.user_icon,
@@ -259,13 +275,17 @@ fun BottomGroupHome(navController: NavController, orderViewModel: OrderViewModel
 
 @Composable
 fun TopGroupHome(navController: NavController, viewModel: MainViewModel) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val dataStore = StoreUserSession(context)
+
     TopAppBar(
         title = {
             Text(text = stringResource(id = R.string.app_name))
         },
 
         actions = {
-            if (viewModel.user.value?.repartidor.equals("Si")) {
+            if (viewModel.user.value?.delivery.equals("Si")) {
                 IconButton(onClick = { navController.navigate(AppScreens.PendingOrder.route) }) {
                     Image(
                         painter = painterResource(id = R.drawable.repartidor),
@@ -275,7 +295,12 @@ fun TopGroupHome(navController: NavController, viewModel: MainViewModel) {
                     )
                 }
             }
-            IconButton(onClick = { viewModel.logout() }) {
+            IconButton(onClick = {
+                viewModel.logout()
+                scope.launch {
+                    dataStore.deleteSession()
+                }
+            }) {
                 Image(
                     painter = painterResource(id = R.drawable.logout_icon),
                     contentDescription = "Logout Icon",
@@ -286,14 +311,3 @@ fun TopGroupHome(navController: NavController, viewModel: MainViewModel) {
         }
     )
 }
-
-/*
-@Preview
-@Composable
-fun DefaultPreview() {
-    val navController = rememberNavController()
-    val viewModel = MainViewModel()
-    val orderViewModel = OrderViewModel()
-    HomeScreen(navController, viewModel, null, null, orderViewModel)
-}
-*/

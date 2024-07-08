@@ -1,6 +1,5 @@
 package ar.edu.utn.frba.foody.ui.navigation
 
-import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
@@ -8,13 +7,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import androidx.navigation.navDeepLink
 import ar.edu.utn.frba.foody.ui.dataBase.Firebase.UserDataBaseFirebase
-import ar.edu.utn.frba.foody.ui.dataBase.SQLite.GroupDataBase
-import ar.edu.utn.frba.foody.ui.dataBase.SQLite.OrderDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.RestaurantDataBase
-import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
-import ar.edu.utn.frba.foody.ui.dataClasses.AddressViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
@@ -35,7 +29,9 @@ import ar.edu.utn.frba.foody.ui.main.PendingOrderScreen
 import ar.edu.utn.frba.foody.ui.main.ProfileScreen
 import ar.edu.utn.frba.foody.ui.main.ProgressOrderScreen
 import ar.edu.utn.frba.foody.ui.main.RestaurantScreen
+import ar.edu.utn.frba.foody.ui.main.SessionScreen
 import ar.edu.utn.frba.foody.ui.main.SignUpScreen
+import ar.edu.utn.frba.foody.ui.main.SplashScreen
 
 @Composable
 fun AppNavigation(
@@ -44,19 +40,28 @@ fun AppNavigation(
     viewModel: MainViewModel,
     orderViewModel: OrderViewModel,
     groupViewModel: GroupViewModel,
-    dbUserHelper: UserDataBase,
     dbRestaurantHelper: RestaurantDataBase,
-    dbGroupHelper: GroupDataBase,
-    dbOrderHelper: OrderDataBase,
     dbUserDataBaseFirebase: UserDataBaseFirebase
 ) {
-    NavHost(navController = navController, startDestination = AppScreens.Login_Screen.route) {
+    NavHost(navController = navController, startDestination = AppScreens.Splash_Screen.route) {
+        composable(route = AppScreens.Session_Screen.route)
+        {
+            SessionScreen(
+                navController = navController,
+                viewModel = viewModel,
+                restaurantDataBase = dbRestaurantHelper,
+                orderViewModel = orderViewModel,
+                groupViewModel = groupViewModel
+            )
+        }
+        composable(route = AppScreens.Splash_Screen.route){
+            SplashScreen(navController = navController)
+        }
         composable(route = AppScreens.Home_Screen.route) {
             HomeScreen(
                 navController = navController,
                 viewModel = viewModel,
                 restaurantDataBase = dbRestaurantHelper,
-                userDataBase = dbUserHelper,
                 orderViewModel = orderViewModel,
                 groupViewModel = groupViewModel
             )
@@ -73,14 +78,12 @@ fun AppNavigation(
                 navController = navController,
                 viewModel = orderViewModel,
                 mainViewModel = viewModel,
-                dbUserHelper,
                 dbUserDataBaseFirebase
             )
         }
         composable(route = AppScreens.Profile_Screen.route) {
             ProfileScreen(
-                navController = navController, viewModel = viewModel,
-                dbUserDataBase = dbUserHelper, orderViewModel
+                navController = navController, viewModel = viewModel, orderViewModel
             )
         }
         composable(route = AppScreens.Cart_Screen.route) { backStackEntry ->
@@ -169,6 +172,5 @@ fun AppNavigation(
         composable(route = AppScreens.OnTheWayOrders.route) {
             OrdersOnTheWayScreen(navController = navController,orderViewModel)
         }
-
     }
 }

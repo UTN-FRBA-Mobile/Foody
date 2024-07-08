@@ -4,10 +4,10 @@ data class User(
     var userId: String = "",
     var email: String = "",
     var password: String = "",
-    var direccion: Address.AddressInfo = Address.AddressInfo(),
-    var numeroContacto: Int = 0,
+    var address: Address.AddressInfo = Address.AddressInfo(),
+    var contactNumber: Int = 0,
     var groupId: String = "",
     var admin: Boolean = false,
-    var tarjetas: MutableList<Card.CardInfo> = mutableListOf(),
-    var repartidor: String = "No"
+    var cards: MutableList<Card.CardInfo> = mutableListOf(),
+    var delivery: String = "No"
 )

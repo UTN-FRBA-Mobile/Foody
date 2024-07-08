@@ -25,10 +25,6 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,7 +32,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role.Companion.RadioButton
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -47,7 +42,6 @@ import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.dataBase.Firebase.UserDataBaseFirebase
-import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
@@ -57,7 +51,6 @@ fun SignUpScreen(
     navController: NavController,
     viewModel: OrderViewModel,
     mainViewModel: MainViewModel,
-    dbUserDataBase: UserDataBase?,
     dbUserDataBaseFirebase: UserDataBaseFirebase
 ) {
     val user = User()
@@ -69,8 +62,6 @@ fun SignUpScreen(
     val delivery = mainViewModel.delivery.value
 
     AppScaffold(
-        navController,
-        null,
         null,
         { TopGroupSignUp() }
     ) {
@@ -156,8 +147,8 @@ fun SignUpScreen(
                         .fillMaxWidth()
                         .padding(top = 16.dp)
                 ) {
-                    val direccionText = if (viewModel.user.direccion.calle != null && viewModel.user.direccion.calle != "")
-                        viewModel.user.direccion.let { "${it.calle} ${it.numero}, ${it.localidad}, ${it.region}" }
+                    val direccionText = if (viewModel.user.address.street != null && viewModel.user.address.street != "")
+                        viewModel.user.address.let { "${it.street} ${it.number}, ${it.location}, ${it.country}" }
                     else ""
 
                     TextField(
@@ -218,19 +209,19 @@ fun SignUpScreen(
                         user.email = email
                         user.password = password
                         if (validateAnyUserEmpty(user, contactNumber, context,mainViewModel)) {
-                            user.numeroContacto = contactNumber.toInt()
+                            user.contactNumber = contactNumber.toInt()
 
-                            val address = viewModel.user.direccion
+                            val address = viewModel.user.address
 
                             dbUserDataBaseFirebase.addUser(
                                 user.email,
                                 user.password,
                                 address,
-                                user.numeroContacto,
+                                user.contactNumber,
                                 delivery
                                 )
 
-                            viewModel.emptyAddress()
+                            //viewModel.emptyAddress()
                             navController.navigate(AppScreens.Login_Screen.route)
                         } else {
                             navController.navigate(AppScreens.SignUp_Screen.route)

@@ -61,8 +61,7 @@ fun CartScreen(
         groupViewModel.updateGroup(order.group!!)
     }
 
-    AppScaffold(navController,
-        null,
+    AppScaffold(
         { BottomGroupCart(navController, orderViewModel = viewModel, order = order) },
         { TopGroupCart(navController, origin) }) {
         OrdersGrid(viewModel, order.userOrders,navController)

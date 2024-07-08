@@ -1,13 +1,11 @@
 package ar.edu.utn.frba.foody.ui.Classes
-
-
 class Address {
     data class AddressInfo(
-        val calle: String? = "",
-        val numero: Int? = 0,
-        val localidad: String? = "",
-        val region: String? = "",
-        val latitud: Double? = 0.0,
-        val longitud: Double? = 0.0
+        val street: String? = "",
+        val number: Int? = 0,
+        val location: String? = "",
+        val country: String? = "",
+        val latitude: Double? = 0.0,
+        val longitude: Double? = 0.0
     )
 }

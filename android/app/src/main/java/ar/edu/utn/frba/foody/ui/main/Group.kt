@@ -40,8 +40,7 @@ fun GroupScreen(
 ) {
     val group = groupViewModel.getPickedGroup()
 
-    AppScaffold(navController = navController,
-        null,
+    AppScaffold(
         null,
         { TopGroup(navController = navController) }
     ) {

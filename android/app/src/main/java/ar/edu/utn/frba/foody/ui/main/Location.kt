@@ -41,10 +41,10 @@ fun LocationGoogleScreen(
     origin: String,
     id: String
 ) {
-    var direccion by remember { mutableStateOf(if(origin != "sign_up") viewModel.user.direccion.calle!! else "") }
-    var nro by remember { mutableStateOf(if(origin != "sign_up") viewModel.user.direccion.numero.toString() else "") }
-    var localidad by remember { mutableStateOf(if(origin != "sign_up") viewModel.user.direccion.localidad!! else "") }
-    var region by remember { mutableStateOf(if(origin != "sign_up") viewModel.user.direccion.region!! else "") }
+    var direccion by remember { mutableStateOf(if(origin != "sign_up") viewModel.user.address.street!! else "") }
+    var nro by remember { mutableStateOf(if(origin != "sign_up") viewModel.user.address.number.toString() else "") }
+    var localidad by remember { mutableStateOf(if(origin != "sign_up") viewModel.user.address.location!! else "") }
+    var region by remember { mutableStateOf(if(origin != "sign_up") viewModel.user.address.country!! else "") }
     var address: Address.AddressInfo
 
     val permissions = arrayOf(
@@ -305,12 +305,12 @@ fun LocationGoogleScreen(
             Button(
                 onClick = {
                     address = Address.AddressInfo(
-                        calle = direccion,
-                        numero = if (nro == "") 0 else nro.toInt(),
-                        localidad = localidad,
-                        region = region,
-                        latitud = currentLocation.latitude,
-                        longitud = currentLocation.longitude
+                        street = direccion,
+                        number = if (nro == "") 0 else nro.toInt(),
+                        location = localidad,
+                        country = region,
+                        latitude = currentLocation.latitude,
+                        longitude = currentLocation.longitude
                     )
                     //coroutineScope.launch {
                     //val location = geocodeAddress(address.calle)
@@ -324,10 +324,10 @@ fun LocationGoogleScreen(
                         //stopLocationUpdates()
                         //currentLocation = location
                         //cameraPositionState.position = CameraPosition.fromLatLngZoom(currentLocation, 15f)
-                        Log.d("LocationGoogleScreen", "Dirección: ${address.calle}")
-                        Log.d("LocationGoogleScreen", "Número: ${address.numero}")
-                        Log.d("LocationGoogleScreen", "Localidad: ${address.localidad}")
-                        Log.d("LocationGoogleScreen", "Región: ${address.region}")
+                        Log.d("LocationGoogleScreen", "Dirección: ${address.street}")
+                        Log.d("LocationGoogleScreen", "Número: ${address.number}")
+                        Log.d("LocationGoogleScreen", "Localidad: ${address.location}")
+                        Log.d("LocationGoogleScreen", "Región: ${address.country}")
                         // Guardar la dirección en la variable
                         viewModel.updateAddress(address)
 
