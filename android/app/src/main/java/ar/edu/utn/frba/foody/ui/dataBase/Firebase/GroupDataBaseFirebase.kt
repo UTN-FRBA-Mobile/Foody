@@ -1,6 +1,9 @@
 package ar.edu.utn.frba.foody.ui.dataBase.Firebase
 
+import android.annotation.SuppressLint
+import ar.edu.utn.frba.foody.ui.Classes.Estado
 import ar.edu.utn.frba.foody.ui.Classes.Group
+import ar.edu.utn.frba.foody.ui.Classes.Order
 import ar.edu.utn.frba.foody.ui.Classes.User
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -139,27 +142,23 @@ class GroupDataBaseFirebase(private var database: FirebaseDatabase) {
             }
         })
     }
-    /*
-            val myRef = database.getReference(TABLE_USER)
-
-        val userId = email.replace(".", "")
-
-        val ref = myRef.child(userId)
-
-        ref.addListenerForSingleValueEvent(object : ValueEventListener {
+    fun getGroupByUserId(user:User, callback: (Group?) -> Unit) {
+        val myRef = database.getReference(TABLE_GROUPS)
+        myRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    val user = dataSnapshot.getValue(User::class.java)
-                    user?.userId = userId
-                    callback(user)
-                } else {
-                    callback(null)
+                dataSnapshot.children.forEach { groupSnapshot ->
+                    val group = groupSnapshot.getValue(Group::class.java)
+                    if (group != null && group.members.any{member->member.userId==user.userId}) {
+                        callback(group)
+                        return
+                    }
                 }
+                callback(null)
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
                 callback(null)
             }
         })
-     */
+    }
 }

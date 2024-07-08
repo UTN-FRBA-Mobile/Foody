@@ -57,7 +57,8 @@ fun AppNavigation(
                 viewModel = viewModel,
                 restaurantDataBase = dbRestaurantHelper,
                 userDataBase = dbUserHelper,
-                orderViewModel = orderViewModel
+                orderViewModel = orderViewModel,
+                groupViewModel = groupViewModel
             )
         }
         composable(route = AppScreens.Login_Screen.route) {

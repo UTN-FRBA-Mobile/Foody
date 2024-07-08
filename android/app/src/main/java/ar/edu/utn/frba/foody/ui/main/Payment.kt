@@ -157,12 +157,14 @@ fun PaymentScreen(navController: NavHostController,
 
                 if (paymentMethod == "Tarjeta") {
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "Selecciona una tarjeta:",
-                        style = MaterialTheme.typography.subtitle1,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
+                    if( cards.isNotEmpty()) {
+                        Text(
+                            text = "Selecciona una tarjeta:",
+                            style = MaterialTheme.typography.subtitle1,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
                     Spacer(modifier = Modifier.height(16.dp))
+                    }
                     cards.forEach { card ->
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -274,6 +276,7 @@ fun validatePayment(order: Order,tarjeta:String,context: Context):Boolean{
         Toast.makeText(context, "Falta completar la dirección.", Toast.LENGTH_SHORT).show()
         return false
     }
+
     if(tarjeta.equals("Tarjeta")){
         Toast.makeText(context, "Falta seleccionar la tarjeta.", Toast.LENGTH_SHORT).show()
         return false

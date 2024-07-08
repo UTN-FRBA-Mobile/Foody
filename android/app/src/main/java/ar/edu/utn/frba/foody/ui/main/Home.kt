@@ -26,6 +26,7 @@ import ar.edu.utn.frba.foody.ui.Classes.Restaurant
 import ar.edu.utn.frba.foody.ui.composables.SimpleAlert
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.RestaurantDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
+import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
@@ -36,7 +37,8 @@ fun HomeScreen(
     viewModel: MainViewModel,
     restaurantDataBase: RestaurantDataBase?,
     userDataBase: UserDataBase?,
-    orderViewModel: OrderViewModel
+    orderViewModel: OrderViewModel,
+    groupViewModel: GroupViewModel
 ) {
     val canGoBack = remember { mutableStateOf(false) } // Cambia esto según tu lógica
 
@@ -45,6 +47,8 @@ fun HomeScreen(
         // Si canGoBack es false, no haces nada, por lo tanto, evitas el retroceso
     }
     orderViewModel.findAllOrdersByState()
+    groupViewModel.findGroupByuserId()
+
     AppScaffold(
         navController,
         null,
