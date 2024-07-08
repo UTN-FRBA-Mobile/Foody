@@ -34,6 +34,7 @@ fun SessionScreen(
                 mainViewModel = viewModel,
                 orderViewModel = orderViewModel)
         }else{
+            viewModel.fetchUserByEmail(userSession.value.split("-")[0], userSession.value.split("-")[1])
             val notification = intent.getStringExtra("notification")
             if (notification != null) {
                 orderViewModel.findAllOrdersByState()

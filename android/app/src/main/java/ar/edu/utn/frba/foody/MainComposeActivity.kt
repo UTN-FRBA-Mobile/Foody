@@ -109,9 +109,6 @@ class MainComposeActivity : ComponentActivity() {
                     navController,
                     firebaseTokenManager
                 )
-                if (userSession.value != ""){
-                    viewModel.fetchUserByEmail(userSession.value.split("-")[0], userSession.value.split("-")[1])
-                }
                 viewModel.findAllUsers()
             }
             viewModel.user.observe(this@MainComposeActivity, Observer { user ->
