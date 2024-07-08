@@ -1,6 +1,5 @@
 package ar.edu.utn.frba.foody.ui.main
 
-import android.window.SplashScreen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -51,12 +50,11 @@ fun Splash(){
             painter = painterResource(id = R.drawable.foody_logo),
             contentDescription = "Logo foody",
             modifier = Modifier.size(150.dp, 150.dp))
-        Text("Bienvenid@s",
+        Text("Bienvenidos",
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold)
     }
 }
-
 @Preview(showBackground = true)
 @Composable
 fun SplashScreenPreview(){

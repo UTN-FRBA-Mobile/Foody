@@ -23,12 +23,10 @@ import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Status
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 
-
 @Composable
 fun OrdersOnTheWayScreen(navController: NavController, viewModel: OrderViewModel) {
     viewModel.findOrdersDeliveredById()
     val orders = viewModel.getAllOrdersDeliveredById()
-
     AppScaffold(
         null,
         { TopGroupOrderListDelivered(navController = navController)}
@@ -48,7 +46,7 @@ fun OrdersOnTheWayScreen(navController: NavController, viewModel: OrderViewModel
                 .padding(top = 32.dp)
                 .fillMaxWidth()
             ) {
-                Text(text = "Orders On The Way",
+                Text(text = "Ordenes En Camino",
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
                     fontSize = 24.sp

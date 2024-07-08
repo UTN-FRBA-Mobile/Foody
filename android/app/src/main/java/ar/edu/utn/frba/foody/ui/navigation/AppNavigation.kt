@@ -1,5 +1,6 @@
 package ar.edu.utn.frba.foody.ui.navigation
 
+import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
@@ -41,7 +42,8 @@ fun AppNavigation(
     orderViewModel: OrderViewModel,
     groupViewModel: GroupViewModel,
     dbRestaurantHelper: RestaurantDataBase,
-    dbUserDataBaseFirebase: UserDataBaseFirebase
+    dbUserDataBaseFirebase: UserDataBaseFirebase,
+    intent: Intent,
 ) {
     NavHost(navController = navController, startDestination = AppScreens.Splash_Screen.route) {
         composable(route = AppScreens.Session_Screen.route)
@@ -51,7 +53,8 @@ fun AppNavigation(
                 viewModel = viewModel,
                 restaurantDataBase = dbRestaurantHelper,
                 orderViewModel = orderViewModel,
-                groupViewModel = groupViewModel
+                groupViewModel = groupViewModel,
+                intent = intent
             )
         }
         composable(route = AppScreens.Splash_Screen.route){
@@ -159,14 +162,13 @@ fun AppNavigation(
         ) { backStackEntry ->
             LocationGoogleScreen(
                 context, navController, orderViewModel,
-                origin = backStackEntry.arguments?.getString("origin") ?: "unknown",
-                id = backStackEntry.arguments?.getString("id") ?: "unknown"
+                origin = backStackEntry.arguments?.getString("origin") ?: "unknown"
             )
         }
         composable(route = AppScreens.PendingOrder.route) {
             PendingOrderScreen(navController = navController,viewModel,orderViewModel)
         }
-        composable(route = AppScreens.OrdersDeliverd.route) {
+        composable(route = AppScreens.OrdersDelivered.route) {
             OrdersDeliveredScreen(navController = navController,orderViewModel)
         }
         composable(route = AppScreens.OnTheWayOrders.route) {

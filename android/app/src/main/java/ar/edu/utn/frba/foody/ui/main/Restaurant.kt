@@ -238,13 +238,3 @@ fun DishCard(
         }
     }
 }
-
-
-/*@Preview
-@Composable
-fun DefaultPreviewRestaurant() {
-    val navController = rememberNavController()
-    val viewModel = MainViewModel()
-    val orderViewModel = OrderViewModel()
-    RestaurantScreen(navController, viewModel, orderViewModel)
-}*/

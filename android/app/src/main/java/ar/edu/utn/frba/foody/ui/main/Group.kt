@@ -199,19 +199,3 @@ fun TopGroup(navController: NavController) {
         }
     )
 }
-
-
-/*
-@Preview
-@Composable
-fun GroupPreview() {
-    val navController = rememberNavController()
-    val orderViewModel = OrderViewModel()
-    val groupViewModel = GroupViewModel()
-    GroupScreen(
-        navController = navController,
-        orderViewModel = orderViewModel,
-        groupViewModel = groupViewModel
-    )
-}
- */

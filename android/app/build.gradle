@@ -54,6 +54,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-database:21.0.0'
     implementation 'androidx.test:monitor:1.7.1'
     implementation 'androidx.test.ext:junit-ktx:1.2.1'
+    implementation 'androidx.datastore:datastore-core-android:1.1.1'
     def nav_version = '2.7.7'
     implementation ("mysql:mysql-connector-java:8.0.33")
     implementation 'org.jetbrains:annotations:16.0.2'

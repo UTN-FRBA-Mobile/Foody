@@ -154,8 +154,7 @@ fun SignUpScreen(
 
                     TextField(
                         value = direccionText,
-                        // Mostrar la dirección si está disponible, de lo contrario, vacío
-                        onValueChange = {},  // No permitir cambios en el texto
+                        onValueChange = {},
                         label = {
                             Text(
                                 text = "Dirección",
@@ -167,7 +166,7 @@ fun SignUpScreen(
                         colors = TextFieldDefaults.textFieldColors(
                             backgroundColor = Color.Transparent
                         ),
-                        enabled = false  // Deshabilitar la edición del TextField
+                        enabled = false
                     )
 
                     IconButton(onClick = {
@@ -221,8 +220,6 @@ fun SignUpScreen(
                                 user.contactNumber,
                                 delivery
                                 )
-
-                            //viewModel.emptyAddress()
                             navController.navigate(AppScreens.Login_Screen.route)
                         } else {
                             navController.navigate(AppScreens.SignUp_Screen.route)
@@ -245,12 +242,12 @@ fun SignUpScreen(
                         .padding(top = 16.dp)
                 ) {
 
-                    Text("Do you have an account?", style = MaterialTheme.typography.body2)
+                    Text("Ya tienes una cuenta?", style = MaterialTheme.typography.body2)
 
                     Spacer(modifier = Modifier.width(4.dp))
 
                     ClickableText(
-                        text = AnnotatedString("Sign in"),
+                        text = AnnotatedString("Ingresar Sesión"),
                         onClick = { navController.navigate(AppScreens.Login_Screen.route) },
                         style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.primary)
                     )
@@ -303,21 +300,3 @@ fun validateAnyUserEmpty(
 
     return true
 }
-
-/*@Preview
-@Composable
-fun DefaultPreviewSignUp() {
-    val navController = rememberNavController()
-    val addressViewModel = AddressViewModel()
-    val database = FirebaseDatabase.getInstance()
-    val context = LocalContext.current
-    val dbUserHelper = UserDataBase(context)
-    val userDataBaseFirebase = UserDataBaseFirebase(database)
-
-    SignUpScreen(
-        navController = navController,
-        addressViewModel,
-        dbUserHelper,
-        userDataBaseFirebase
-    )
-}*/

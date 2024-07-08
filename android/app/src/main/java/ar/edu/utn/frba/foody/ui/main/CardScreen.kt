@@ -32,7 +32,6 @@ import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import java.util.Calendar
 
-
 @Composable
 fun CardInfoScreen(navController: NavHostController, mainViewModel: MainViewModel,
                    orderViewModel: OrderViewModel
@@ -43,9 +42,7 @@ fun CardInfoScreen(navController: NavHostController, mainViewModel: MainViewMode
     ){
         var cardInfo by remember { mutableStateOf(Card.CardInfo()) }
         val user= orderViewModel.user
-
         val context = LocalContext.current
-
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -64,7 +61,7 @@ fun CardInfoScreen(navController: NavHostController, mainViewModel: MainViewMode
 
             ) {
                 Text(
-                    text = "Add new card",
+                    text = "Agregar nueva Tarjeta",
                     style = MaterialTheme.typography.h5.copy(fontSize = 24.sp),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -75,7 +72,7 @@ fun CardInfoScreen(navController: NavHostController, mainViewModel: MainViewMode
                 TextField(
                     value = cardInfo.cardNumber,
                     onValueChange = { cardInfo = cardInfo.copy(cardNumber = it) },
-                    label = { Text("Card number") },
+                    label = { Text("Número de Tarjeta") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     maxLines = 1,
@@ -97,7 +94,7 @@ fun CardInfoScreen(navController: NavHostController, mainViewModel: MainViewMode
                     TextField(
                         value = cardInfo.firstName,
                         onValueChange = { cardInfo = cardInfo.copy(firstName = it) },
-                        label = { Text("Name") },
+                        label = { Text("Nombre") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                         singleLine = true,
                         maxLines = 1,
@@ -109,7 +106,7 @@ fun CardInfoScreen(navController: NavHostController, mainViewModel: MainViewMode
                     TextField(
                         value = cardInfo.lastName,
                         onValueChange = { cardInfo = cardInfo.copy(lastName = it) },
-                        label = { Text("Last Name") },
+                        label = { Text("Apellido") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                         singleLine = true,
                         maxLines = 1,
@@ -130,7 +127,7 @@ fun CardInfoScreen(navController: NavHostController, mainViewModel: MainViewMode
                     TextField(
                         value = cardInfo.expiryDate,
                         onValueChange = { cardInfo = cardInfo.copy(expiryDate = it) },
-                        label = { Text("Expiry date(MM/YY)") },
+                        label = { Text("Fecha de Vencimiento(MM/YY)") },
                         visualTransformation = ExpiryDateVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         singleLine = true,
@@ -182,7 +179,7 @@ fun CardInfoScreen(navController: NavHostController, mainViewModel: MainViewMode
                         .fillMaxWidth()
                         .height(50.dp)
                 ) {
-                    Text("Save", fontSize = 18.sp)
+                    Text("Guardar", fontSize = 18.sp)
                 }
             }
         }
@@ -228,7 +225,7 @@ fun validateExpiryDate(input: String, context: Context): String {
     val currentYear = Calendar.getInstance().get(Calendar.YEAR) % 100
 
     if (month == null || (month < 1 || month > 12)) {
-        Toast.makeText(context, "Invalid month. Must be between 01 and 12.", Toast.LENGTH_SHORT)
+        Toast.makeText(context, "Mes Incorrecto.", Toast.LENGTH_SHORT)
             .show()
         return ""
     }
@@ -236,7 +233,7 @@ fun validateExpiryDate(input: String, context: Context): String {
     if (year == null || year < currentYear) {
         Toast.makeText(
             context,
-            "Invalid year. Must be the current year or later.",
+            "Año Incorrecto.No puede encontrarse vencida la tarjeta",
             Toast.LENGTH_SHORT
         ).show()
         return ""
@@ -248,7 +245,7 @@ fun validateExpiryDate(input: String, context: Context): String {
 fun validateCVV(input: String, context: Context): String {
     val cleanedInput = input.filter { it.isDigit() }
     if (cleanedInput.length < 3) {
-        Toast.makeText(context, "Invalid CVV.", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "CVV Incorrecto, debe tener exactamente 3 dígitos.", Toast.LENGTH_SHORT).show()
         return ""
     }
     return input
@@ -280,15 +277,3 @@ class ExpiryDateVisualTransformation : VisualTransformation {
         return TransformedText(AnnotatedString(out.toString()), offsetMapping)
     }
 }
-
-/*
-@Preview
-@Composable
-fun DefaultPreviewCardInfo() {
-    val navController= rememberNavController()
-    val mainViewModel = MainViewModel()
-    val orderViewModel = OrderViewModel()
-   CardInfoScreen(navController,mainViewModel,orderViewModel)
-}
-
- */

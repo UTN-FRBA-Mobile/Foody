@@ -322,9 +322,9 @@ class OrderViewModel() : ViewModel() {
     }
 
     fun deleteCurrentOrder() {
-        orderDataBaseFirebase?.getOrderByState(Status.INPROGRESS, user) { orden ->
-            if (orden != null) {
-                orderDataBaseFirebase?.deleteOrder(orden.orderId) {}
+        orderDataBaseFirebase?.getOrderByState(Status.INPROGRESS, user) { orderInProgress ->
+            if (orderInProgress != null) {
+                orderDataBaseFirebase?.deleteOrder(orderInProgress.orderId) {}
             }
         }
     }
@@ -389,7 +389,7 @@ class OrderViewModel() : ViewModel() {
         orderDataBaseFirebase?.updateOrder(updatedOrder) {}
     }
 
-    fun reasignAdmin(newGroup: Group): Group {
+    fun reassignAdmin(newGroup: Group): Group {
         var adminFound = false
 
         newGroup.members.forEach { member ->

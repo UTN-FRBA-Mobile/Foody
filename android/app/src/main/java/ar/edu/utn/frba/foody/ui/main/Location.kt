@@ -6,8 +6,6 @@ import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -38,8 +36,7 @@ fun LocationGoogleScreen(
     context: ComponentActivity,
     navController: NavController,
     viewModel: OrderViewModel,
-    origin: String,
-    id: String
+    origin: String
 ) {
     var direccion by remember { mutableStateOf(if(origin != "sign_up") viewModel.user.address.street!! else "") }
     var nro by remember { mutableStateOf(if(origin != "sign_up") viewModel.user.address.number.toString() else "") }
@@ -47,10 +44,6 @@ fun LocationGoogleScreen(
     var region by remember { mutableStateOf(if(origin != "sign_up") viewModel.user.address.country!! else "") }
     var address: Address.AddressInfo
 
-    val permissions = arrayOf(
-        android.Manifest.permission.ACCESS_COARSE_LOCATION,
-        android.Manifest.permission.ACCESS_FINE_LOCATION
-    )
     var locationRequired by remember { mutableStateOf(false) }
     val fusedLocationClient = remember {
         LocationServices.getFusedLocationProviderClient(context)
@@ -60,8 +53,6 @@ fun LocationGoogleScreen(
         position = CameraPosition.fromLatLngZoom(currentLocation, 30f)
     }
     val cameraPositionState by remember { mutableStateOf(cameraPosition) }
-
-
     val locationCallback = remember {
         object : LocationCallback() {
             override fun onLocationResult(p0: LocationResult) {
@@ -75,40 +66,22 @@ fun LocationGoogleScreen(
                     startLocationUpdates(
                         fusedLocationClient,
                         this
-                    ) // "this" hace referencia al LocationCallback
-                    locationRequired = false // Marca como que ya se activaron las actualizaciones
+                    )
+                    locationRequired = false
                 }
             }
         }
     }
-
     LaunchedEffect(locationRequired) {
         if (locationRequired) {
             startLocationUpdates(fusedLocationClient, locationCallback)
         }
     }
-
     DisposableEffect(Unit) {
         onDispose {
             fusedLocationClient.removeLocationUpdates(locationCallback)
         }
     }
-
-
-    val launchMultiplePermissions = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissionMaps ->
-        val areGranted = permissionMaps.values.reduce { acc, next -> acc && next }
-        if (areGranted) {
-            locationRequired = true
-            startLocationUpdates(fusedLocationClient, locationCallback)
-            Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-
     val apiKey = try {
         val applicationInfo = context.packageManager.getApplicationInfo(
             context.packageName,
@@ -125,8 +98,6 @@ fun LocationGoogleScreen(
             .apiKey(apiKey)
             .build()
     }
-
-
     suspend fun geocodeAddress(address: String): LatLng? {
         return withContext(Dispatchers.IO) {
             try {
@@ -205,23 +176,7 @@ fun LocationGoogleScreen(
                     .padding(top = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Text("Your location ${currentLocation.latitude}/${currentLocation.longitude}")
-                /*Button(onClick = {
-                    if (permissions.all {
-                            ContextCompat.checkSelfPermission(context, it) ==
-                                    PackageManager.PERMISSION_GRANTED
-                        }) {
-                        locationRequired = true
-
-                       // startLocationUpdates(fusedLocationClient, locationCallback)
-                    } else {
-                        launchMultiplePermissions.launch(permissions)
-                    }
-                }) {
-                    Text("Get your location")
-                }
-
-                 */
+                Text("Tu ubicación es:  ${currentLocation.latitude}/${currentLocation.longitude}")
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -273,7 +228,7 @@ fun LocationGoogleScreen(
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = region, onValueChange = { region = it },
-                label = { Text(text = "Region", modifier = Modifier.padding(start = 16.dp)) },
+                label = { Text(text = "País", modifier = Modifier.padding(start = 16.dp)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 singleLine = true,
                 colors = TextFieldDefaults.textFieldColors(
@@ -297,7 +252,7 @@ fun LocationGoogleScreen(
                     }
                 }
             ) {
-                Text("Find")
+                Text("Encontrar")
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -312,37 +267,29 @@ fun LocationGoogleScreen(
                         latitude = currentLocation.latitude,
                         longitude = currentLocation.longitude
                     )
-                    //coroutineScope.launch {
-                    //val location = geocodeAddress(address.calle)
                     if (viewModel.isEmptyAddress(address)) {
                         Toast.makeText(
                             navController.context,
-                            "Address Incomplete",
+                            "Dirección Incompleta",
                             Toast.LENGTH_SHORT
                         ).show()
                     } else {
-                        //stopLocationUpdates()
-                        //currentLocation = location
-                        //cameraPositionState.position = CameraPosition.fromLatLngZoom(currentLocation, 15f)
                         Log.d("LocationGoogleScreen", "Dirección: ${address.street}")
                         Log.d("LocationGoogleScreen", "Número: ${address.number}")
                         Log.d("LocationGoogleScreen", "Localidad: ${address.location}")
                         Log.d("LocationGoogleScreen", "Región: ${address.country}")
-                        // Guardar la dirección en la variable
+
                         viewModel.updateAddress(address)
 
-                        // Navegar a SignUpScreen
                         when (origin) {
                             "sign_up" -> navController.navigate(AppScreens.SignUp_Screen.route)
                             "profile" -> navController.navigate(AppScreens.Profile_Screen.route)
                             "payment" -> navController.navigate(AppScreens.Payment.route)
-                            // add other cases if needed
                         }
                     }
-                    // }
                 }
             ) {
-                Text("Save & Continue")
+                Text("Guardar y continuar")
             }
         }
     }
@@ -368,9 +315,8 @@ internal fun startLocationUpdates(
         locationCallback,
         Looper.getMainLooper()
     )
-    // Cancelar actualizaciones después de un tiempo determinado
     locationUpdatesJob = CoroutineScope(Dispatchers.Main).launch {
-        delay(10000) // Detener las actualizaciones después de 10 segundos (ajusta este valor según sea necesario)
+        delay(10000)
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 

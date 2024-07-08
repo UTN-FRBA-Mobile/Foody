@@ -64,7 +64,6 @@ fun CartScreen(
     if (order.group != null) {
         groupViewModel.updateGroup(order.group!!)
     }
-
     AppScaffold(
         { BottomGroupCart(navController, orderViewModel = viewModel, order = order) },
         { TopGroupCart(navController, origin) }) {
@@ -227,7 +226,7 @@ fun OrdersGrid(
 }
 
 @Composable
-fun OrderCard(viewModel: OrderViewModel, userOrder: UserOrder, navController: NavController) {
+fun OrderCard(viewModel: OrderViewModel, userOrder: UserOrder) {
     val heightContent = if (userOrder.items.size > 1) 170.dp else 90.dp
 
     Card(
@@ -341,12 +340,3 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
         }
     }
 }
-
-/*
-@Preview
-@Composable
-fun DefaultPreviewCart() {
-    val navController = rememberNavController()
-    val viewModel = OrderViewModel()
-    CartScreen(navController, viewModel, origin = "home")
-}*/

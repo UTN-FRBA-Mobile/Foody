@@ -37,7 +37,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
@@ -52,10 +51,8 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val showError by remember { mutableStateOf(false) }
-    val canGoBack = remember { mutableStateOf(false) } // Cambia esto según tu lógica
+    val canGoBack = remember { mutableStateOf(false) }
     BackHandler(enabled = !canGoBack.value) {
-        // Aquí decides qué hacer cuando se presiona el botón de retroceso
-        // Si canGoBack es false, no haces nada, por lo tanto, evitas el retroceso
     }
     AppScaffold(
         null,
@@ -93,7 +90,7 @@ fun LoginScreen(
 
 
                 Text(
-                    text = "Welcome to Foody",
+                    text = "Bienvenido a Foody",
                     style = MaterialTheme.typography.h5,
                     color = MaterialTheme.colors.primary,
                     textAlign = TextAlign.Center
@@ -104,7 +101,7 @@ fun LoginScreen(
                 TextField(
                     value = email,
                     onValueChange = { email = it },
-                    label = { Text("Username") },
+                    label = { Text("Nombre de Usuario") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     singleLine = true,
                     maxLines = 1,
@@ -119,7 +116,7 @@ fun LoginScreen(
                 TextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("Password") },
+                    label = { Text("Contraseña") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     singleLine = true,
                     maxLines = 1,
@@ -134,7 +131,7 @@ fun LoginScreen(
 
                 if (showError) {
                     Text(
-                        text = "Incorrect User or Password",
+                        text = "Nombre de Usuario o Contraseña Incorrecta",
                         color = MaterialTheme.colors.error,
                         style = MaterialTheme.typography.body2
                     )
@@ -154,26 +151,14 @@ fun LoginScreen(
                 ) {
                     Text("Login", fontSize = 18.sp)
                 }
-
                 Spacer(modifier = Modifier.height(16.dp))
-
-               /* ClickableText(
-                    text = AnnotatedString("Forgot Password?"),
-                    onClick = { /* Aquí puedes manejar la lógica de recuperación de contraseña */ },
-                    style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.primary)
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-
-                */
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Don't have an account?", style = MaterialTheme.typography.body2)
+                    Text("No tienes una cuenta?", style = MaterialTheme.typography.body2)
                     Spacer(modifier = Modifier.width(4.dp))
                     ClickableText(
-                        text = AnnotatedString("Sign Up"),
+                        text = AnnotatedString("Registrarte"),
                         onClick = {
                             orderViewModel.emptyAddress()
                             navController.navigate(AppScreens.SignUp_Screen.route)

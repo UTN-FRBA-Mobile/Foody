@@ -64,7 +64,7 @@ fun CreateGroupScreen(
                     value = groupName,
                     onValueChange = { groupName = it },
                     label = {
-                        Text(text = "Name")
+                        Text(text = "Nombre del Grupo")
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     singleLine = true,
@@ -80,7 +80,7 @@ fun CreateGroupScreen(
                     value = password,
                     onValueChange = { password = it },
                     label = {
-                        Text(text = "Password")
+                        Text(text = "Contraseña")
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     visualTransformation = PasswordVisualTransformation(),
@@ -97,7 +97,7 @@ fun CreateGroupScreen(
                     value = order.restaurant.name,
                     onValueChange = { },
                     label = {
-                        Text(text = "Restaurant")
+                        Text(text = "Restaurante")
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     singleLine = true,
@@ -114,7 +114,7 @@ fun CreateGroupScreen(
                     value = order.address,
                     onValueChange = { },
                     label = {
-                        Text(text = "Address")
+                        Text(text = "Dirección")
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     singleLine = true,
@@ -127,7 +127,7 @@ fun CreateGroupScreen(
                     ),
                     enabled = false
                 )
-                CustomText(text = "(You pay the total)")
+                CustomText(text = "(Seras el encargado de pagar)")
             }
         }
         Box(
@@ -140,7 +140,7 @@ fun CreateGroupScreen(
 
             if (showError) {
                 Text(
-                    text = "Name already Exist",
+                    text = "El nombre ingresado ya existe",
                     color = MaterialTheme.colors.error,
                     style = MaterialTheme.typography.body2
                 )
@@ -159,7 +159,7 @@ fun CreateGroupScreen(
                             password = ""
                             Toast.makeText(
                                 navController.context,
-                                "Name already Exist",
+                                "El nombre ingresado ya existe",
                                 Toast.LENGTH_SHORT
                             ).show()
                         } else {
@@ -180,7 +180,6 @@ fun CreateGroupScreen(
         }
     }
 }
-
 @Composable
 fun CustomText(text: String) {
     Text(
@@ -193,7 +192,6 @@ fun CustomText(text: String) {
             .padding(vertical = 20.dp)
     )
 }
-
 @Composable
 fun TopGroupCreateGroup(navController: NavController) {
     TopAppBar(
@@ -212,14 +210,3 @@ fun TopGroupCreateGroup(navController: NavController) {
         }
     )
 }
-
-/*
-@Preview
-@Composable
-fun CreateGroupPreview() {
-    val navController = rememberNavController()
-    val orderViewModel = OrderViewModel()
-    val groupViewModel = GroupViewModel()
-    CreateGroupScreen(navController = navController, orderViewModel = orderViewModel, groupViewModel = groupViewModel)
-}
- */

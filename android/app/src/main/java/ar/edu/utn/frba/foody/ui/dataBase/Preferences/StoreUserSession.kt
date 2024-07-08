@@ -1,7 +1,6 @@
 package ar.edu.utn.frba.foody.ui.dataBase.StoreUserSession
 
 import android.content.Context
-import androidx.compose.runtime.collectAsState
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
