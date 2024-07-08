@@ -1,6 +1,8 @@
 package ar.edu.utn.frba.foody.ui.navigation
 
 sealed class AppScreens(val route: String) {
+    object Session_Screen : AppScreens("Session")
+    object Splash_Screen : AppScreens("Splash")
     object Home_Screen: AppScreens("Home")
     object Login_Screen: AppScreens("Login")
     object SignUp_Screen: AppScreens("SignUp")
