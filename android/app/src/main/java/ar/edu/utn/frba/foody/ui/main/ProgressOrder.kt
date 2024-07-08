@@ -42,8 +42,7 @@ fun ProgressOrderScreen(
 ) {
     val order = orderViewModel.getOrderById(order_id)
 
-    AppScaffold(navController = navController,
-        null,
+    AppScaffold(
         null,
         { TopGroupProgressOrder(navController = navController) }
     ) {
@@ -62,23 +61,23 @@ fun ProgressOrderScreen(
 
             Column(modifier = Modifier.fillMaxWidth()) {
                 if (order.orderStates.isNotEmpty() && order.orderStates[1].completed) {
-                    TextInfo(text = "Repartidor Asignado: " + order.repartidor?.email)
+                    TextInfo(text = "Repartidor Asignado: " + order.delivery?.email)
                 }
 
                 TextInfo(text = "Total Sin Envio: $" + order.userOrders.sumOf { userOrder ->
                     userOrder.items.sumOf { x -> x.quantity * x.dish.price }
                 }.toString())
 
-                TextInfo(text = "Total : $" + order.montoPagado.toString())
+                TextInfo(text = "Total : $" + order.amount.toString())
 
-                TextInfo(text = "Dirección de Entrega : " + order.direction)
+                TextInfo(text = "Dirección de Entrega : " + order.address)
 
-                if (order.tarjetaUsada.equals("Efectivo")) {
+                if (order.card.equals("Efectivo")) {
                     TextInfo(text = "Pago Realizado en Efectivo")
                 } else {
                     TextInfo(
                         text = "Tarjeta Usada : **** **** **** ${
-                            order.tarjetaUsada.takeLast(4)
+                            order.card.takeLast(4)
                         }"
                     )
                 }

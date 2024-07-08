@@ -8,11 +8,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Address
 import ar.edu.utn.frba.foody.ui.Classes.Dish
-import ar.edu.utn.frba.foody.ui.Classes.Estado
+import ar.edu.utn.frba.foody.ui.Classes.Status
 import ar.edu.utn.frba.foody.ui.Classes.Group
 import ar.edu.utn.frba.foody.ui.Classes.Order
 import ar.edu.utn.frba.foody.ui.Classes.OrderItemInfo
@@ -21,9 +20,7 @@ import ar.edu.utn.frba.foody.ui.Classes.Restaurant
 import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.Classes.UserOrder
 import ar.edu.utn.frba.foody.ui.dataBase.Firebase.OrderDataBaseFirebase
-import ar.edu.utn.frba.foody.ui.dataBase.SQLite.OrderDataBase
 import java.util.Calendar
-
 
 class OrderViewModel() : ViewModel() {
     private var order by mutableStateOf(Order(""))
@@ -31,40 +28,26 @@ class OrderViewModel() : ViewModel() {
     private var pendingOrders by mutableStateOf(listOf<Order>())
     private var orderByDeliveryMan by mutableStateOf(listOf<Order>())
     private var orderDetail by mutableStateOf(Order(""))
-
-    var orderDataBase: OrderDataBase? = null
     var orderDataBaseFirebase: OrderDataBaseFirebase? = null
-    var navController: NavController? = null
-
     var user by mutableStateOf(User(""))
 
     private val _addUserOrderResult = MutableLiveData<Boolean>()
     val addUserOrderResult: LiveData<Boolean> get() = _addUserOrderResult
-
-
     fun setServices(
-        orderDataBase: OrderDataBase,
         orderDataBaseFirebase: OrderDataBaseFirebase,
-        navController: NavController
     ) {
-        this.orderDataBase = orderDataBase
         this.orderDataBaseFirebase = orderDataBaseFirebase
-        this.navController = navController
     }
-
     fun updateOrderLogin() {
         this.findAllOrdersForUser()
-        this.getOrderByState(Estado.ENPROGRESO)
+        this.getOrderByState(Status.INPROGRESS)
     }
-
     fun getPendingsOrders(): List<Order> {
         return pendingOrders
     }
-
     fun updatePendingOrders(orders: List<Order>) {
         this.pendingOrders = orders
     }
-
     fun updateOrder(order: Order) {
         this.order = order
     }
@@ -75,15 +58,14 @@ class OrderViewModel() : ViewModel() {
 
     fun updateDataBaseOrder(newOrder: Order) {
         this.updateOrder(newOrder)
-        orderDataBaseFirebase?.updateOrder(order) { isSuccess -> }
+        orderDataBaseFirebase?.updateOrder(order) {}
     }
-
-    fun createOrderWithStates(direccion: String, totalPayment: Double, tarjeta: String): Order {
+    fun createOrderWithStates(address: String, totalPayment: Double, card: String): Order {
         return order.copy(
-            estado = Estado.PENDIENTE,
-            direction = direccion,
-            montoPagado = totalPayment,
-            tarjetaUsada = tarjeta,
+            status = Status.PENDING,
+            address = address,
+            amount = totalPayment,
+            card = card,
             orderStates = listOf(
                 OrderState(
                     R.drawable.order_icon,
@@ -112,26 +94,20 @@ class OrderViewModel() : ViewModel() {
             )
         )
     }
-
     fun getPickedOrder(): Order {
         return order
     }
-
     fun getAllOrdersForUser(): List<Order> {
         return orders
     }
-
     fun createGroup(newGroup: Group) {
         user.admin = true
         this.updateGroup(newGroup)
     }
-
     fun updateGroup(newGroup: Group) {
         order = order.copy(group = newGroup)
         orderDataBaseFirebase?.updateOrder(order) {}
-        //orderDataBase?.updateGroup(newGroup.groupId.toInt(), order.orderId)
     }
-
     fun getOrderByGroup(groupId: String, callback: (Order?) -> Unit) {
         orderDataBaseFirebase?.getOrderByGroup(groupId) { order ->
             if (order != null) {
@@ -140,31 +116,25 @@ class OrderViewModel() : ViewModel() {
             }
         }
     }
-
     fun addUser() {
         val updatedMembers = order.group?.members?.toMutableList()
         updatedMembers?.add(user)
         val updatedOrder =
             order.copy(group = updatedMembers?.let { order.group?.copy(members = it.toList()) })
-
         orderDataBaseFirebase?.updateOrder(updatedOrder) {
             this.updateOrder(updatedOrder)
         }
     }
-
     fun hasItems(newOrder: Order): Boolean {
         return newOrder.userOrders.any { userOrder -> userOrder.items.isNotEmpty() }
     }
-
-    fun getUserOrder(restaurant: Restaurant, loading: MutableState<Boolean>): UserOrder {
+    fun getUserOrder(restaurant: Restaurant): UserOrder {
         if (order.orderId == "") {
             createOrder(restaurant)
         }
-
-        return getAssignedUserOrder(loading)
+        return getAssignedUserOrder()
     }
-
-    fun getAssignedUserOrder(loading: MutableState<Boolean>): UserOrder {
+    fun getAssignedUserOrder(): UserOrder {
         println(user)
         println(order.userOrders)
         val userOrder = order.userOrders.firstOrNull() { x -> x.user.userId == this.user.userId }
@@ -173,159 +143,103 @@ class OrderViewModel() : ViewModel() {
         }
         return userOrder
     }
-
     fun removeOrderFromSession() {
         order = Order("")
     }
-
     fun createOrder(restaurant: Restaurant) {
         val createdOrder = Order(
             "",
             restaurant,
             restaurant.name,
-            user.direccion.calle + " " + user.direccion.numero
+            user.address.street + " " + user.address.number
         )
-
         createdOrder.orderId = orderDataBaseFirebase?.addOrder(createdOrder) ?: ""
-
         val loading = mutableStateOf(false)
         createUserOrder(createdOrder, loading)
     }
-
     fun createUserOrder(newOrder: Order, loading: MutableState<Boolean>): UserOrder {
         val userOrder = UserOrder("", mutableListOf(), user)
-
         orderDataBaseFirebase?.addUserOrderToOrder(newOrder.orderId, userOrder) { isSuccess ->
             _addUserOrderResult.postValue(isSuccess)
-
             if (isSuccess) {
                 loading.value = false
             }
         }
-
         loading.value = true
         val userOrders = mutableListOf<UserOrder>()
-
         userOrders.add(userOrder)
-
         this.order = newOrder.copy(userOrders = userOrders)
-
         return userOrder
     }
-
     fun updateUserOrder(newOrder: Order): UserOrder {
         val userOrder = UserOrder("", mutableListOf(), user)
-
         val updatedUserOrders = newOrder.userOrders.toMutableList()
         updatedUserOrders.add(userOrder)
-
         order = newOrder.copy(userOrders = updatedUserOrders)
-
         orderDataBaseFirebase?.updateOrder(order) { }
-
         return userOrder
     }
-
-
     fun getTotal(): Double {
         return order.userOrders.sumOf { x -> x.items.sumOf { y -> y.quantity * y.dish.price } }
     }
-
     fun deleteItem(dishId: Int) {
         val userOrderIndex = order.userOrders.indexOfFirst { it.user.userId == user.userId }
-
         val userOrder = order.userOrders[userOrderIndex]
-
         if (userOrder.items.size > 1) {
             val updatedItems = userOrder.items.filter { it.dish.dishId != dishId }
-
             val updatedUserOrder = userOrder.copy(items = updatedItems.toMutableList())
-
             val updatedUserOrders = order.userOrders.toMutableList()
             updatedUserOrders[userOrderIndex] = updatedUserOrder
-
             order = order.copy(userOrders = updatedUserOrders.toMutableList())
-
-            orderDataBaseFirebase?.updateUserOrder(order.orderId, updatedUserOrder) { isSuccess -> }
+            orderDataBaseFirebase?.updateUserOrder(order.orderId,
+                updatedUserOrder) {}
         } else {
             this.emptyUserOrder()
         }
-
     }
-
     fun changeItemQuantity(dishId: Int, variation: Int) {
         val userOrderIndex = order.userOrders.indexOfFirst { it.user.userId == user.userId }
-
         val userOrder = order.userOrders[userOrderIndex]
-
         val userItemIndex = userOrder.items.indexOfFirst { it.dish.dishId == dishId }
-
         val userItem = userOrder.items[userItemIndex]
-
         if (userItem.quantity + variation == 0) {
             deleteItem(dishId)
             return
         }
-
         val newQuantity = userItem.quantity + variation
-
         val updatedUserItem = userItem.copy(quantity = newQuantity)
-
         val updatedUserItems = userOrder.items.toMutableList()
         updatedUserItems[userItemIndex] = updatedUserItem
-
         val updatedUserOrder = userOrder.copy(items = updatedUserItems)
-
         val updatedUserOrders = order.userOrders.toMutableList()
         updatedUserOrders[userOrderIndex] = updatedUserOrder
-
         order = order.copy(userOrders = updatedUserOrders.toMutableList())
-
-        //TODO: bloquear pantalla
-
-        orderDataBaseFirebase?.updateUserOrder(order.orderId, updatedUserOrder) { isSuccess ->
-            //TODO: desbloquear pantalla
-        }
+        orderDataBaseFirebase?.updateUserOrder(order.orderId, updatedUserOrder) {}
     }
-
     fun addItem(quantity: Int, dish: Dish) {
         val userOrderIndex = order.userOrders.indexOfFirst { it.user.userId == user.userId }
-
         val userOrder = order.userOrders[userOrderIndex]
-
         val newOrderItem = OrderItemInfo("", dish, quantity)
-
         val updatedUserItems = userOrder.items.toMutableList()
         updatedUserItems.add(newOrderItem)
-
         val updatedUserOrder = userOrder.copy(items = updatedUserItems)
-
         val updatedUserOrders = order.userOrders.toMutableList()
         updatedUserOrders[userOrderIndex] = updatedUserOrder
-
         order = order.copy(userOrders = updatedUserOrders.toMutableList())
-
-        //TODO: bloquear pantalla
-
-        orderDataBaseFirebase?.updateUserOrder(order.orderId, updatedUserOrder) { isSuccess ->
-            //TODO: desbloquear pantalla
-        }
+        orderDataBaseFirebase?.updateUserOrder(order.orderId, updatedUserOrder) {}
     }
-
     fun changeRestaurant(newRestaurant: Restaurant) {
-        orderDataBaseFirebase?.getOrderByState(Estado.ENPROGRESO, user) { orden ->
-            if (orden != null) {
-                orderDataBaseFirebase?.deleteOrder(orden.orderId) { isSuccess -> }
+        orderDataBaseFirebase?.getOrderByState(Status.INPROGRESS, user) { orderReceived ->
+            if (orderReceived != null) {
+                orderDataBaseFirebase?.deleteOrder(orderReceived.orderId) {}
             }
         }
         createOrder(newRestaurant)
     }
-
     fun changeItemQuantityIfExists(
         orderItem: OrderItemInfo?,
         variation: Int,
-        dish: Dish,
-        restaurant: Restaurant
+        dish: Dish
     ) {
         if (orderItem == null) {
             if (variation > 0) {
@@ -335,7 +249,6 @@ class OrderViewModel() : ViewModel() {
             changeItemQuantity(dish.dishId, variation)
         }
     }
-
     fun getOrder() {
         orderDataBaseFirebase?.getOrderById(order.orderId) { order ->
             if (order != null) {
@@ -343,7 +256,6 @@ class OrderViewModel() : ViewModel() {
             }
         }
     }
-
     fun findAllOrdersForUser() {
         orderDataBaseFirebase?.getOrdersByUser(user.userId) { orders ->
             if (orders.isNotEmpty()) {
@@ -351,7 +263,6 @@ class OrderViewModel() : ViewModel() {
             }
         }
     }
-
     fun getOrderById(order_id: String): Order {
         orderDataBaseFirebase?.getOrderById(order_id) { order ->
             if (order != null) {
@@ -360,15 +271,13 @@ class OrderViewModel() : ViewModel() {
         }
         return orderDetail
     }
-
-    fun getOrderByState(estado: Estado) {
-        orderDataBaseFirebase?.getOrderByState(estado, user) { order ->
+    fun getOrderByState(status: Status) {
+        orderDataBaseFirebase?.getOrderByState(status, user) { order ->
             if (order != null) {
                 this.order = order
             }
         }
     }
-
     fun findAllOrdersByState() {
         orderDataBaseFirebase?.getOrdersByState() { orders ->
             if (orders.isNotEmpty()) {
@@ -376,7 +285,6 @@ class OrderViewModel() : ViewModel() {
             }
         }
     }
-
     fun findOrdersDeliveredById() {
         orderDataBaseFirebase?.getOrdersByDeliveredId(user.userId) { orders ->
             if (orders.isNotEmpty()) {
@@ -394,16 +302,13 @@ class OrderViewModel() : ViewModel() {
     }
 
     fun emptyUserOrder() {
-        val loading = mutableStateOf(false)
-        val userOrder = getAssignedUserOrder(loading)
-
         val userOrders = order.userOrders.filter { x -> x.user != user }
         order = order.copy(userOrders = userOrders.toMutableList())
 
         orderDataBaseFirebase?.updateUserOrderList(
             order.orderId,
             mutableListOf<UserOrder>()
-        ) { isSuccess -> }
+        ) {}
     }
 
     fun createOrderGroup(group: Group, restaurant: Restaurant): Order {
@@ -419,9 +324,9 @@ class OrderViewModel() : ViewModel() {
     }
 
     fun deleteCurrentOrder() {
-        orderDataBaseFirebase?.getOrderByState(Estado.ENPROGRESO, user) { orden ->
+        orderDataBaseFirebase?.getOrderByState(Status.INPROGRESS, user) { orden ->
             if (orden != null) {
-                orderDataBaseFirebase?.deleteOrder(orden.orderId) { isSuccess -> }
+                orderDataBaseFirebase?.deleteOrder(orden.orderId) {}
             }
         }
     }
@@ -447,34 +352,34 @@ class OrderViewModel() : ViewModel() {
     }
 
     fun updateAddress(newAddress: Address.AddressInfo) {
-        user.direccion = newAddress
+        user.address = newAddress
     }
 
     fun existAddress(): Boolean {
-        return user.direccion.calle != null
-                && user.direccion.numero != null
-                && user.direccion.localidad != null
-                && user.direccion.region != null
+        return user.address.street != null
+                && user.address.number != null
+                && user.address.location != null
+                && user.address.country != null
     }
 
     fun emptyAddress() {
-        user.direccion = Address.AddressInfo(
-            calle = null,
-            numero = null,
-            localidad = null,
-            region = null,
-            latitud = null,
-            longitud = null
+        user.address = Address.AddressInfo(
+            street = null,
+            number = null,
+            location = null,
+            country = null,
+            latitude = null,
+            longitude = null
         )
     }
 
     fun isEmptyAddress(address: Address.AddressInfo): Boolean {
-        return address.calle == ""
-                || address.region == ""
-                || address.localidad == ""
-                || address.numero == 0
-                || address.latitud == 0.0
-                || address.longitud == 0.0
+        return address.street == ""
+                || address.country == ""
+                || address.location == ""
+                || address.number == 0
+                || address.latitude == 0.0
+                || address.longitude == 0.0
     }
 
     fun updateUserOrders(user: User) {

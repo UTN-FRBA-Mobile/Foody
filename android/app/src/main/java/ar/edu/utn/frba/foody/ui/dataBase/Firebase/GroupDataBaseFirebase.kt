@@ -1,9 +1,6 @@
 package ar.edu.utn.frba.foody.ui.dataBase.Firebase
 
-import android.annotation.SuppressLint
-import ar.edu.utn.frba.foody.ui.Classes.Estado
 import ar.edu.utn.frba.foody.ui.Classes.Group
-import ar.edu.utn.frba.foody.ui.Classes.Order
 import ar.edu.utn.frba.foody.ui.Classes.User
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -13,7 +10,6 @@ import com.google.firebase.database.ValueEventListener
 class GroupDataBaseFirebase(private var database: FirebaseDatabase) {
     private val TABLE_GROUPS = "groups"
     private val TABLE_USERS = "users"
-
 
     fun insertGroup(group: Group) {
         val myRefGroups = database.getReference(TABLE_GROUPS)
@@ -27,7 +23,6 @@ class GroupDataBaseFirebase(private var database: FirebaseDatabase) {
         }
 
     }
-
     fun addUser(group: Group, user: User) {
         val myRef = database.getReference(TABLE_GROUPS)
         myRef.child(group.groupId).setValue(group)
@@ -36,7 +31,6 @@ class GroupDataBaseFirebase(private var database: FirebaseDatabase) {
         user.groupId = group.groupId
         myRefUsers.child(user.userId).setValue(user)
     }
-
     fun removeUser(groupId: String, user: User, callback: (Boolean) -> Unit) {
         val membersRef = database.getReference(TABLE_GROUPS).child(groupId).child("members")
 
@@ -49,7 +43,6 @@ class GroupDataBaseFirebase(private var database: FirebaseDatabase) {
             }
 
         }
-
         membersRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 var userFound = false
@@ -73,23 +66,19 @@ class GroupDataBaseFirebase(private var database: FirebaseDatabase) {
                         break
                     }
                 }
-
                 if (!userFound) {
                     callback(false)
                 }
             }
-
             override fun onCancelled(error: DatabaseError) {
                 callback(false)
             }
         })
     }
-
     private fun changeUserRole(userReassigned: User, adminRole: Boolean) {
         database.getReference(TABLE_USERS).child(userReassigned.userId).child("admin")
             .setValue(adminRole)
     }
-
     private fun reassignAdmin(groupId: String, callback: (User?) -> Unit) {
         val groupRef = database.getReference(TABLE_GROUPS).child(groupId).child("members")
 
@@ -114,13 +103,11 @@ class GroupDataBaseFirebase(private var database: FirebaseDatabase) {
                     }
                 }
             }
-
             override fun onCancelled(error: DatabaseError) {
                 callback(null)
             }
         })
     }
-
     fun getGroupByName(name: String, callback: (Group?) -> Unit) {
         val myRef = database.getReference(TABLE_GROUPS)
         val ref = myRef.child(name)
@@ -136,7 +123,6 @@ class GroupDataBaseFirebase(private var database: FirebaseDatabase) {
                     callback(null)
                 }
             }
-
             override fun onCancelled(databaseError: DatabaseError) {
                 callback(null)
             }
@@ -155,7 +141,6 @@ class GroupDataBaseFirebase(private var database: FirebaseDatabase) {
                 }
                 callback(null)
             }
-
             override fun onCancelled(databaseError: DatabaseError) {
                 callback(null)
             }

@@ -25,7 +25,6 @@ import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Restaurant
 import ar.edu.utn.frba.foody.ui.composables.SimpleAlert
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.RestaurantDataBase
-import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
@@ -36,7 +35,6 @@ fun HomeScreen(
     navController: NavController,
     viewModel: MainViewModel,
     restaurantDataBase: RestaurantDataBase?,
-    userDataBase: UserDataBase?,
     orderViewModel: OrderViewModel,
     groupViewModel: GroupViewModel
 ) {
@@ -47,12 +45,10 @@ fun HomeScreen(
         // Si canGoBack es false, no haces nada, por lo tanto, evitas el retroceso
     }
     orderViewModel.findAllOrdersByState()
-    groupViewModel.findGroupByuserId()
+    groupViewModel.findGroupByUserId()
 
     AppScaffold(
-        navController,
-        null,
-        { BottomGroupHome(navController, orderViewModel) },
+        { BottomGroupHome(navController,orderViewModel) },
         { TopGroupHome(navController, viewModel) }
     ) {
         Image(
@@ -88,7 +84,7 @@ fun HomeScreen(
                     .height(505.dp)
             ) {
                 if (restaurantDataBase != null) {
-                    for (restaurant in restaurantDataBase.getAllRestaurants(userDataBase)) {
+                    for (restaurant in restaurantDataBase.getAllRestaurants(restaurantDataBase)) {
                         item {
                             RestaurantItem(
                                 navController = navController,
@@ -99,7 +95,7 @@ fun HomeScreen(
                         }
                     }
                     item {
-                        if (restaurantDataBase.getAllRestaurants(userDataBase).isNotEmpty())
+                        if (restaurantDataBase.getAllRestaurants(restaurantDataBase).isNotEmpty())
                             Divider()
                     }
                 }
@@ -209,7 +205,7 @@ data class ButtonInterface(
 
 
 @Composable
-fun BottomGroupHome(navController: NavController, orderViewModel: OrderViewModel) {
+fun BottomGroupHome(navController: NavController,orderViewModel: OrderViewModel) {
     val buttons = mutableListOf(
         ButtonInterface(
             resourceId = R.drawable.user_icon,
@@ -265,7 +261,7 @@ fun TopGroupHome(navController: NavController, viewModel: MainViewModel) {
         },
 
         actions = {
-            if (viewModel.user.value?.repartidor.equals("Si")) {
+            if (viewModel.user.value?.delivery.equals("Si")) {
                 IconButton(onClick = { navController.navigate(AppScreens.PendingOrder.route) }) {
                     Image(
                         painter = painterResource(id = R.drawable.repartidor),

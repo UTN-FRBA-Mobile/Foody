@@ -25,7 +25,7 @@ import ar.edu.utn.frba.foody.ui.Classes.Dish
 
 @Composable
 fun DishAlert(show: Boolean, dish: Dish, totalPrice: Double?, onDismiss: () -> Unit) {
-    val priceText = if (totalPrice != null) "Total Price: $$totalPrice" else "Price: $${dish.price}"
+    val priceText = if (totalPrice != null) "Precio Total: $$totalPrice" else "Precio: $${dish.price}"
 
     if (show) {
         AlertDialog(
@@ -59,29 +59,16 @@ fun DishAlert(show: Boolean, dish: Dish, totalPrice: Double?, onDismiss: () -> U
         )
     }
 }
-
 @Preview
 @Composable
 private fun DefaultPreview() {
-    /* DishAlert(
-         show = true,
-         dish = Dish(
-             dishId = 4,
-             name = "Tuna Roll",
-             description = "Tuna roll with avocado",
-             imageResourceId = R.drawable.tuna_roll,
-             price = 5000.0,
-             restaurantId = 2
-         ),
-         onDismiss = {}
-     )*/
     DishAlert(
         show = true,
         dish =
         Dish(
             dishId = 3,
             name = "Salmon Nigiri",
-            description = "Fresh salmon on sushi rice",
+            description = "Salmón fresco sobre arroz de sushi",
             imageResourceId = R.drawable.salmon_nigiri,
             price = 5000.0,
             restaurantId = 2
@@ -89,16 +76,4 @@ private fun DefaultPreview() {
         null,
         onDismiss = {}
     )
-    /*DishAlert(
-        show = true,
-        dish = Dish(
-            dishId = 10,
-            name = "Sweet Potato Fries",
-            description = "Crispy sweet potato fries",
-            imageResourceId = R.drawable.sweet_potato_fries,
-            price = 5000.0,
-            restaurantId = 5
-        ),
-        onDismiss = {}
-    )*/
 }

@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.*
 import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Group
-import ar.edu.utn.frba.foody.ui.dataBase.SQLite.GroupDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.*
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
@@ -34,10 +33,7 @@ fun CreateGroupScreen(
     var password by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
 
-    val scope = rememberCoroutineScope()
-
-    AppScaffold(navController = navController,
-        null,
+    AppScaffold(
         null,
         { TopGroupCreateGroup(navController = navController) }
     ) {
@@ -115,7 +111,7 @@ fun CreateGroupScreen(
                     enabled = false
                 )
                 TextField(
-                    value = order.direction,
+                    value = order.address,
                     onValueChange = { },
                     label = {
                         Text(text = "Address")

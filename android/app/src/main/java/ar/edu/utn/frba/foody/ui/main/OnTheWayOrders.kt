@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
-import ar.edu.utn.frba.foody.ui.Classes.Estado
+import ar.edu.utn.frba.foody.ui.Classes.Status
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 
 
@@ -29,8 +29,7 @@ fun OrdersOnTheWayScreen(navController: NavController, viewModel: OrderViewModel
     viewModel.findOrdersDeliveredById()
     val orders = viewModel.getAllOrdersDeliveredById()
 
-    AppScaffold(navController = navController,
-        null,
+    AppScaffold(
         null,
         { TopGroupOrderListDelivered(navController = navController)}
     ) {
@@ -64,7 +63,7 @@ fun OrdersOnTheWayScreen(navController: NavController, viewModel: OrderViewModel
                 orders.forEach { order ->
                     item {
                         if (viewModel.hasItems(order)) {
-                            if (order.estado.equals(Estado.ENCAMINO)) {
+                            if (order.status.equals(Status.ONTHEWAY)) {
                                 OrderItemDelivered(
                                     navController = navController,
                                     order = order,

@@ -18,9 +18,6 @@ import androidx.compose.ui.unit.*
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import ar.edu.utn.frba.foody.R
-import ar.edu.utn.frba.foody.ui.Classes.Restaurant
-import ar.edu.utn.frba.foody.ui.dataBase.SQLite.GroupDataBase
-import ar.edu.utn.frba.foody.ui.dataBase.SQLite.OrderDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
@@ -37,10 +34,7 @@ fun JoinGroupScreen(
     var password by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
 
-    val scope = rememberCoroutineScope()
-
-    AppScaffold(navController = navController,
-        null,
+    AppScaffold(
         null,
         { TopGroupJoinGroup(navController = navController) }
     ) {

@@ -5,17 +5,13 @@ import android.app.NotificationManager
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -24,36 +20,25 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.ui.Classes.Dish
 import ar.edu.utn.frba.foody.ui.Classes.Restaurant
-import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.dataBase.Firebase.GroupDataBaseFirebase
 import ar.edu.utn.frba.foody.ui.dataBase.Firebase.OrderDataBaseFirebase
 import ar.edu.utn.frba.foody.ui.dataBase.Firebase.TokenDataBaseFirebase
 import ar.edu.utn.frba.foody.ui.dataBase.Firebase.UserDataBaseFirebase
-import ar.edu.utn.frba.foody.ui.dataBase.SQLite.GroupDataBase
-import ar.edu.utn.frba.foody.ui.dataBase.SQLite.OrderDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.RestaurantDataBase
-import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
-import ar.edu.utn.frba.foody.ui.dataClasses.AddressViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppNavigation
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 import ar.edu.utn.frba.foody.ui.dataBase.FirebaseTokenService
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
 class MainComposeActivity : ComponentActivity() {
-    lateinit var dbUserHelper: UserDataBase
     private lateinit var dbRestaurantHelper: RestaurantDataBase
-    private lateinit var dbOrderHelper: OrderDataBase
-    private lateinit var dbGroupHelper: GroupDataBase
     private lateinit var firebaseTokenManager: FirebaseTokenService
     private lateinit var userDataBaseFirebase: UserDataBaseFirebase
     private lateinit var orderDataBaseFirebase: OrderDataBaseFirebase
@@ -106,8 +91,8 @@ class MainComposeActivity : ComponentActivity() {
             val orderViewModel: OrderViewModel = viewModel()
             val groupViewModel: GroupViewModel = viewModel()
             LaunchedEffect(Unit) {
-                orderViewModel.setServices(dbOrderHelper, orderDataBaseFirebase, navController)
-                groupViewModel.setServices(dbGroupHelper, groupDataBaseFirebase, navController)
+                orderViewModel.setServices(orderDataBaseFirebase)
+                groupViewModel.setServices(groupDataBaseFirebase)
                 viewModel.setServices(
                     userDataBaseFirebase,
                     tokenDataBaseFirebase,
@@ -122,7 +107,7 @@ class MainComposeActivity : ComponentActivity() {
                     orderViewModel.user = user
                     orderViewModel.removeOrderFromSession()
                     orderViewModel.updateOrderLogin()
-                    groupViewModel.userPrueba=user
+                    groupViewModel.userLogged=user
                     navController.navigate(AppScreens.Home_Screen.route)
                     tokenDataBaseFirebase.addUserDeviceToken(firebaseTokenManager.getTokenFromPreferences()!!, user.userId)
                 } else {
@@ -140,10 +125,7 @@ class MainComposeActivity : ComponentActivity() {
                 viewModel,
                 orderViewModel,
                 groupViewModel,
-                dbUserHelper,
                 dbRestaurantHelper,
-                dbGroupHelper,
-                dbOrderHelper,
                 userDataBaseFirebase
             )
 
@@ -151,24 +133,12 @@ class MainComposeActivity : ComponentActivity() {
             if (notification != null) {
                 navController.navigate(AppScreens.Progress_Order_Screen.createRoute(""))
             }
-        } else {
-            //CircularProgressIndicator()
         }
     }
 
     private suspend fun initializeDatabase() = withContext(Dispatchers.IO) {
-        dbUserHelper = UserDataBase(this@MainComposeActivity)
-        //dbUserHelper.createDataBase(dbUserHelper)
-
         dbRestaurantHelper = RestaurantDataBase(this@MainComposeActivity)
-        dbRestaurantHelper.deleteAndCreateTables(dbUserHelper)
-
-        dbOrderHelper = OrderDataBase(this@MainComposeActivity)
-        //dbOrderHelper.deleteAndCreateTables()
-
-        dbGroupHelper = GroupDataBase(this@MainComposeActivity)
-        dbGroupHelper.createDataBase(dbGroupHelper)
-
+        dbRestaurantHelper.deleteAndCreateTables(dbRestaurantHelper)
         createTestData(dbRestaurantHelper)
 
         //Get firebase token for this device
@@ -177,7 +147,6 @@ class MainComposeActivity : ComponentActivity() {
         if (firebaseToken.isNullOrEmpty()) {
             firebaseTokenManager.getAndSaveToken()
         }
-
         //Create instance
         val database = FirebaseDatabase.getInstance()
 
@@ -308,11 +277,11 @@ class MainComposeActivity : ComponentActivity() {
             )
         )
 
-        dbRestaurantHelper.insertRestaurant(restaurant1, dbUserHelper)
-        dbRestaurantHelper.insertRestaurant(restaurant2, dbUserHelper)
-        dbRestaurantHelper.insertRestaurant(restaurant3, dbUserHelper)
-        dbRestaurantHelper.insertRestaurant(restaurant4, dbUserHelper)
-        dbRestaurantHelper.insertRestaurant(restaurant5, dbUserHelper)
+        dbRestaurantHelper.insertRestaurant(restaurant1, dbRestaurantHelper)
+        dbRestaurantHelper.insertRestaurant(restaurant2, dbRestaurantHelper)
+        dbRestaurantHelper.insertRestaurant(restaurant3, dbRestaurantHelper)
+        dbRestaurantHelper.insertRestaurant(restaurant4, dbRestaurantHelper)
+        dbRestaurantHelper.insertRestaurant(restaurant5, dbRestaurantHelper)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
