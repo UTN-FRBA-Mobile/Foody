@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.Button
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -23,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.User
@@ -49,6 +51,7 @@ fun GroupScreen(
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
+
         Box(
             modifier = Modifier.padding(top = 16.dp, start = 32.dp, end = 32.dp),
             contentAlignment = Alignment.TopCenter
@@ -71,6 +74,7 @@ fun GroupScreen(
                 )
             }
         }
+
         Box(
             modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 16.dp),
             contentAlignment = Alignment.Center
@@ -91,13 +95,35 @@ fun GroupScreen(
                 }
             }
         }
+
+        Box(contentAlignment = Alignment.Center) {
+            val user = orderViewModel.user
+            Button(modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+                .padding(horizontal = 32.dp),
+                onClick = {
+                    groupViewModel.deleteUser(user) {
+                        if (it != null) {
+                            orderViewModel.updateGroup(it)
+                            orderViewModel.updateUserOrders(user)
+                        }
+                    }
+                    navController.navigate(AppScreens.Home_Screen.route)
+                }
+            ) {
+                Text("Salir del grupo", fontSize = 18.sp)
+            }
+        }
     }
 }
 
 @Composable
 fun UserRow(user: User, orderViewModel: OrderViewModel, groupViewModel: GroupViewModel) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -126,8 +152,12 @@ fun UserRow(user: User, orderViewModel: OrderViewModel, groupViewModel: GroupVie
                 Row(horizontalArrangement = Arrangement.End, modifier = Modifier.weight(0.2f)) {
                     IconButton(
                         onClick = {
-                            val updatedGroup = groupViewModel.deleteUser(user)
-                            orderViewModel.updateGroup(updatedGroup)
+                            groupViewModel.deleteUser(user) {
+                                if (it != null) {
+                                    orderViewModel.updateGroup(it)
+                                    orderViewModel.updateUserOrders(user)
+                                }
+                            }
                         },
                         modifier = Modifier
                             .padding(vertical = 8.dp)

@@ -4,5 +4,5 @@ data class Group (
     var groupId: String = "",
     var password: String = "",
     var members: List<User> = emptyList(),
-    val membersLimit: Int = 10,
+    val membersLimit: Int = 3,
 )

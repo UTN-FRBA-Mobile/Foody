@@ -1,5 +1,6 @@
 package ar.edu.utn.frba.foody.ui.main
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -7,8 +8,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -118,8 +121,10 @@ fun RestaurantItem(
     val changeRestaurant = remember {
         mutableStateOf(false)
     }
+    var showError by remember { mutableStateOf(false) }
 
     val restaurantName = orderViewModel.getPickedOrder().restaurant.name
+    val group = orderViewModel.getPickedOrder().group
 
     SimpleAlert(
         show = showAlert.value,
@@ -146,15 +151,29 @@ fun RestaurantItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(onClick = {
-                    if (restaurantName != "" &&
-                        restaurant.name != restaurantName
-                    ) {
-                        showAlert.value = true
-                    } else {
-                        showRestaurant.value = true
-                    }
-                })
+                .clickable(
+                    //enabled = group == null || restaurantName == restaurant.name,
+                    onClick = {
+                        if (group != null) {
+                            if (restaurantName != restaurant.name) {
+                                showError = true
+                                Toast.makeText(
+                                    navController.context,
+                                    "You can't order in this restaurant",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                showRestaurant.value = true
+                            }
+                        } else {
+                            if (restaurantName != "" &&
+                                restaurant.name != restaurantName) {
+                                showAlert.value = true
+                            } else {
+                                showRestaurant.value = true
+                            }
+                        }
+                    })
                 .padding(16.dp, 4.dp)
         ) {
             Image(
