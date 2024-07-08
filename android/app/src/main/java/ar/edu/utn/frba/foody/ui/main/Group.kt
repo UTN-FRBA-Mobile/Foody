@@ -109,6 +109,7 @@ fun GroupScreen(
                             orderViewModel.updateUserOrders(user)
                         }
                     }
+                    orderViewModel.user.groupId = ""
                     navController.navigate(AppScreens.Home_Screen.route)
                 }
             ) {
