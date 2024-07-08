@@ -217,7 +217,7 @@ fun SignUpScreen(
                     onClick = {
                         user.email = email
                         user.password = password
-                        if (validateAnyUserEmpty(user, contactNumber, context)) {
+                        if (validateAnyUserEmpty(user, contactNumber, context,mainViewModel)) {
                             user.numeroContacto = contactNumber.toInt()
 
                             val address = viewModel.user.direccion
@@ -280,10 +280,11 @@ fun TopGroupSignUp() {
 fun validateAnyUserEmpty(
     user: User,
     numero: String,
-    context: Context
+    context: Context,
+    mainViewModel: MainViewModel
 ): Boolean {
     if (user.email == "") {
-        Toast.makeText(context, "Falta completar el email.", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Falta completar el nombre de usuario.", Toast.LENGTH_SHORT).show()
         return false
     }
     if (user.password == "") {
@@ -292,6 +293,10 @@ fun validateAnyUserEmpty(
     }
     if (numero == "") {
         Toast.makeText(context, "Falta completar el numero de contacto.", Toast.LENGTH_SHORT).show()
+        return false
+    }
+    if (mainViewModel.validateUser(user.email)){
+        Toast.makeText(context, "El nombre de usuario ya existe.", Toast.LENGTH_SHORT).show()
         return false
     }
     if (user.password.length < 8) {

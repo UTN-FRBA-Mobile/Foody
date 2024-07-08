@@ -36,10 +36,7 @@ class OrderViewModel() : ViewModel() {
     var orderDataBaseFirebase: OrderDataBaseFirebase? = null
     var navController: NavController? = null
 
-    var user = User()
-        set(value) {
-            field = value
-        }
+    var user by mutableStateOf(User(""))
 
     private val _addUserOrderResult = MutableLiveData<Boolean>()
     val addUserOrderResult: LiveData<Boolean> get() = _addUserOrderResult
@@ -70,6 +67,10 @@ class OrderViewModel() : ViewModel() {
 
     fun updateOrder(order: Order) {
         this.order = order
+    }
+
+    fun updateUser(user: User) {
+        this.user = user
     }
 
     fun updateDataBaseOrder(newOrder: Order) {

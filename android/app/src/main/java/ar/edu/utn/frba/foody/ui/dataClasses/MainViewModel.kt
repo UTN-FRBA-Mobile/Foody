@@ -25,7 +25,7 @@ class MainViewModel() : ViewModel() {
     var tokenDataBaseFirebase: TokenDataBaseFirebase? = null
     var navController: NavController? = null
     var firebaseTokenService: FirebaseTokenService? = null
-
+    var allUsers = mutableListOf<User>()
 
     private var restaurant by mutableStateOf(Restaurant())
         private set
@@ -79,6 +79,16 @@ class MainViewModel() : ViewModel() {
             }
         }
     }
+    fun validateUser(email: String): Boolean{
+       return allUsers.any { user->user.userId==email }
+    }
+    fun findAllUsers(){
+        userDataBaseFirebase!!.getallUsers(){
+            users ->
+            if (users.isNotEmpty()) allUsers= users.toMutableList()
+        }
+    }
+
 
     fun setServices(userDataBaseFirebase: UserDataBaseFirebase, tokenDataBaseFirebase: TokenDataBaseFirebase, navController: NavController, firebaseTokenService: FirebaseTokenService) {
         this.userDataBaseFirebase = userDataBaseFirebase

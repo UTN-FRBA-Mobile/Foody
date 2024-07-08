@@ -53,7 +53,7 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     val showError by remember { mutableStateOf(false) }
     val canGoBack = remember { mutableStateOf(false) } // Cambia esto según tu lógica
-
+    orderViewModel.emptyAddress()
     BackHandler(enabled = !canGoBack.value) {
         // Aquí decides qué hacer cuando se presiona el botón de retroceso
         // Si canGoBack es false, no haces nada, por lo tanto, evitas el retroceso

@@ -114,12 +114,15 @@ class MainComposeActivity : ComponentActivity() {
                     navController,
                     firebaseTokenManager
                 )
+                viewModel.findAllUsers()
+
             }
             viewModel.user.observe(this@MainComposeActivity, Observer { user ->
                 if (user != null) {
                     orderViewModel.user = user
                     orderViewModel.removeOrderFromSession()
                     orderViewModel.updateOrderLogin()
+                    groupViewModel.userPrueba=user
                     navController.navigate(AppScreens.Home_Screen.route)
                     tokenDataBaseFirebase.addUserDeviceToken(firebaseTokenManager.getTokenFromPreferences()!!, user.userId)
                 } else {
