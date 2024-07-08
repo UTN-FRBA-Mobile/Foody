@@ -1,5 +1,6 @@
 package ar.edu.utn.frba.foody.ui.navigation
 
+import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
@@ -41,7 +42,8 @@ fun AppNavigation(
     orderViewModel: OrderViewModel,
     groupViewModel: GroupViewModel,
     dbRestaurantHelper: RestaurantDataBase,
-    dbUserDataBaseFirebase: UserDataBaseFirebase
+    dbUserDataBaseFirebase: UserDataBaseFirebase,
+    intent: Intent,
 ) {
     NavHost(navController = navController, startDestination = AppScreens.Splash_Screen.route) {
         composable(route = AppScreens.Session_Screen.route)
@@ -51,11 +53,12 @@ fun AppNavigation(
                 viewModel = viewModel,
                 restaurantDataBase = dbRestaurantHelper,
                 orderViewModel = orderViewModel,
-                groupViewModel = groupViewModel
+                groupViewModel = groupViewModel,
+                intent = intent
             )
         }
         composable(route = AppScreens.Splash_Screen.route){
-            SplashScreen(navController = navController)
+            SplashScreen(navController = navController, intent = intent,orderViewModel)
         }
         composable(route = AppScreens.Home_Screen.route) {
             HomeScreen(

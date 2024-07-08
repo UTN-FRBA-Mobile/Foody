@@ -1,5 +1,6 @@
 package ar.edu.utn.frba.foody.ui.dataBase
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -14,6 +15,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import android.content.Context
+
 
 class FcmService : FirebaseMessagingService() {
     val CHANNEL_ID = "Channel 1"
@@ -57,4 +59,5 @@ class FcmService : FirebaseMessagingService() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(1, notification)
     }
+
 }

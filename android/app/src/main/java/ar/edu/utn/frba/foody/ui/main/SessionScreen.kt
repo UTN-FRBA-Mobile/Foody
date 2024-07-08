@@ -11,6 +11,10 @@ import ar.edu.utn.frba.foody.ui.dataBase.StoreUserSession.StoreUserSession
 import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Intent
+import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
 fun SessionScreen(
@@ -18,7 +22,8 @@ fun SessionScreen(
     viewModel: MainViewModel,
     restaurantDataBase: RestaurantDataBase?,
     orderViewModel: OrderViewModel,
-    groupViewModel: GroupViewModel
+    groupViewModel: GroupViewModel,
+    intent: Intent
 ) {
     val context = LocalContext.current
     val dataStore = StoreUserSession(context)
@@ -32,13 +37,21 @@ fun SessionScreen(
                 mainViewModel = viewModel,
                 orderViewModel = orderViewModel)
         }else{
-            HomeScreen(
-                navController = navController,
-                viewModel = viewModel,
-                restaurantDataBase = restaurantDataBase,
-                orderViewModel = orderViewModel,
-                groupViewModel = groupViewModel
-            )
+            val notification = intent.getStringExtra("notification")
+            if (notification != null) {
+                orderViewModel.findAllOrdersByState()
+                var order_id =orderViewModel.getAllOrdersByState().last().orderId
+                navController.navigate(AppScreens.Progress_Order_Screen.createRoute(order_id))
+            }
+            else {
+                HomeScreen(
+                    navController = navController,
+                    viewModel = viewModel,
+                    restaurantDataBase = restaurantDataBase,
+                    orderViewModel = orderViewModel,
+                    groupViewModel = groupViewModel
+                )
+            }
         }
     }
 }

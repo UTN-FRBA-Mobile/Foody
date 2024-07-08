@@ -1,5 +1,6 @@
 package ar.edu.utn.frba.foody.ui.main
 
+import android.content.Intent
 import android.window.SplashScreen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -19,11 +20,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import ar.edu.utn.frba.foody.R
+import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashScreen(navController : NavHostController){
+fun SplashScreen(navController : NavHostController,intent: Intent,orderViewModel: OrderViewModel){
 
     LaunchedEffect(key1 = true) {
         delay(1000)

@@ -2,7 +2,6 @@ package ar.edu.utn.frba.foody
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -14,13 +13,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -39,13 +35,11 @@ import ar.edu.utn.frba.foody.ui.navigation.AppNavigation
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 import ar.edu.utn.frba.foody.ui.dataBase.FirebaseTokenService
 import ar.edu.utn.frba.foody.ui.dataBase.StoreUserSession.StoreUserSession
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
+
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.prefs.Preferences
 
 
 class MainComposeActivity : ComponentActivity() {
@@ -147,13 +141,17 @@ class MainComposeActivity : ComponentActivity() {
                 orderViewModel,
                 groupViewModel,
                 dbRestaurantHelper,
-                userDataBaseFirebase
+                userDataBaseFirebase,
+                intent = intent
             )
 
-            val notification = intent.getStringExtra("notification")
+            /*val notification = intent.getStringExtra("notification")
             if (notification != null) {
-                navController.navigate(AppScreens.Progress_Order_Screen.createRoute(""))
+                //navController.navigate(AppScreens.Progress_Order_Screen.createRoute("-O1Hquva6QGTIh48NyiE"))
+                navController.navigate(AppScreens.Orders_Screen.route)
             }
+
+             */
         }
     }
 
