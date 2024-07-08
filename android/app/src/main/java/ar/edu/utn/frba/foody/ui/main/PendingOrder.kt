@@ -22,14 +22,17 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -41,9 +44,11 @@ import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Estado
 import ar.edu.utn.frba.foody.ui.Classes.Order
 import ar.edu.utn.frba.foody.ui.composables.SimpleAlert
+import ar.edu.utn.frba.foody.ui.dataBase.StoreUserSession.StoreUserSession
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
+import kotlinx.coroutines.launch
 
 @Composable
 fun PendingOrderScreen(
@@ -254,6 +259,10 @@ fun BottomGroupPendingOrder(navController: NavController) {
 
 @Composable
 fun TopGroupPendingOrder(navController: NavController, viewModel: MainViewModel) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val dataStore = StoreUserSession(context)
+
     TopAppBar(
         title = {
             Box(modifier = Modifier.fillMaxWidth()) {
@@ -282,7 +291,13 @@ fun TopGroupPendingOrder(navController: NavController, viewModel: MainViewModel)
                     contentScale = ContentScale.FillBounds
                 )
             }
-            IconButton(onClick = { viewModel.logout() }) {
+            IconButton(onClick =
+            {
+                viewModel.logout()
+                scope.launch {
+                    dataStore.deleteSession()
+                }
+            }) {
                 Image(
                     painter = painterResource(id = R.drawable.logout_icon),
                     contentDescription = "Logout Icon",

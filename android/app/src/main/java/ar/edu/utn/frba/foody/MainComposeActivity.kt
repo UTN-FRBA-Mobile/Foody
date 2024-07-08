@@ -2,6 +2,7 @@ package ar.edu.utn.frba.foody
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -14,10 +15,15 @@ import androidx.annotation.RequiresApi
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -40,6 +46,7 @@ import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppNavigation
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 import ar.edu.utn.frba.foody.ui.dataBase.FirebaseTokenService
+import ar.edu.utn.frba.foody.ui.dataBase.StoreUserSession.StoreUserSession
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -47,6 +54,7 @@ import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.prefs.Preferences
 
 
 class MainComposeActivity : ComponentActivity() {
@@ -100,6 +108,11 @@ class MainComposeActivity : ComponentActivity() {
 
     @Composable
     fun MyApp(initializationComplete: Boolean) {
+        val context = LocalContext.current
+        val scope = rememberCoroutineScope()
+        val dataStore = StoreUserSession(context)
+        val userSession = dataStore.getSession.collectAsState(initial = "")
+
         if (initializationComplete) {
             val navController = rememberNavController()
             val viewModel: MainViewModel = viewModel()
@@ -114,6 +127,11 @@ class MainComposeActivity : ComponentActivity() {
                     navController,
                     firebaseTokenManager
                 )
+
+                if (userSession.value != ""){
+                    viewModel.fetchUserByEmail(userSession.value.split("-")[0], userSession.value.split("-")[1])
+                }
+
             }
             viewModel.user.observe(this@MainComposeActivity, Observer { user ->
                 if (user != null) {
@@ -122,6 +140,9 @@ class MainComposeActivity : ComponentActivity() {
                     orderViewModel.updateOrderLogin()
                     navController.navigate(AppScreens.Home_Screen.route)
                     tokenDataBaseFirebase.addUserDeviceToken(firebaseTokenManager.getTokenFromPreferences()!!, user.userId)
+                    scope.launch {
+                        dataStore.saveSession(user.userId+"-"+user.password)
+                    }
                 } else {
                     Toast.makeText(
                         navController.context,

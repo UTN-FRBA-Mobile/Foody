@@ -9,10 +9,12 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -23,9 +25,11 @@ import ar.edu.utn.frba.foody.ui.Classes.Restaurant
 import ar.edu.utn.frba.foody.ui.composables.SimpleAlert
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.RestaurantDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
+import ar.edu.utn.frba.foody.ui.dataBase.StoreUserSession.StoreUserSession
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
@@ -231,6 +235,10 @@ fun BottomGroupHome(navController: NavController, orderViewModel: OrderViewModel
 
 @Composable
 fun TopGroupHome(navController: NavController, viewModel: MainViewModel) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val dataStore = StoreUserSession(context)
+
     TopAppBar(
         title = {
             Text(text = stringResource(id = R.string.app_name))
@@ -247,7 +255,12 @@ fun TopGroupHome(navController: NavController, viewModel: MainViewModel) {
                     )
                 }
             }
-            IconButton(onClick = { viewModel.logout() }) {
+            IconButton(onClick = {
+                viewModel.logout()
+                scope.launch {
+                    dataStore.deleteSession()
+                }
+            }) {
                 Image(
                     painter = painterResource(id = R.drawable.logout_icon),
                     contentDescription = "Logout Icon",
@@ -258,14 +271,3 @@ fun TopGroupHome(navController: NavController, viewModel: MainViewModel) {
         }
     )
 }
-
-/*
-@Preview
-@Composable
-fun DefaultPreview() {
-    val navController = rememberNavController()
-    val viewModel = MainViewModel()
-    val orderViewModel = OrderViewModel()
-    HomeScreen(navController, viewModel, null, null, orderViewModel)
-}
-*/
