@@ -19,6 +19,9 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCH835hjQd64yAhhde_HWo0wjdo7W_wEZQ" />
+
+        <activity android:name=".ui.navigation.AppScreens$OnTheWayOrders" />
+
         <activity
             android:name=".MainComposeActivity"
             android:exported="true">

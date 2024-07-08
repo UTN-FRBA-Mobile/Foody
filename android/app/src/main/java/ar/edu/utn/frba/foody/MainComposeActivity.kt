@@ -143,6 +143,11 @@ class MainComposeActivity : ComponentActivity() {
                 dbOrderHelper,
                 userDataBaseFirebase
             )
+
+            val notification = intent.getStringExtra("notification")
+            if (notification != null) {
+                navController.navigate(AppScreens.Progress_Order_Screen.createRoute(""))
+            }
         } else {
             //CircularProgressIndicator()
         }

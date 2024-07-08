@@ -168,6 +168,5 @@ fun AppNavigation(
         composable(route = AppScreens.OnTheWayOrders.route) {
             OrdersOnTheWayScreen(navController = navController,orderViewModel)
         }
-
     }
 }
