@@ -165,8 +165,6 @@ class OrderViewModel() : ViewModel() {
     }
 
     fun getAssignedUserOrder(loading: MutableState<Boolean>): UserOrder {
-        println(user)
-        println(order.userOrders)
         val userOrder = order.userOrders.firstOrNull() { x -> x.user.userId == this.user.userId }
         if (userOrder == null) {
             return updateUserOrder(order)
@@ -421,7 +419,7 @@ class OrderViewModel() : ViewModel() {
     fun deleteCurrentOrder() {
         orderDataBaseFirebase?.getOrderByState(Estado.ENPROGRESO, user) { orden ->
             if (orden != null) {
-                orderDataBaseFirebase?.deleteOrder(orden.orderId) { isSuccess -> }
+                orderDataBaseFirebase?.deleteOrder(orden.orderId) { }
             }
         }
     }

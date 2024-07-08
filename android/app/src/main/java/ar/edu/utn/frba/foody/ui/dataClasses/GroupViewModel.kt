@@ -65,7 +65,12 @@ class GroupViewModel() : ViewModel() {
                 updatedGroup = group.copy(members = group.members.filter { it != user })
             }
 
-            this.updateGroup(updatedGroup)
+            if (updatedGroup.members.isEmpty()) {
+                this.updateGroup(Group())
+            } else {
+                this.updateGroup(updatedGroup)
+            }
+
             callback(updatedGroup)
         }
     }

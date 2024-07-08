@@ -107,9 +107,7 @@ fun PaymentScreen(
     }
 
     if (deleteCard.value) {
-        println("Card deleted")
         val filteredCards = cards.filter { it.cvv != tarjeta }
-        println(filteredCards)
         orderViewModel.updateUser(user.copy(tarjetas = filteredCards.toMutableList()))
     }
 

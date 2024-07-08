@@ -45,9 +45,10 @@ class GroupDataBaseFirebase(private var database: FirebaseDatabase) {
                 if (userReassigned != null) {
                     changeUserRole(userReassigned, true)
                     changeUserRole(user, false)
+                } else {
+                    changeUserRole(user, false)
                 }
             }
-
         }
 
         membersRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -64,7 +65,26 @@ class GroupDataBaseFirebase(private var database: FirebaseDatabase) {
                                 val usersRef = database.getReference(TABLE_USERS).child(user.userId)
                                 usersRef.child("groupId").setValue("")
 
-                                callback(true)
+                                membersRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                                    override fun onDataChange(snapshot: DataSnapshot) {
+                                        if (!snapshot.exists()) {
+                                            val groupRef = database.getReference(TABLE_GROUPS).child(groupId)
+                                            groupRef.removeValue().addOnCompleteListener { groupTask ->
+                                                if (groupTask.isSuccessful) {
+                                                    callback(true)
+                                                } else {
+                                                    callback(false)
+                                                }
+                                            }
+                                        } else {
+                                            callback(true)
+                                        }
+                                    }
+
+                                    override fun onCancelled(error: DatabaseError) {
+                                        callback(false)
+                                    }
+                                })
                             } else {
                                 callback(false)
                             }
@@ -92,7 +112,6 @@ class GroupDataBaseFirebase(private var database: FirebaseDatabase) {
 
     private fun reassignAdmin(groupId: String, callback: (User?) -> Unit) {
         val groupRef = database.getReference(TABLE_GROUPS).child(groupId).child("members")
-
         groupRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 var firstNonAdminFound = false
@@ -111,6 +130,8 @@ class GroupDataBaseFirebase(private var database: FirebaseDatabase) {
                                     callback(null)
                                 }
                             }
+                    } else {
+                        callback(null)
                     }
                 }
             }
