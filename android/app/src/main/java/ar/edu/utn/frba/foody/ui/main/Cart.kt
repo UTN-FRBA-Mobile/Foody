@@ -271,6 +271,20 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
     val showDialog = remember { mutableStateOf(false) }
     val totalPrice = orderItem.quantity * orderItem.dish.price
 
+    val showAlert = remember {
+        mutableStateOf(false)
+    }
+
+    SimpleAlert(
+        show = showAlert.value,
+        text = "¿Estás seguro que deseas eliminar el plato?",
+        onConfirm = {
+            showAlert.value = false
+            viewModel.deleteItem(orderItem.dish.dishId)
+        },
+        onDismiss = { showAlert.value = false }
+    )
+
     DishAlert(show = showDialog.value, dish = orderItem.dish, totalPrice) {
         showDialog.value = false
     }
@@ -290,13 +304,13 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(
-                onClick = {
-                    viewModel.deleteItem(orderItem.dish.dishId)
-                },
-                enabled = viewModel.enableChangeUserOrderButton(userOrder.user.userId)
-            ) {
-                Icon(imageVector = Icons.Default.Clear, contentDescription = "Remove")
+            if ((viewModel.getPickedOrder().group != null && (viewModel.user.admin || viewModel.user.userId == userOrder.user.userId)) || viewModel.getPickedOrder().group == null) {
+                IconButton(
+                    onClick = { showAlert.value = true },
+                    enabled = viewModel.enableChangeUserOrderButton(userOrder.user.userId)
+                ) {
+                    Icon(imageVector = Icons.Default.Clear, contentDescription = "Remove")
+                }
             }
 
             Spacer(modifier = Modifier.width(8.dp))
