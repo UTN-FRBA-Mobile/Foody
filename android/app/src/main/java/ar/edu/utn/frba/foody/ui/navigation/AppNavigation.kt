@@ -9,7 +9,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import ar.edu.utn.frba.foody.ui.dataBase.Firebase.UserDataBaseFirebase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.RestaurantDataBase
-import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
@@ -51,8 +50,8 @@ fun AppNavigation(
                 navController = navController,
                 viewModel = viewModel,
                 restaurantDataBase = dbRestaurantHelper,
-                userDataBase = dbUserHelper,
-                orderViewModel = orderViewModel
+                orderViewModel = orderViewModel,
+                groupViewModel = groupViewModel
             )
         }
         composable(route = AppScreens.Splash_Screen.route){
