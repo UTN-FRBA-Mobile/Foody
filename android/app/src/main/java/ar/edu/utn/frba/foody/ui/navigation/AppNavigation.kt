@@ -63,7 +63,8 @@ fun AppNavigation(
         composable(route = AppScreens.Login_Screen.route) {
             LoginScreen(
                 navController = navController,
-                mainViewModel = viewModel
+                mainViewModel = viewModel,
+                orderViewModel = orderViewModel
             )
         }
         composable(route = AppScreens.SignUp_Screen.route) {

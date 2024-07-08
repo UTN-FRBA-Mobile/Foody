@@ -90,7 +90,7 @@ fun SignUpScreen(
         ) {
             item {
                 Text(
-                    text = "Create an Account",
+                    text = "Crear una cuenta",
                     style = MaterialTheme.typography.h5,
                     color = MaterialTheme.colors.primary,
                     textAlign = TextAlign.Center,
@@ -102,7 +102,7 @@ fun SignUpScreen(
                 TextField(
                     value = email,
                     { mainViewModel.updateEmail(it) },
-                    label = { Text(text = "Username", modifier = Modifier.padding(start = 16.dp)) },
+                    label = { Text(text = "Usuario", modifier = Modifier.padding(start = 16.dp)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     singleLine = true,
                     maxLines = 1,
@@ -117,7 +117,7 @@ fun SignUpScreen(
                 TextField(
                     value = password,
                     { mainViewModel.updatePassword(it) },
-                    label = { Text(text = "Password", modifier = Modifier.padding(start = 16.dp)) },
+                    label = { Text(text = "Contraseña", modifier = Modifier.padding(start = 16.dp)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     singleLine = true,
                     maxLines = 1,
@@ -135,7 +135,7 @@ fun SignUpScreen(
                     onValueChange = { mainViewModel.updateContactNumber(it) },
                     label = {
                         Text(
-                            text = "Numero Contacto",
+                            text = "Número de contacto",
                             modifier = Modifier.padding(start = 16.dp)
                         )
                     },
@@ -156,8 +156,9 @@ fun SignUpScreen(
                         .fillMaxWidth()
                         .padding(top = 16.dp)
                 ) {
-                    val direccionText = if (viewModel.existAddress()) viewModel.user.direccion
-                        .let { "${it.calle} ${it.numero}, ${it.localidad}, ${it.region}" } else ""
+                    val direccionText = if (viewModel.user.direccion.calle != null && viewModel.user.direccion.calle != "")
+                        viewModel.user.direccion.let { "${it.calle} ${it.numero}, ${it.localidad}, ${it.region}" }
+                    else ""
 
                     TextField(
                         value = direccionText,
@@ -165,7 +166,7 @@ fun SignUpScreen(
                         onValueChange = {},  // No permitir cambios en el texto
                         label = {
                             Text(
-                                text = "Direccion",
+                                text = "Dirección",
                                 modifier = Modifier.padding(start = 16.dp)
                             )
                         },
@@ -291,6 +292,10 @@ fun validateAnyUserEmpty(
     }
     if (numero == "") {
         Toast.makeText(context, "Falta completar el numero de contacto.", Toast.LENGTH_SHORT).show()
+        return false
+    }
+    if (user.password.length < 8) {
+        Toast.makeText(context, "La contraseña debe tener al menos 8 caracteres.", Toast.LENGTH_SHORT).show()
         return false
     }
 

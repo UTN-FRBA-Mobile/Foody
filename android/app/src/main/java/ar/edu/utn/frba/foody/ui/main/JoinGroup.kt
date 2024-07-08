@@ -113,21 +113,26 @@ fun JoinGroupScreen(
 
                 Button(
                     onClick = {
-                        groupViewModel.verifyGroupExist(name, password) { group ->
-                            if (group != null) {
-                                orderViewModel.deleteCurrentOrder()
-                                orderViewModel.getOrderByGroup(group.groupId)
-                                groupViewModel.updateUser(orderViewModel.user)
-                                navController.navigate(AppScreens.Restaurant_Screen.route)
-                            } else {
-                                showError = true
-                                name = ""
-                                password = ""
-                                Toast.makeText(
-                                    navController.context,
-                                    "Incorrect Name or Password",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                        if(name == "" && password == "") {
+                            showError = true
+                        }
+                        else {
+                            groupViewModel.verifyGroupExist(name, password) { group ->
+                                if (group != null) {
+                                    orderViewModel.deleteCurrentOrder()
+                                    orderViewModel.getOrderByGroup(group.groupId)
+                                    groupViewModel.updateUser(orderViewModel.user)
+                                    navController.navigate(AppScreens.Restaurant_Screen.route)
+                                } else {
+                                    showError = true
+                                    name = ""
+                                    password = ""
+                                    Toast.makeText(
+                                        navController.context,
+                                        "Incorrect Name or Password",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             }
                         }
                     },

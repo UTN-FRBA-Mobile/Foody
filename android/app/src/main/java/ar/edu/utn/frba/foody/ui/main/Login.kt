@@ -47,7 +47,8 @@ import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 @Composable
 fun LoginScreen(
     navController: NavHostController,
-    mainViewModel: MainViewModel) {
+    mainViewModel: MainViewModel,
+    orderViewModel: OrderViewModel) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val showError by remember { mutableStateOf(false) }
@@ -179,6 +180,7 @@ fun LoginScreen(
                         onClick = {
                             navController.navigate(AppScreens.SignUp_Screen.route)
                             mainViewModel.clearSignUpFields()
+                            orderViewModel.emptyAddress()
                         },
                         style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.primary)
                     )
