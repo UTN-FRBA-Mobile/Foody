@@ -194,7 +194,7 @@ fun OrdersGrid(
         ) {
             items(userOrders.size) { index ->
                 if (userOrders[index].items.isNotEmpty()) {
-                    OrderCard(viewModel, userOrders[index], navController)
+                    OrderCard(viewModel, userOrders[index])
                 }
             }
         }
