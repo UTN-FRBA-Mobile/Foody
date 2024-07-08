@@ -80,25 +80,20 @@ fun PaymentScreen(
     val selectedCard = remember { mutableStateListOf(*List(cards.size) { false }.toTypedArray()) }
 
     fun validatePay() {
-        val order = orderViewModel.getPickedOrder()
-        if (order.address == "") {
-            Toast.makeText(context, "Falta completar la dirección.", Toast.LENGTH_SHORT).show()
-        } else {
-            val updatedOrder = orderViewModel.createOrderWithStates(
-                addressComplete,
-                totalPayment,
-                tarjeta
-            )
-            orderViewModel.updateDataBaseOrder(updatedOrder)
-            orderViewModel.updateOrder(Order())
-            mainViewModel.updateRestaurant(Restaurant())
-            Toast.makeText(
-                navController.context,
-                "Pago validado",
-                Toast.LENGTH_SHORT
-            ).show()
-            navController.navigate(AppScreens.Orders_Screen.route)
-        }
+        val updatedOrder = orderViewModel.createOrderWithStates(
+            addressComplete,
+            totalPayment,
+            tarjeta
+        )
+        orderViewModel.updateDataBaseOrder(updatedOrder)
+        orderViewModel.updateOrder(Order())
+        mainViewModel.updateRestaurant(Restaurant())
+        Toast.makeText(
+            navController.context,
+            "Pago validado",
+            Toast.LENGTH_SHORT
+        ).show()
+        navController.navigate(AppScreens.Orders_Screen.route)
     }
 
     InputAlert(
