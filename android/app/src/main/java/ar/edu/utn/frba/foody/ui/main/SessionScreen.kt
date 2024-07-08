@@ -37,9 +37,8 @@ fun SessionScreen(
             viewModel.fetchUserByEmail(userSession.value.split("-")[0], userSession.value.split("-")[1])
             val notification = intent.getStringExtra("notification")
             if (notification != null) {
-                orderViewModel.findAllOrdersByState()
-                var order_id =orderViewModel.getAllOrdersByState().last().orderId
-                navController.navigate(AppScreens.Progress_Order_Screen.createRoute(order_id))
+                orderViewModel.findAllOrdersByState2()
+
             }
             else {
                 HomeScreen(

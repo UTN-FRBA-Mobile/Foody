@@ -101,7 +101,7 @@ class MainComposeActivity : ComponentActivity() {
             val orderViewModel: OrderViewModel = viewModel()
             val groupViewModel: GroupViewModel = viewModel()
             LaunchedEffect(Unit) {
-                orderViewModel.setServices(orderDataBaseFirebase)
+                orderViewModel.setServices(orderDataBaseFirebase, navController)
                 groupViewModel.setServices(groupDataBaseFirebase)
                 viewModel.setServices(
                     userDataBaseFirebase,
