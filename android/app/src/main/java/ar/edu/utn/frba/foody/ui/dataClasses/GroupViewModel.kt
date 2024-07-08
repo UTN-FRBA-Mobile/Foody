@@ -11,11 +11,10 @@ import ar.edu.utn.frba.foody.ui.dataBase.SQLite.GroupDataBase
 
 class GroupViewModel() : ViewModel() {
     private var group by mutableStateOf(Group())
-
     var groupDataBase: GroupDataBase? = null
     var groupDataBaseFirebase: GroupDataBaseFirebase? = null
     var navController: NavController? = null
-
+    var userPrueba by mutableStateOf(User())
     fun setServices(
         groupDataBase: GroupDataBase,
         groupDataBaseFirebase: GroupDataBaseFirebase,
@@ -93,6 +92,9 @@ class GroupViewModel() : ViewModel() {
             }
         }
     }
+    fun groupIsEmpty():Boolean{
+        return group.groupId==""
+    }
 
     fun verifyGroupExist(name: String, pass: String, callback: (Group?) -> Unit) {
         groupDataBaseFirebase?.getGroupByName(name) { group ->
@@ -104,4 +106,13 @@ class GroupViewModel() : ViewModel() {
         }
     }
 
+    fun findGroupByuserId(){
+        groupDataBaseFirebase?.getGroupByUserId(userPrueba) { group ->
+            if (group != null) {
+                this.updateGroup(group)
+            } else {
+                //this.updateGroup(Group())
+            }
+        }
+    }
 }

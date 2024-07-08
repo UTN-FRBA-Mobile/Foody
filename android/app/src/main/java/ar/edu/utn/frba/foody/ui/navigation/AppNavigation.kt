@@ -57,19 +57,22 @@ fun AppNavigation(
                 viewModel = viewModel,
                 restaurantDataBase = dbRestaurantHelper,
                 userDataBase = dbUserHelper,
-                orderViewModel = orderViewModel
+                orderViewModel = orderViewModel,
+                groupViewModel = groupViewModel
             )
         }
         composable(route = AppScreens.Login_Screen.route) {
             LoginScreen(
                 navController = navController,
-                mainViewModel = viewModel
+                mainViewModel = viewModel,
+                orderViewModel = orderViewModel
             )
         }
         composable(route = AppScreens.SignUp_Screen.route) {
             SignUpScreen(
                 navController = navController,
                 viewModel = orderViewModel,
+                mainViewModel = viewModel,
                 dbUserHelper,
                 dbUserDataBaseFirebase
             )

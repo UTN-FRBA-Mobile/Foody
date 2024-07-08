@@ -200,12 +200,14 @@ fun PaymentScreen(
 
                     if (paymentMethod == "Tarjeta") {
                         Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = "Selecciona una tarjeta:",
-                            style = MaterialTheme.typography.subtitle1,
-                            modifier = Modifier.padding(vertical = 8.dp)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        if (cards.isNotEmpty()) {
+                            Text(
+                                text = "Selecciona una tarjeta:",
+                                style = MaterialTheme.typography.subtitle1,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
                         cards.forEach { card ->
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -322,11 +324,6 @@ fun PaymentScreen(
         }
 
     }
-}
-
-fun validatePayment(order: Order, tarjeta: String, context: Context): Boolean {
-
-    return true
 }
 
 @Composable
