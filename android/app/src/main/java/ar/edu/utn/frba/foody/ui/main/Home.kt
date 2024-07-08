@@ -206,7 +206,7 @@ data class ButtonInterface(
 
 @Composable
 fun BottomGroupHome(navController: NavController, orderViewModel: OrderViewModel) {
-    val buttons = listOf(
+    val buttons = mutableListOf(
         ButtonInterface(
             resourceId = R.drawable.user_icon,
             imageDescription = "User Icon",
@@ -222,12 +222,17 @@ fun BottomGroupHome(navController: NavController, orderViewModel: OrderViewModel
             imageDescription = "Order Icon",
             route = AppScreens.Orders_Screen.route
         ),
-        ButtonInterface(
-            resourceId = R.drawable.create_group_icon,
-            imageDescription = "Join Group Icon",
-            route = AppScreens.Join_Group_Screen.route
-        )
     )
+
+    if (orderViewModel.user.groupId == "") {
+        buttons.add(
+            ButtonInterface(
+                resourceId = R.drawable.create_group_icon,
+                imageDescription = "Join Group Icon",
+                route = AppScreens.Join_Group_Screen.route
+            )
+        )
+    }
 
     BottomAppBar {
         Row(modifier = Modifier.fillMaxWidth()) {
