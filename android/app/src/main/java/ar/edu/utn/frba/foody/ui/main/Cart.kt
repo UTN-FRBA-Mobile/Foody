@@ -60,7 +60,6 @@ fun CartScreen(
     if (order.group != null) {
         groupViewModel.updateGroup(order.group!!)
     }
-
     AppScaffold(
         { BottomGroupCart(navController, orderViewModel = viewModel, order = order) },
         { TopGroupCart(navController, origin) }) {
@@ -96,14 +95,7 @@ fun BottomGroupCart(
     orderViewModel: OrderViewModel,
     order: Order
 ) {
-    val buttons = mutableListOf(
-        ButtonInterface(
-            resourceId = R.drawable.payment_icon,
-            imageDescription = "Payment Icon",
-            route = AppScreens.Payment.route,
-        )
-    )
-
+    val buttons = mutableListOf<ButtonInterface>()
     if (order.group != null) {
         buttons.add(
             ButtonInterface(
@@ -113,7 +105,6 @@ fun BottomGroupCart(
             )
         )
     }
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -145,9 +136,6 @@ fun BottomGroupCart(
                 contentScale = ContentScale.FillBounds
             )
         }
-
-
-        // Buttons
         buttons.forEach { button ->
             IconButton(
                 onClick = { navController.navigate(button.route) },
@@ -186,7 +174,7 @@ fun OrdersGrid(
         ) {
         items(userOrders.size) { index ->
             if (userOrders[index].items.isNotEmpty()) {
-                OrderCard(viewModel, userOrders[index], navController)
+                OrderCard(viewModel, userOrders[index])
             }
         }
     }
@@ -216,7 +204,7 @@ fun OrdersGrid(
 }
 
 @Composable
-fun OrderCard(viewModel: OrderViewModel, userOrder: UserOrder,navController: NavController) {
+fun OrderCard(viewModel: OrderViewModel, userOrder: UserOrder) {
     val heightContent = if (userOrder.items.size > 1) 170.dp else 90.dp
 
     Card(
@@ -315,12 +303,3 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
         }
     }
 }
-
-/*
-@Preview
-@Composable
-fun DefaultPreviewCart() {
-    val navController = rememberNavController()
-    val viewModel = OrderViewModel()
-    CartScreen(navController, viewModel, origin = "home")
-}*/

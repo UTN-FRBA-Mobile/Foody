@@ -58,11 +58,9 @@ fun HomeScreen(
     orderViewModel: OrderViewModel,
     groupViewModel: GroupViewModel
 ) {
-    val canGoBack = remember { mutableStateOf(false) } // Cambia esto según tu lógica
+    val canGoBack = remember { mutableStateOf(false) }
 
     BackHandler(enabled = !canGoBack.value) {
-        // Aquí decides qué hacer cuando se presiona el botón de retroceso
-        // Si canGoBack es false, no haces nada, por lo tanto, evitas el retroceso
     }
     orderViewModel.findAllOrdersByState()
     groupViewModel.findGroupByUserId()
@@ -89,7 +87,7 @@ fun HomeScreen(
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = "Restaurants",
+                    text = "Restaurantes",
                     modifier = Modifier
                         .fillMaxWidth(),
                     textAlign = TextAlign.Center,
@@ -179,7 +177,7 @@ fun RestaurantItem(
                                 showError = true
                                 Toast.makeText(
                                     navController.context,
-                                    "You can't order in this restaurant",
+                                    "No podes ordenar en este restaurante",
                                     Toast.LENGTH_SHORT
                                 ).show()
                             } else {

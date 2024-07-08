@@ -1,7 +1,5 @@
 package ar.edu.utn.frba.foody.ui.main
 
-import android.content.Intent
-import android.window.SplashScreen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,12 +18,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import ar.edu.utn.frba.foody.R
-import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashScreen(navController : NavHostController,intent: Intent,orderViewModel: OrderViewModel){
+fun SplashScreen(navController : NavHostController){
 
     LaunchedEffect(key1 = true) {
         delay(1000)
@@ -53,12 +50,11 @@ fun Splash(){
             painter = painterResource(id = R.drawable.foody_logo),
             contentDescription = "Logo foody",
             modifier = Modifier.size(150.dp, 150.dp))
-        Text("Bienvenid@s",
+        Text("Bienvenidos",
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold)
     }
 }
-
 @Preview(showBackground = true)
 @Composable
 fun SplashScreenPreview(){

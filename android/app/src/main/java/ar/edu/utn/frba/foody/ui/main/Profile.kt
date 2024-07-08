@@ -75,7 +75,7 @@ fun ProfileScreen(
         ) {
             item {
                 Text(
-                    text = "Edit Your Information",
+                    text = "Modificar Tu Información",
                     style = MaterialTheme.typography.h5,
                     color = MaterialTheme.colors.primary,
                     textAlign = TextAlign.Center,
@@ -86,7 +86,7 @@ fun ProfileScreen(
 
                 TextField(
                     value = email, onValueChange = { email = it },
-                    label = { Text(text = "Username", modifier = Modifier.padding(start = 16.dp)) },
+                    label = { Text(text = "Nombre de Usuario", modifier = Modifier.padding(start = 16.dp)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     singleLine = true,
                     maxLines = 1,
@@ -100,7 +100,7 @@ fun ProfileScreen(
 
                 TextField(
                     value = password, onValueChange = { password = it },
-                    label = { Text(text = "Password", modifier = Modifier.padding(start = 16.dp)) },
+                    label = { Text(text = "Contraseña", modifier = Modifier.padding(start = 16.dp)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     singleLine = true,
                     maxLines = 1,
@@ -117,7 +117,7 @@ fun ProfileScreen(
                     value = numero, onValueChange = { numero = it },
                     label = {
                         Text(
-                            text = "Numero Contacto",
+                            text = "Numero de Contacto",
                             modifier = Modifier.padding(start = 16.dp)
                         )
                     },
@@ -143,7 +143,7 @@ fun ProfileScreen(
                         onValueChange = {},
                         label = {
                             Text(
-                                text = "Direccion",
+                                text = "Dirección",
                                 modifier = Modifier.padding(start = 16.dp)
                             )
                         },
@@ -152,7 +152,7 @@ fun ProfileScreen(
                         colors = TextFieldDefaults.textFieldColors(
                             backgroundColor = Color.Transparent
                         ),
-                        enabled = false  // Deshabilitar la edición del TextField
+                        enabled = false
                     )
 
                     IconButton(onClick = {
@@ -243,14 +243,3 @@ fun validateAnyUserEmptyProf(
 
     return true
 }
-
-/*
-@Preview
-@Composable
-fun DefaultPreviewProfile(){
-    val navController = rememberNavController()
-    val addressViewModel= AddressViewModel()
-
-    SignUpScreen(navController = navController,addressViewModel,null)
-}
-        */

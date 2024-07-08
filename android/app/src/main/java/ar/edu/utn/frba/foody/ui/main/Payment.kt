@@ -135,7 +135,6 @@ fun PaymentScreen(
         null,
         { TopGroupPayment(navController) }
     ) {
-        // Simulated list of preloaded cards
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
                 painter = painterResource(id = R.drawable.background_signup),
@@ -170,7 +169,7 @@ fun PaymentScreen(
                             colors = TextFieldDefaults.textFieldColors(
                                 backgroundColor = Color.Transparent
                             ),
-                            enabled = false  // Deshabilitar la edición del TextField
+                            enabled = false
                         )
 
                         IconButton(onClick = {
@@ -271,19 +270,6 @@ fun PaymentScreen(
                             }
                         }
                         Spacer(modifier = Modifier.height(8.dp))
-                        /*cards.forEach { card ->
-                            Text(
-                                text = "**** **** **** ${
-                                    card.cardNumber.takeLast(4)
-                                } - ${card.firstName} ${card.lastName}",
-                                style = MaterialTheme.typography.body1,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 4.dp)
-                            )
-
-                     */
-
                         Text(
                             text = "Añadir nueva tarjeta",
                             style = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.primary),
@@ -375,13 +361,3 @@ fun TopGroupPayment(navController: NavController) {
         }
     )
 }
-
-/*@Preview
-@Composable
-fun DefaultPreviewPayment() {
-    val navController = rememberNavController()
-    val viewModel= MainViewModel()
-    val orderViewModel = OrderViewModel()
-
-    PaymentScreen(navController, viewModel,orderViewModel)
-}*/

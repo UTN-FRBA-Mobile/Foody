@@ -56,7 +56,7 @@ fun JoinGroupScreen(
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = "Join to a Group",
+                    text = "Unirse a un grupo",
                     style = MaterialTheme.typography.h5,
                     color = MaterialTheme.colors.primary,
                     textAlign = TextAlign.Center
@@ -67,7 +67,7 @@ fun JoinGroupScreen(
                 TextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Name") },
+                    label = { Text("Nombre del Grupo") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     singleLine = true,
                     maxLines = 1,
@@ -82,7 +82,7 @@ fun JoinGroupScreen(
                 TextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("Password") },
+                    label = { Text("Contraseña") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     singleLine = true,
                     maxLines = 1,
@@ -97,7 +97,7 @@ fun JoinGroupScreen(
 
                 if (showError) {
                     Text(
-                        text = "Incorrect Name or Password",
+                        text = "Nombre o contraseña incorrecta",
                         color = MaterialTheme.colors.error,
                         style = MaterialTheme.typography.body2
                     )
@@ -122,7 +122,7 @@ fun JoinGroupScreen(
                                             password = ""
                                             Toast.makeText(
                                                 navController.context,
-                                                "Full Group",
+                                                "Grupo Completo",
                                                 Toast.LENGTH_SHORT
                                             ).show()
                                         }
@@ -134,7 +134,7 @@ fun JoinGroupScreen(
                                 password = ""
                                 Toast.makeText(
                                     navController.context,
-                                    "Incorrect Name or Password",
+                                    "Nombre o contraseña incorrecta",
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
@@ -144,7 +144,7 @@ fun JoinGroupScreen(
                         .fillMaxWidth()
                         .height(50.dp)
                 ) {
-                    Text("Join", fontSize = 18.sp)
+                    Text("Unirse", fontSize = 18.sp)
                 }
 
                 Spacer(modifier = Modifier.height(100.dp))
@@ -172,12 +172,3 @@ fun TopGroupJoinGroup(navController: NavController) {
         }
     )
 }
-
-/*fun verifyGroupExist(groupViewModel: GroupViewModel, name: String, password: String): Group? {
-    val groups: List<Group> = groupViewModel.getGroups()
-    val group: Group? = groups.find { groupPred: Group -> groupPred.name == name }
-    if (group != null && group.password == password) {
-        return group
-    }
-    return null
-}*/

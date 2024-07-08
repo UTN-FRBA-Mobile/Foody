@@ -1,5 +1,6 @@
 package ar.edu.utn.frba.foody.ui.composables
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -14,6 +15,7 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -36,7 +38,7 @@ fun InputAlert(
 ) {
     var inputValue by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
-    var validIntents by remember { mutableStateOf(3) }
+    var validIntents by remember { mutableIntStateOf(3) }
 
     if (show) {
         AlertDialog(
@@ -103,6 +105,7 @@ fun InputAlert(
     }
 }
 
+@SuppressLint("UnrememberedMutableState")
 @Preview
 @Composable
 private fun DefaultPreview() {

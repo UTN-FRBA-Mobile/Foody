@@ -36,7 +36,6 @@ import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 @Composable
 fun OrdersScreen(navController: NavController, viewModel: OrderViewModel) {
     val orders = viewModel.getAllOrdersForUser()
-
     AppScaffold(
         null,
         { TopGroupOrderList(navController = navController) }
@@ -59,7 +58,7 @@ fun OrdersScreen(navController: NavController, viewModel: OrderViewModel) {
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = "Orders",
+                    text = "Ordenes",
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
                     fontSize = 24.sp
@@ -79,7 +78,6 @@ fun OrdersScreen(navController: NavController, viewModel: OrderViewModel) {
                         if (viewModel.hasItems(order) && order.status != Status.INPROGRESS) {
                             OrderItem(
                                 navController = navController,
-                                viewModel = viewModel,
                                 order = order
                             )
                         }
@@ -115,7 +113,7 @@ fun TopGroupOrderList(navController: NavController) {
 }
 
 @Composable
-fun OrderItem(navController: NavController, viewModel: OrderViewModel, order: Order) {
+fun OrderItem(navController: NavController, order: Order) {
     Card(
         modifier = Modifier
             .fillMaxSize(),
@@ -146,7 +144,6 @@ fun OrderItem(navController: NavController, viewModel: OrderViewModel, order: Or
                     horizontalArrangement = Arrangement.Center
                 ) {
                     IconButton(onClick = {
-                        //viewModel.updateOrder(order)
                         navController.navigate(
                             AppScreens.Progress_Order_Screen.createRoute(order.orderId)
                         )
@@ -160,7 +157,6 @@ fun OrderItem(navController: NavController, viewModel: OrderViewModel, order: Or
                     }
 
                     IconButton(onClick = {
-                        //viewModel.updateOrder(order)
                         navController.navigate(
                             AppScreens.Order_Screen.createRoute(
                                 order.orderId, "ordersList"
@@ -182,13 +178,3 @@ fun OrderItem(navController: NavController, viewModel: OrderViewModel, order: Or
         Divider()
     }
 }
-
-/*
-@Preview
-@Composable
-fun Default() {
-    val navController= rememberNavController()
-    val viewModel = OrderViewModel()
-    OrdersScreen(navController, viewModel)
-}
- */

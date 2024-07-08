@@ -57,7 +57,7 @@ fun OrdersDeliveredScreen(navController: NavController, viewModel: OrderViewMode
                 .padding(top = 32.dp)
                 .fillMaxWidth()
             ) {
-                Text(text = "Orders Delivered",
+                Text(text = "Ordenes entregadas",
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
                     fontSize = 24.sp

@@ -1,12 +1,8 @@
 package ar.edu.utn.frba.foody.ui.dataClasses
 
-import android.app.Application
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -16,7 +12,6 @@ import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.dataBase.Firebase.TokenDataBaseFirebase
 import ar.edu.utn.frba.foody.ui.dataBase.Firebase.UserDataBaseFirebase
 import ar.edu.utn.frba.foody.ui.dataBase.FirebaseTokenService
-import ar.edu.utn.frba.foody.ui.dataBase.StoreUserSession.StoreUserSession
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 import androidx.compose.runtime.State
 

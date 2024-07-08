@@ -27,7 +27,6 @@ fun OrderScreen(
     origin: String
 ) {
     val order = viewModel.getOrderById(order_id)
-
     AppScaffold(
         null,
         { TopGroupOrder(navController, origin) }
@@ -52,7 +51,7 @@ fun TopGroupOrder(navController: NavController, origin: String) {
             IconButton(onClick = {
                 when (origin) {
                     "ordersList" -> navController.navigate(AppScreens.Orders_Screen.route)
-                    "ordersDelivered" -> navController.navigate(AppScreens.OrdersDeliverd.route)
+                    "ordersDelivered" -> navController.navigate(AppScreens.OrdersDelivered.route)
                     "ordersOnTheWay" -> navController.navigate(AppScreens.OnTheWayOrders.route)
                 }
             }) {
@@ -104,7 +103,7 @@ fun OrderDetailGrid(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "Total Sin Envio: $" + order.userOrders.sumOf { userOrder ->
+                        text = "Total Sin Envío: $" + order.userOrders.sumOf { userOrder ->
                             userOrder.items.sumOf { x -> x.quantity * x.dish.price }
                         }
                             .toString(),
@@ -257,13 +256,3 @@ fun OrderDetailItem(orderItem: OrderItemInfo) {
         }
     }
 }
-
-
-/*
-@Preview
-@Composable
-fun DefaultPreviewOrder() {
-    val navController = rememberNavController()
-    val viewModel = OrderViewModel()
-    OrderScreen(navController, viewModel)
-}*/

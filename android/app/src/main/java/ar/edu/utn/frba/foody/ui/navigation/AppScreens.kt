@@ -28,6 +28,6 @@ sealed class AppScreens(val route: String) {
     object Card_Screen: AppScreens("Card")
     object Payment: AppScreens("Payment")
     object PendingOrder: AppScreens("PendingOrder")
-    object OrdersDeliverd: AppScreens("ordersDelivered")
+    object OrdersDelivered: AppScreens("ordersDelivered")
     object OnTheWayOrders: AppScreens("onTheWayOrders")
 }

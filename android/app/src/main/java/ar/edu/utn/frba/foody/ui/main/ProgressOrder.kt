@@ -245,12 +245,3 @@ fun TopGroupProgressOrder(navController: NavController) {
         }
     })
 }
-
-/*
-@Preview
-@Composable
-fun ProgressOrderPreview() {
-    val navController= rememberNavController()
-    val viewModel = OrderViewModel()
-    ProgressOrderScreen(navController, viewModel)
-}*/

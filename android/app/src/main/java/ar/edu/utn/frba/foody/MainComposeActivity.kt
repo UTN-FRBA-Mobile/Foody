@@ -128,7 +128,7 @@ class MainComposeActivity : ComponentActivity() {
                 } else {
                     Toast.makeText(
                         navController.context,
-                        "Incorrect User or Password",
+                        "Nombre de Usuario o contraseña incorrecta",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -144,14 +144,6 @@ class MainComposeActivity : ComponentActivity() {
                 userDataBaseFirebase,
                 intent = intent
             )
-
-            /*val notification = intent.getStringExtra("notification")
-            if (notification != null) {
-                //navController.navigate(AppScreens.Progress_Order_Screen.createRoute("-O1Hquva6QGTIh48NyiE"))
-                navController.navigate(AppScreens.Orders_Screen.route)
-            }
-
-             */
         }
     }
 
@@ -184,15 +176,15 @@ class MainComposeActivity : ComponentActivity() {
                 Dish(
                     dishId = 1,
                     name = "Spaghetti Carbonara",
-                    description = "Classic Italian pasta",
+                    description = "Pasta Italiana",
                     imageResourceId = R.drawable.spaghetti_carbonara,
                     price = 5000.0,
                     restaurantId = 1
                 ),
                 Dish(
                     dishId = 2,
-                    name = "Margherita Pizza",
-                    description = "Pizza with tomatoes, mozzarella, and basil",
+                    name = "Pizza Margarita",
+                    description = "Pizza con tomate, queso y albahaca",
                     imageResourceId = R.drawable.peperoni_pizza,
                     price = 8000.0,
                     restaurantId = 1
@@ -208,7 +200,7 @@ class MainComposeActivity : ComponentActivity() {
                 Dish(
                     dishId = 3,
                     name = "Salmon Nigiri",
-                    description = "Fresh salmon on sushi rice",
+                    description = "Salmón fresco sobre arroz de sushi",
                     imageResourceId = R.drawable.salmon_nigiri,
                     price = 5000.0,
                     restaurantId = 2
@@ -216,7 +208,7 @@ class MainComposeActivity : ComponentActivity() {
                 Dish(
                     dishId = 4,
                     name = "Tuna Roll",
-                    description = "Tuna roll with avocado",
+                    description ="Rollito de atún con aguacate",
                     imageResourceId = R.drawable.tuna_roll,
                     price = 5000.0,
                     restaurantId = 2
@@ -250,21 +242,21 @@ class MainComposeActivity : ComponentActivity() {
 
         val restaurant4 = Restaurant(
             name = "Taco Fiesta",
-            imageDescription = "Mexican street food",
+            imageDescription = "Comida Callejera Mexicana",
             image = R.drawable.taco_restaurant,
             dishes = listOf(
                 Dish(
                     dishId = 7,
                     name = "Carne Asada Tacos",
-                    description = "Grilled beef tacos",
+                    description = "Tacos de carne a la parrilla",
                     imageResourceId = R.drawable.carne_asada_tacos,
                     price = 5000.0,
                     restaurantId = 4
                 ),
                 Dish(
                     dishId = 8,
-                    name = "Guacamole and Chips",
-                    description = "Fresh guacamole with tortilla chips",
+                    name ="Guacamole y papas fritas",
+                    description = "Guacamole fresco con chips de tortilla",
                     imageResourceId = R.drawable.guacamole_and_chips,
                     price = 5000.0,
                     restaurantId = 4
@@ -280,15 +272,15 @@ class MainComposeActivity : ComponentActivity() {
                 Dish(
                     dishId = 9,
                     name = "Cheeseburger",
-                    description = "Beef burger with cheese, lettuce, and tomato",
+                    description = "Hamburguesa con queso, lechuga y tomate",
                     imageResourceId = R.drawable.cheeseburger,
                     price = 5000.0,
                     restaurantId = 5
                 ),
                 Dish(
                     dishId = 10,
-                    name = "Sweet Potato Fries",
-                    description = "Crispy sweet potato fries",
+                    name = "Papas dulces fritas",
+                    description = "Papas fritas crujientes",
                     imageResourceId = R.drawable.sweet_potato_fries,
                     price = 5000.0,
                     restaurantId = 5

@@ -22,7 +22,6 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,7 +56,6 @@ fun PendingOrderScreen(
     orderViewModel: OrderViewModel
 ) {
     var refreshState by remember { mutableStateOf(false) }
-
     AppScaffold(
         { BottomGroupPendingOrder(navController) },
         { TopGroupPendingOrder(navController, viewModel) }
@@ -80,7 +78,7 @@ fun PendingOrderScreen(
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = "Orders",
+                    text = "Ordenes",
                     modifier = Modifier
                         .fillMaxWidth(),
                     textAlign = TextAlign.Center,
@@ -100,7 +98,7 @@ fun PendingOrderScreen(
                             navController = navController,
                             orderViewModel = orderViewModel,
                             order = order,
-                            onRechazarClick = { refreshState = !refreshState }
+                            onRejectClick = { refreshState = !refreshState }
                         )
                     }
                 }
@@ -120,7 +118,7 @@ fun OrderPending(
     navController: NavController,
     orderViewModel: OrderViewModel,
     order: Order,
-    onRechazarClick: () -> Unit
+    onRejectClick: () -> Unit
 ) {
     val showAlert = remember {
         mutableStateOf(false)
@@ -148,7 +146,6 @@ fun OrderPending(
         orders = orders.filter { ordernew -> ordernew.orderId != order.orderId }
         orderViewModel.updatePendingOrders(orders)
         orderViewModel.findOrdersDeliveredById()
-
         navController.navigate(AppScreens.OnTheWayOrders.route)
     }
     Card(
@@ -206,7 +203,7 @@ fun OrderPending(
                         var orders = orderViewModel.getPendingsOrders()
                         orders = orders.filter { ordernew -> ordernew.orderId != order.orderId }
                         orderViewModel.updatePendingOrders(orders)
-                        onRechazarClick()
+                        onRejectClick()
                     }) {
                         Image(
                             painter = painterResource(id = R.drawable.wrong),
@@ -232,7 +229,7 @@ fun BottomGroupPendingOrder(navController: NavController) {
         ButtonInterface(
             resourceId = R.drawable.order_accept,
             imageDescription = "Order Delivered",
-            route = AppScreens.OrdersDeliverd.route
+            route = AppScreens.OrdersDelivered.route
         )
     )
 
@@ -281,7 +278,7 @@ fun TopGroupPendingOrder(navController: NavController, viewModel: MainViewModel)
             }
         },
         actions = {
-            IconButton(onClick = { /* Action for repartidor */ }) {
+            IconButton(onClick = {}) {
                 Image(
                     painter = painterResource(id = R.drawable.repartidor),
                     contentDescription = "Repartidor Icon",

@@ -58,7 +58,7 @@ fun AppNavigation(
             )
         }
         composable(route = AppScreens.Splash_Screen.route){
-            SplashScreen(navController = navController, intent = intent,orderViewModel)
+            SplashScreen(navController = navController)
         }
         composable(route = AppScreens.Home_Screen.route) {
             HomeScreen(
@@ -162,14 +162,13 @@ fun AppNavigation(
         ) { backStackEntry ->
             LocationGoogleScreen(
                 context, navController, orderViewModel,
-                origin = backStackEntry.arguments?.getString("origin") ?: "unknown",
-                id = backStackEntry.arguments?.getString("id") ?: "unknown"
+                origin = backStackEntry.arguments?.getString("origin") ?: "unknown"
             )
         }
         composable(route = AppScreens.PendingOrder.route) {
             PendingOrderScreen(navController = navController,viewModel,orderViewModel)
         }
-        composable(route = AppScreens.OrdersDeliverd.route) {
+        composable(route = AppScreens.OrdersDelivered.route) {
             OrdersDeliveredScreen(navController = navController,orderViewModel)
         }
         composable(route = AppScreens.OnTheWayOrders.route) {
