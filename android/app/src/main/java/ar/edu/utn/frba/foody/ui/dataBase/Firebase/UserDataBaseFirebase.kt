@@ -1,6 +1,8 @@
 package ar.edu.utn.frba.foody.ui.dataBase.Firebase
 
 import ar.edu.utn.frba.foody.ui.Classes.Address
+import ar.edu.utn.frba.foody.ui.Classes.Estado
+import ar.edu.utn.frba.foody.ui.Classes.Order
 import ar.edu.utn.frba.foody.ui.Classes.User
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -10,10 +12,12 @@ import com.google.firebase.database.ValueEventListener
 class UserDataBaseFirebase(private var database: FirebaseDatabase) {
     private val TABLE_USER = "users"
 
-    fun addUser(email: String, password: String, direccion: Address.AddressInfo, numeroContacto: Int): User {
+    fun addUser(email: String, password: String, direccion: Address.AddressInfo,
+                numeroContacto: Int,repartidor: String): User {
         val myRef = database.getReference(TABLE_USER)
 
-        val user = User(email = email, password = password, direccion = direccion, numeroContacto = numeroContacto)
+        val user = User(email = email, password = password, direccion = direccion,
+            numeroContacto = numeroContacto,repartidor =repartidor )
 
         user.userId = email.replace(".", "")
 
@@ -49,6 +53,26 @@ class UserDataBaseFirebase(private var database: FirebaseDatabase) {
 
             override fun onCancelled(databaseError: DatabaseError) {
                 callback(null)
+            }
+        })
+    }
+    fun getallUsers(callback: (List<User>) -> Unit) {
+        val myRef = database.getReference(TABLE_USER)
+        myRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val users = mutableListOf<User>()
+                dataSnapshot.children.forEach { userSnapshot ->
+                    val user = userSnapshot.getValue(User::class.java)
+                    if (user != null) {
+                        users.add(user)
+                    }
+                }
+                if (users.isNotEmpty()) callback(users)
+                else callback(emptyList())
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                callback(emptyList())
             }
         })
     }

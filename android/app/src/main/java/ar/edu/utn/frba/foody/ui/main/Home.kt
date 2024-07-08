@@ -1,13 +1,17 @@
 package ar.edu.utn.frba.foody.ui.main
 
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -22,6 +26,7 @@ import ar.edu.utn.frba.foody.ui.Classes.Restaurant
 import ar.edu.utn.frba.foody.ui.composables.SimpleAlert
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.RestaurantDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
+import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
@@ -32,8 +37,18 @@ fun HomeScreen(
     viewModel: MainViewModel,
     restaurantDataBase: RestaurantDataBase?,
     userDataBase: UserDataBase?,
-    orderViewModel: OrderViewModel
+    orderViewModel: OrderViewModel,
+    groupViewModel: GroupViewModel
 ) {
+    val canGoBack = remember { mutableStateOf(false) } // Cambia esto según tu lógica
+
+    BackHandler(enabled = !canGoBack.value) {
+        // Aquí decides qué hacer cuando se presiona el botón de retroceso
+        // Si canGoBack es false, no haces nada, por lo tanto, evitas el retroceso
+    }
+    orderViewModel.findAllOrdersByState()
+    groupViewModel.findGroupByuserId()
+
     AppScaffold(
         navController,
         null,
@@ -85,7 +100,7 @@ fun HomeScreen(
                     }
                     item {
                         if (restaurantDataBase.getAllRestaurants(userDataBase).isNotEmpty())
-                        Divider()
+                            Divider()
                     }
                 }
             }
@@ -110,8 +125,10 @@ fun RestaurantItem(
     val changeRestaurant = remember {
         mutableStateOf(false)
     }
+    var showError by remember { mutableStateOf(false) }
 
-    val restaurantName = viewModel.getPickedRestaurantName()
+    val restaurantName = orderViewModel.getPickedOrder().restaurant.name
+    val group = orderViewModel.getPickedOrder().group
 
     SimpleAlert(
         show = showAlert.value,
@@ -121,12 +138,10 @@ fun RestaurantItem(
         },
         onDismiss = { showAlert.value = false }
     )
-
     if (showRestaurant.value) {
         viewModel.updateRestaurant(restaurant)
         navController.navigate(AppScreens.Restaurant_Screen.route)
     }
-
     if (changeRestaurant.value) {
         orderViewModel.changeRestaurant(restaurant)
     }
@@ -140,13 +155,29 @@ fun RestaurantItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(onClick = {
-                    if (restaurantName != "" && restaurant != viewModel.getPickedRestaurant()) {
-                        showAlert.value = true
-                    } else {
-                        showRestaurant.value = true
-                    }
-                })
+                .clickable(
+                    //enabled = group == null || restaurantName == restaurant.name,
+                    onClick = {
+                        if (group != null) {
+                            if (restaurantName != restaurant.name) {
+                                showError = true
+                                Toast.makeText(
+                                    navController.context,
+                                    "You can't order in this restaurant",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                showRestaurant.value = true
+                            }
+                        } else {
+                            if (restaurantName != "" &&
+                                restaurant.name != restaurantName) {
+                                showAlert.value = true
+                            } else {
+                                showRestaurant.value = true
+                            }
+                        }
+                    })
                 .padding(16.dp, 4.dp)
         ) {
             Image(
@@ -179,7 +210,7 @@ data class ButtonInterface(
 
 @Composable
 fun BottomGroupHome(navController: NavController, orderViewModel: OrderViewModel) {
-    val buttons = listOf(
+    val buttons = mutableListOf(
         ButtonInterface(
             resourceId = R.drawable.user_icon,
             imageDescription = "User Icon",
@@ -195,12 +226,17 @@ fun BottomGroupHome(navController: NavController, orderViewModel: OrderViewModel
             imageDescription = "Order Icon",
             route = AppScreens.Orders_Screen.route
         ),
-        ButtonInterface(
-            resourceId = R.drawable.create_group_icon,
-            imageDescription = "Join Group Icon",
-            route = AppScreens.Join_Group_Screen.route
-        )
     )
+
+    if (orderViewModel.user.groupId == "") {
+        buttons.add(
+            ButtonInterface(
+                resourceId = R.drawable.create_group_icon,
+                imageDescription = "Join Group Icon",
+                route = AppScreens.Join_Group_Screen.route
+            )
+        )
+    }
 
     BottomAppBar {
         Row(modifier = Modifier.fillMaxWidth()) {
@@ -227,7 +263,18 @@ fun TopGroupHome(navController: NavController, viewModel: MainViewModel) {
         title = {
             Text(text = stringResource(id = R.string.app_name))
         },
+
         actions = {
+            if (viewModel.user.value?.repartidor.equals("Si")) {
+                IconButton(onClick = { navController.navigate(AppScreens.PendingOrder.route) }) {
+                    Image(
+                        painter = painterResource(id = R.drawable.repartidor),
+                        contentDescription = "Repartidor Icon",
+                        modifier = Modifier.size(30.dp),
+                        contentScale = ContentScale.FillBounds
+                    )
+                }
+            }
             IconButton(onClick = { viewModel.logout() }) {
                 Image(
                     painter = painterResource(id = R.drawable.logout_icon),

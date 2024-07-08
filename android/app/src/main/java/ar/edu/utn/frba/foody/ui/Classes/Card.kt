@@ -11,13 +11,14 @@ import java.time.LocalDate
 
 class Card {
     data class CardInfo(
-        val cardNumber: String="",
-        val firstName: String="",
-        val lastName: String="",
-        val expiryDate: String="",
-        val cvv: String=""
+        val cardNumber: String = "",
+        val firstName: String = "",
+        val lastName: String = "",
+        val expiryDate: String = "",
+        val cvv: String = ""
     )
 }
+
 @SuppressLint("MutableCollectionMutableState")
 class CardViewModel : ViewModel() {
     var cards by mutableStateOf(mutableStateListOf<Card.CardInfo>())

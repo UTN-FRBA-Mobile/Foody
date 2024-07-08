@@ -14,28 +14,24 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Group
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.GroupDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.*
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @Composable
 fun CreateGroupScreen(
     navController: NavController,
+    mainViewModel: MainViewModel,
     orderViewModel: OrderViewModel,
     groupViewModel: GroupViewModel,
-    groupDataBase: GroupDataBase
 ) {
-    var group = Group()
+    val group = Group()
     val order = orderViewModel.getPickedOrder()
     var groupName by remember { mutableStateOf("") }
-    var password by remember {mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
@@ -160,20 +156,23 @@ fun CreateGroupScreen(
                     group.groupId = groupName
                     group.password = password
 
-                    if (!groupViewModel.verifyNameGroupExist(groupName))
-                    {
-                        groupViewModel.createGroup(group, orderViewModel.user)
-                        //orderViewModel.createGroup(group)
-                        navController.navigate(AppScreens.Cart_Screen.route)
-                    }else{
-                        showError = true
-                        groupName = ""
-                        password = ""
-                        Toast.makeText(
-                            navController.context,
-                            "Name already Exist",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                    groupViewModel.verifyNameGroupExist(groupName) { groupToVerify ->
+                        if (groupToVerify != null) {
+                            showError = true
+                            groupName = ""
+                            password = ""
+                            Toast.makeText(
+                                navController.context,
+                                "Name already Exist",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            val createdGroup =
+                                groupViewModel.createGroup(group, orderViewModel.user)
+                            val restaurant = mainViewModel.getPickedRestaurant()
+                            orderViewModel.createOrderGroup(createdGroup, restaurant)
+                            navController.navigate(AppScreens.Home_Screen.route)
+                        }
                     }
                 },
                 modifier = Modifier

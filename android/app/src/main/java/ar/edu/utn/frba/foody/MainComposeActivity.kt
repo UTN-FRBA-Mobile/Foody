@@ -1,12 +1,25 @@
 package ar.edu.utn.frba.foody
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.NonNull
+import androidx.annotation.RequiresApi
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import ar.edu.utn.frba.foody.ui.Classes.Dish
@@ -31,62 +44,87 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class MainComposeActivity : ComponentActivity() {
     lateinit var dbUserHelper: UserDataBase
+    private lateinit var dbRestaurantHelper: RestaurantDataBase
+    private lateinit var dbOrderHelper: OrderDataBase
+    private lateinit var dbGroupHelper: GroupDataBase
+    private lateinit var firebaseTokenManager: FirebaseTokenService
+    private lateinit var userDataBaseFirebase: UserDataBaseFirebase
+    private lateinit var orderDataBaseFirebase: OrderDataBaseFirebase
+    private lateinit var groupDataBaseFirebase: GroupDataBaseFirebase
+    private lateinit var tokenDataBaseFirebase: TokenDataBaseFirebase
+    companion object{
+        const val NOTIFICATION_CHANNEL_ID = "notification_fcm"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        dbUserHelper = UserDataBase(this)
-       // dbUserHelper.createDataBase(dbUserHelper)
-
-        val dbRestaurantHelper = RestaurantDataBase(this)
-        dbRestaurantHelper.deleteAndCreateTables(dbUserHelper)
-
-        val dbOrderHelper = OrderDataBase(this)
-        //dbOrderHelper.deleteAndCreateTables()
-
-        //createTestData(dbRestaurantHelper)
-        val dbGroupHelper = GroupDataBase(this)
-        dbGroupHelper.createDataBase(dbGroupHelper)
-
-        createTestData(dbRestaurantHelper)
-
-        //Get firebase token for this device
-        val firebaseTokenManager = FirebaseTokenService(this)
-
-        var firebaseToken = firebaseTokenManager.getTokenFromPreferences()
-        if(firebaseToken.isNullOrEmpty()) {
-            firebaseTokenManager.getAndSaveToken()
+        val initializationComplete =  mutableStateOf(false)
+        requestNotificationPermissions()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createNotificationChannel()
         }
-
-       ///Create instance
-        val database = FirebaseDatabase.getInstance()
-
-        //Create Firebase data base instance
-        val userDataBaseFirebase = UserDataBaseFirebase(database)
-        val orderDataBaseFirebase = OrderDataBaseFirebase(database)
-        val groupDataBaseFirebase = GroupDataBaseFirebase(database)
-        val tokenDataBaseFirebase = TokenDataBaseFirebase(database)
-
+        lifecycleScope.launch(Dispatchers.IO) {
+            initializeDatabase()
+            withContext(Dispatchers.Main) {
+                initializationComplete.value = true
+            }
+        }
         setContent {
-            val navController = rememberNavController()
-            val viewModel = viewModel<MainViewModel>()
-            val orderViewModel = viewModel<OrderViewModel>()
-            val groupViewModel = viewModel<GroupViewModel>()
-            orderViewModel.setServices(dbOrderHelper, orderDataBaseFirebase, navController)
-            groupViewModel.setServices(dbGroupHelper,groupDataBaseFirebase,navController)
-            viewModel.setServices(userDataBaseFirebase, tokenDataBaseFirebase, navController, firebaseTokenManager)
+            MyApp(initializationComplete.value)
+        }
+    }
 
-            viewModel.user.observe(this, Observer { user ->
+    private fun requestNotificationPermissions() {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            val hasPermission = ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.POST_NOTIFICATIONS
+            )== PackageManager.PERMISSION_GRANTED
+
+            if(!hasPermission){
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                    0
+                )
+            }
+        }
+    }
+
+    @Composable
+    fun MyApp(initializationComplete: Boolean) {
+        if (initializationComplete) {
+            val navController = rememberNavController()
+            val viewModel: MainViewModel = viewModel()
+            val orderViewModel: OrderViewModel = viewModel()
+            val groupViewModel: GroupViewModel = viewModel()
+            LaunchedEffect(Unit) {
+                orderViewModel.setServices(dbOrderHelper, orderDataBaseFirebase, navController)
+                groupViewModel.setServices(dbGroupHelper, groupDataBaseFirebase, navController)
+                viewModel.setServices(
+                    userDataBaseFirebase,
+                    tokenDataBaseFirebase,
+                    navController,
+                    firebaseTokenManager
+                )
+                viewModel.findAllUsers()
+
+            }
+            viewModel.user.observe(this@MainComposeActivity, Observer { user ->
                 if (user != null) {
                     orderViewModel.user = user
                     orderViewModel.removeOrderFromSession()
                     orderViewModel.updateOrderLogin()
+                    groupViewModel.userPrueba=user
                     navController.navigate(AppScreens.Home_Screen.route)
                     tokenDataBaseFirebase.addUserDeviceToken(firebaseTokenManager.getTokenFromPreferences()!!, user.userId)
-                    //TODO sacar el login del stack de navegación
                 } else {
                     Toast.makeText(
                         navController.context,
@@ -97,7 +135,7 @@ class MainComposeActivity : ComponentActivity() {
             })
 
             AppNavigation(
-                this,
+                this@MainComposeActivity,
                 navController,
                 viewModel,
                 orderViewModel,
@@ -108,10 +146,43 @@ class MainComposeActivity : ComponentActivity() {
                 dbOrderHelper,
                 userDataBaseFirebase
             )
+        } else {
+            //CircularProgressIndicator()
         }
     }
 
-    fun createTestData(dbRestaurantHelper: RestaurantDataBase) {
+    private suspend fun initializeDatabase() = withContext(Dispatchers.IO) {
+        dbUserHelper = UserDataBase(this@MainComposeActivity)
+        //dbUserHelper.createDataBase(dbUserHelper)
+
+        dbRestaurantHelper = RestaurantDataBase(this@MainComposeActivity)
+        dbRestaurantHelper.deleteAndCreateTables(dbUserHelper)
+
+        dbOrderHelper = OrderDataBase(this@MainComposeActivity)
+        //dbOrderHelper.deleteAndCreateTables()
+
+        dbGroupHelper = GroupDataBase(this@MainComposeActivity)
+        dbGroupHelper.createDataBase(dbGroupHelper)
+
+        createTestData(dbRestaurantHelper)
+
+        //Get firebase token for this device
+        firebaseTokenManager = FirebaseTokenService(this@MainComposeActivity)
+        var firebaseToken = firebaseTokenManager.getTokenFromPreferences()
+        if (firebaseToken.isNullOrEmpty()) {
+            firebaseTokenManager.getAndSaveToken()
+        }
+
+        //Create instance
+        val database = FirebaseDatabase.getInstance()
+
+        //Create Firebase data base instance
+         userDataBaseFirebase = UserDataBaseFirebase(database)
+        orderDataBaseFirebase = OrderDataBaseFirebase(database)
+        groupDataBaseFirebase = GroupDataBaseFirebase(database)
+        tokenDataBaseFirebase = TokenDataBaseFirebase(database)
+    }
+        fun createTestData(dbRestaurantHelper: RestaurantDataBase) {
         val restaurant1 = Restaurant(
             name = "La Bella Italia",
             imageDescription = "A cozy Italian restaurant",
@@ -239,49 +310,17 @@ class MainComposeActivity : ComponentActivity() {
         dbRestaurantHelper.insertRestaurant(restaurant5, dbUserHelper)
     }
 
-    /*
-           val orderItems1 = listOf(OrderItemInfo(dish = dish1, quantity = 2, id = 1), OrderItemInfo(dish = dish2, quantity = 1, id = 2))
-           val orderItems2 = listOf(OrderItemInfo(dish = dish2, quantity = 3, id = 2), OrderItemInfo(dish = dish1, quantity = 1, id = 3))
-           val orderItems3 = listOf(OrderItemInfo(dish = dish2, quantity = 2, id = 3))
-           val orderItems4 = listOf(OrderItemInfo(dish = dish1, quantity = 4, id = 4), OrderItemInfo(dish = dish2, quantity = 2, id = 1))
-           val orderItems5 = listOf(OrderItemInfo(dish = dish1, quantity = 1, id = 5))
-
-
-           val userOrder1 = UserOrder(userOrderId = 1, items = orderItems1, user = user1)
-           val userOrder2 = UserOrder(userOrderId = 2, items = orderItems2, user = user2)
-           val userOrder3 = UserOrder(userOrderId = 3, items = orderItems3, user = user3)
-           val userOrder4 = UserOrder(userOrderId = 4, items = orderItems4, user = user4)
-           val userOrder5 = UserOrder(userOrderId = 5, items = orderItems5, user = user5)
-
-    val group = Group(
-        groupId = 0,
-        name = "Los Movileros",
-        members = mutableListOf(
-            User(
-                userId = 0,
-                userName = "Zeke",
-                userPassword = "SeQueL"
-            ),
-            User(
-                userId = 1,
-                userName = "Walter",
-                userPassword = "1234"
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                NOTIFICATION_CHANNEL_ID,
+                "Notificaciones de FCM",
+                NotificationManager.IMPORTANCE_HIGH,
             )
-        ),
-        limit = 10,
-    )
-
-
-           val order1 = Order(orderId = 123, name = "Sample Order", restaurant = restaurant, userOrders = listOf(userOrder1, userOrder2, userOrder3, userOrder4, userOrder5))
-           viewModel.updateOrder(order1)
-    val order1 = Order(
-        orderId = 123,
-        name = "Sample Order",
-        restaurant = restaurant,
-        userOrders = listOf(userOrder1, userOrder2, userOrder3, userOrder4, userOrder5),
-        group = group
-    )
-    viewModel.updateOrder(order1)
-
-     */
+            channel.description = "Estas notificaciones van a ser recibidas desde FCM"
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
 }

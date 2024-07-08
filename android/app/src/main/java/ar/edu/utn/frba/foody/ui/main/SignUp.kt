@@ -19,6 +19,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.RadioButton
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -35,6 +36,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role.Companion.RadioButton
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -46,6 +48,7 @@ import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.dataBase.Firebase.UserDataBaseFirebase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.UserDataBase
+import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
@@ -53,14 +56,17 @@ import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 fun SignUpScreen(
     navController: NavController,
     viewModel: OrderViewModel,
+    mainViewModel: MainViewModel,
     dbUserDataBase: UserDataBase?,
     dbUserDataBaseFirebase: UserDataBaseFirebase
 ) {
     val user = User()
     val context = LocalContext.current
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var numero by remember { mutableStateOf("") }
+
+    val email = mainViewModel.email.value
+    val password = mainViewModel.password.value
+    val contactNumber = mainViewModel.contactNumber.value
+    val delivery = mainViewModel.delivery.value
 
     AppScaffold(
         navController,
@@ -84,7 +90,7 @@ fun SignUpScreen(
         ) {
             item {
                 Text(
-                    text = "Create an Account",
+                    text = "Crear una cuenta",
                     style = MaterialTheme.typography.h5,
                     color = MaterialTheme.colors.primary,
                     textAlign = TextAlign.Center,
@@ -95,8 +101,8 @@ fun SignUpScreen(
 
                 TextField(
                     value = email,
-                    onValueChange = { email = it },
-                    label = { Text(text = "Username", modifier = Modifier.padding(start = 16.dp)) },
+                    { mainViewModel.updateEmail(it) },
+                    label = { Text(text = "Usuario", modifier = Modifier.padding(start = 16.dp)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     singleLine = true,
                     maxLines = 1,
@@ -109,8 +115,9 @@ fun SignUpScreen(
                 )
 
                 TextField(
-                    value = password, onValueChange = { password = it },
-                    label = { Text(text = "Password", modifier = Modifier.padding(start = 16.dp)) },
+                    value = password,
+                    { mainViewModel.updatePassword(it) },
+                    label = { Text(text = "Contraseña", modifier = Modifier.padding(start = 16.dp)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     singleLine = true,
                     maxLines = 1,
@@ -124,10 +131,11 @@ fun SignUpScreen(
                 )
 
                 TextField(
-                    value = numero, onValueChange = { numero = it },
+                    value = contactNumber,
+                    onValueChange = { mainViewModel.updateContactNumber(it) },
                     label = {
                         Text(
-                            text = "Numero Contacto",
+                            text = "Número de contacto",
                             modifier = Modifier.padding(start = 16.dp)
                         )
                     },
@@ -148,8 +156,9 @@ fun SignUpScreen(
                         .fillMaxWidth()
                         .padding(top = 16.dp)
                 ) {
-                    val direccionText = if (viewModel.existAddress()) viewModel.user.direccion
-                        .let { "${it.calle} ${it.numero}, ${it.localidad}, ${it.region}" } else ""
+                    val direccionText = if (viewModel.user.direccion.calle != null && viewModel.user.direccion.calle != "")
+                        viewModel.user.direccion.let { "${it.calle} ${it.numero}, ${it.localidad}, ${it.region}" }
+                    else ""
 
                     TextField(
                         value = direccionText,
@@ -157,7 +166,7 @@ fun SignUpScreen(
                         onValueChange = {},  // No permitir cambios en el texto
                         label = {
                             Text(
-                                text = "Direccion",
+                                text = "Dirección",
                                 modifier = Modifier.padding(start = 16.dp)
                             )
                         },
@@ -188,12 +197,28 @@ fun SignUpScreen(
 
                 Spacer(modifier = Modifier.height(60.dp))
 
+                Text(text = "Repartidor:", fontSize = 24.sp, modifier = Modifier.padding(bottom = 16.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                     RadioButton(
+                            selected = delivery == "Si",
+                            onClick = { mainViewModel.updateDelivery("Si") }
+                        )
+                        Text(text = "Sí", fontSize = 18.sp, modifier = Modifier.padding(horizontal = 8.dp))
+                        RadioButton(
+                            selected = delivery == "No",
+                            onClick = { mainViewModel.updateDelivery("No") }
+                        )
+                        Text(text = "No", fontSize = 18.sp, modifier = Modifier.padding(horizontal = 8.dp))
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(text = "Seleccionaste $delivery", fontSize = 18.sp)
+                Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
                         user.email = email
                         user.password = password
-                        if (validateAnyUserEmpty(user, numero, context)) {
-                            user.numeroContacto = numero.toInt()
+                        if (validateAnyUserEmpty(user, contactNumber, context,mainViewModel)) {
+                            user.numeroContacto = contactNumber.toInt()
 
                             val address = viewModel.user.direccion
 
@@ -201,8 +226,9 @@ fun SignUpScreen(
                                 user.email,
                                 user.password,
                                 address,
-                                user.numeroContacto
-                            )
+                                user.numeroContacto,
+                                delivery
+                                )
 
                             viewModel.emptyAddress()
                             navController.navigate(AppScreens.Login_Screen.route)
@@ -254,10 +280,11 @@ fun TopGroupSignUp() {
 fun validateAnyUserEmpty(
     user: User,
     numero: String,
-    context: Context
+    context: Context,
+    mainViewModel: MainViewModel
 ): Boolean {
     if (user.email == "") {
-        Toast.makeText(context, "Falta completar el email.", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Falta completar el nombre de usuario.", Toast.LENGTH_SHORT).show()
         return false
     }
     if (user.password == "") {
@@ -266,6 +293,14 @@ fun validateAnyUserEmpty(
     }
     if (numero == "") {
         Toast.makeText(context, "Falta completar el numero de contacto.", Toast.LENGTH_SHORT).show()
+        return false
+    }
+    if (mainViewModel.validateUser(user.email)){
+        Toast.makeText(context, "El nombre de usuario ya existe.", Toast.LENGTH_SHORT).show()
+        return false
+    }
+    if (user.password.length < 8) {
+        Toast.makeText(context, "La contraseña debe tener al menos 8 caracteres.", Toast.LENGTH_SHORT).show()
         return false
     }
 

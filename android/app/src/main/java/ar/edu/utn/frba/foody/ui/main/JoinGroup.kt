@@ -18,21 +18,18 @@ import androidx.compose.ui.unit.*
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import ar.edu.utn.frba.foody.R
-import ar.edu.utn.frba.foody.ui.Classes.Group
+import ar.edu.utn.frba.foody.ui.Classes.Restaurant
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.GroupDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.OrderDataBase
 import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
+import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @Composable
 fun JoinGroupScreen(
     navController: NavHostController,
-    dbHelper: GroupDataBase,
-    dbOrderHelper: OrderDataBase,
+    mainViewModel: MainViewModel,
     orderViewModel: OrderViewModel,
     groupViewModel: GroupViewModel
 ) {
@@ -41,7 +38,6 @@ fun JoinGroupScreen(
     var showError by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
-
 
     AppScaffold(navController = navController,
         null,
@@ -117,21 +113,37 @@ fun JoinGroupScreen(
 
                 Button(
                     onClick = {
-                        val group = groupViewModel.verifyGroupExist(name, password)
-                        if (group != null ) {
-                            orderViewModel.removeOrderFromSession()
-                            //orderViewModel.updateGroup(group)
-                            groupViewModel.updateUser(orderViewModel.user)
-                            navController.navigate(AppScreens.Home_Screen.route)
-                        } else {
-                            showError = true
-                            name = ""
-                            password = ""
-                            Toast.makeText(
-                                navController.context,
-                                "Incorrect Name or Password",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                        groupViewModel.verifyGroupExist(name, password) { group ->
+                            if (group != null) {
+                                orderViewModel.deleteCurrentOrder()
+                                orderViewModel.getOrderByGroup(group.groupId) { order ->
+                                    if (order != null) {
+                                        if (group.members.size + 1 <= group.membersLimit) {
+                                            groupViewModel.updateUser(orderViewModel.user)
+                                            orderViewModel.addUser()
+                                            mainViewModel.updateRestaurant(order.restaurant)
+                                            navController.navigate(AppScreens.Restaurant_Screen.route)
+                                        } else {
+                                            name = ""
+                                            password = ""
+                                            Toast.makeText(
+                                                navController.context,
+                                                "Full Group",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    }
+                                }
+                            } else {
+                                showError = true
+                                name = ""
+                                password = ""
+                                Toast.makeText(
+                                    navController.context,
+                                    "Incorrect Name or Password",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
                     },
                     modifier = Modifier

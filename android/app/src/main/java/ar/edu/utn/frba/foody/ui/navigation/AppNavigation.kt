@@ -1,5 +1,6 @@
 package ar.edu.utn.frba.foody.ui.navigation
 
+import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
@@ -7,6 +8,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import ar.edu.utn.frba.foody.ui.dataBase.Firebase.UserDataBaseFirebase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.GroupDataBase
 import ar.edu.utn.frba.foody.ui.dataBase.SQLite.OrderDataBase
@@ -25,8 +27,11 @@ import ar.edu.utn.frba.foody.ui.main.JoinGroupScreen
 import ar.edu.utn.frba.foody.ui.main.LocationGoogleScreen
 import ar.edu.utn.frba.foody.ui.main.LoginScreen
 import ar.edu.utn.frba.foody.ui.main.OrderScreen
+import ar.edu.utn.frba.foody.ui.main.OrdersDeliveredScreen
+import ar.edu.utn.frba.foody.ui.main.OrdersOnTheWayScreen
 import ar.edu.utn.frba.foody.ui.main.OrdersScreen
 import ar.edu.utn.frba.foody.ui.main.PaymentScreen
+import ar.edu.utn.frba.foody.ui.main.PendingOrderScreen
 import ar.edu.utn.frba.foody.ui.main.ProfileScreen
 import ar.edu.utn.frba.foody.ui.main.ProgressOrderScreen
 import ar.edu.utn.frba.foody.ui.main.RestaurantScreen
@@ -52,19 +57,22 @@ fun AppNavigation(
                 viewModel = viewModel,
                 restaurantDataBase = dbRestaurantHelper,
                 userDataBase = dbUserHelper,
-                orderViewModel = orderViewModel
+                orderViewModel = orderViewModel,
+                groupViewModel = groupViewModel
             )
         }
         composable(route = AppScreens.Login_Screen.route) {
             LoginScreen(
                 navController = navController,
-                mainViewModel = viewModel
+                mainViewModel = viewModel,
+                orderViewModel = orderViewModel
             )
         }
         composable(route = AppScreens.SignUp_Screen.route) {
             SignUpScreen(
                 navController = navController,
                 viewModel = orderViewModel,
+                mainViewModel = viewModel,
                 dbUserHelper,
                 dbUserDataBaseFirebase
             )
@@ -79,6 +87,7 @@ fun AppNavigation(
             CartScreen(
                 navController = navController,
                 viewModel = orderViewModel,
+                groupViewModel = groupViewModel,
                 origin = backStackEntry.arguments?.getString("origin") ?: "unknown",
             )
         }
@@ -94,15 +103,17 @@ fun AppNavigation(
         }
         composable(
             route = AppScreens.Order_Screen.route,
-            arguments = listOf(navArgument("order_id") { type = NavType.StringType })
+            arguments = listOf(navArgument("order_id") { type = NavType.StringType },
+                navArgument("origin") { type = NavType.StringType }),
         ) {
                 backStackEntry ->
             OrderScreen(navController = navController, viewModel = orderViewModel,
-                backStackEntry.arguments?.getString("order_id") ?: "unknown")
+                backStackEntry.arguments?.getString("order_id") ?: "unknown",
+                backStackEntry.arguments?.getString("origin") ?: "unknown")
         }
         composable(
             route = AppScreens.Progress_Order_Screen.route,
-            arguments = listOf(navArgument("order_id") { type = NavType.StringType })
+            arguments = listOf(navArgument("order_id") { type = NavType.StringType }),
 
         ) {backStackEntry->
             ProgressOrderScreen(navController = navController, orderViewModel = orderViewModel,
@@ -119,16 +130,15 @@ fun AppNavigation(
         composable(route = AppScreens.Create_Group_Screen.route) {
             CreateGroupScreen(
                 navController = navController,
+                mainViewModel = viewModel,
                 orderViewModel = orderViewModel,
                 groupViewModel = groupViewModel,
-                groupDataBase = dbGroupHelper
             )
         }
         composable(route = AppScreens.Join_Group_Screen.route) {
             JoinGroupScreen(
                 navController = navController,
-                dbHelper = dbGroupHelper,
-                dbOrderHelper = dbOrderHelper,
+                mainViewModel = viewModel,
                 orderViewModel = orderViewModel,
                 groupViewModel = groupViewModel
             )
@@ -150,5 +160,15 @@ fun AppNavigation(
                 id = backStackEntry.arguments?.getString("id") ?: "unknown"
             )
         }
+        composable(route = AppScreens.PendingOrder.route) {
+            PendingOrderScreen(navController = navController,viewModel,orderViewModel)
+        }
+        composable(route = AppScreens.OrdersDeliverd.route) {
+            OrdersDeliveredScreen(navController = navController,orderViewModel)
+        }
+        composable(route = AppScreens.OnTheWayOrders.route) {
+            OrdersOnTheWayScreen(navController = navController,orderViewModel)
+        }
+
     }
 }

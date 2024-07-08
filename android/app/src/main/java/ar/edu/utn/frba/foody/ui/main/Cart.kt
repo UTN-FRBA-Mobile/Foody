@@ -44,6 +44,7 @@ import ar.edu.utn.frba.foody.ui.Classes.Order
 import ar.edu.utn.frba.foody.ui.Classes.OrderItemInfo
 import ar.edu.utn.frba.foody.ui.Classes.UserOrder
 import ar.edu.utn.frba.foody.ui.composables.DishAlert
+import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
@@ -51,9 +52,15 @@ import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 fun CartScreen(
     navController: NavHostController,
     viewModel: OrderViewModel,
+    groupViewModel: GroupViewModel,
     origin: String,
 ) {
     val order = viewModel.getPickedOrder()
+
+    if (order.group != null) {
+        groupViewModel.updateGroup(order.group!!)
+    }
+
     AppScaffold(navController,
         null,
         { BottomGroupCart(navController, orderViewModel = viewModel, order = order) },
@@ -184,6 +191,29 @@ fun OrdersGrid(
             }
         }
     }
+    Spacer(modifier = Modifier.width(8.dp))
+    if(viewModel.getPickedOrder().userOrders.isNotEmpty() ||
+        viewModel.getPickedOrder().userOrders.any { userOrder -> userOrder.items.isNotEmpty()}){
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 32.dp)
+                .fillMaxWidth()
+                .padding(bottom = 100.dp),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            Button(
+                onClick = {
+                    navController.navigate(AppScreens.Payment.route)
+                },
+                enabled = viewModel.enablePayOrder(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+            ) {
+                Text("Pagar", fontSize = 18.sp)
+            }
+        }
+    }
 }
 
 @Composable
@@ -224,24 +254,6 @@ fun OrderCard(viewModel: OrderViewModel, userOrder: UserOrder,navController: Nav
             )
         }
     }
-    Box(
-        modifier = Modifier
-            .padding(horizontal = 32.dp)
-            .fillMaxWidth()
-            .padding(bottom = 100.dp),
-        contentAlignment = Alignment.BottomCenter
-    ) {
-        Button(
-            onClick = {
-                navController.navigate(AppScreens.Payment.route)
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-        ) {
-            Text("Pagar", fontSize = 18.sp)
-        }
-    }
 }
 
 @Composable
@@ -268,9 +280,12 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = {
+            IconButton(
+                onClick = {
                 viewModel.deleteItem(orderItem.dish.dishId)
-            }) {
+                },
+                enabled = viewModel.enableChangeUserOrderButton(userOrder.user.userId)
+            ) {
                 Icon(imageVector = Icons.Default.Clear, contentDescription = "Remove")
             }
 
@@ -280,9 +295,12 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            IconButton(onClick = {
+            IconButton(
+                onClick = {
                 viewModel.changeItemQuantity(orderItem.dish.dishId, 1)
-            }) {
+                },
+                enabled = viewModel.enableChangeUserOrderButton(userOrder.user.userId)
+            ) {
                 Icon(imageVector = Icons.Default.KeyboardArrowUp, contentDescription = "Increase")
             }
 
@@ -290,7 +308,9 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
 
             IconButton(onClick = {
                 viewModel.changeItemQuantity(orderItem.dish.dishId, -1)
-            }) {
+                },
+                enabled = viewModel.enableChangeUserOrderButton(userOrder.user.userId)
+            ) {
                 Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "Decrease")
             }
         }

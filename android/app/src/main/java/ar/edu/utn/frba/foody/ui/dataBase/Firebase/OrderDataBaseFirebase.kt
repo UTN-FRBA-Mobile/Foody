@@ -2,7 +2,6 @@ package ar.edu.utn.frba.foody.ui.dataBase.Firebase
 
 import ar.edu.utn.frba.foody.ui.Classes.Estado
 import ar.edu.utn.frba.foody.ui.Classes.Order
-import ar.edu.utn.frba.foody.ui.Classes.OrderItemInfo
 import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.Classes.UserOrder
 import com.google.firebase.database.DataSnapshot
@@ -13,21 +12,23 @@ import com.google.firebase.database.ValueEventListener
 class OrderDataBaseFirebase(private var database: FirebaseDatabase) {
     private val TABLE_ORDERS = "orders"
     private val TABLE_USER_ORDERS = "userOrders"
+    private val TABLE_GROUPS = "group"
 
     fun addOrder(order: Order): String {
         val myRef = database.getReference(TABLE_ORDERS)
 
         val key = myRef.push().key!!
 
-        order.orderId = key.toString()
+        order.orderId = key
 
         myRef.child(order.orderId).setValue(order)
 
-        return key;
+        return key
     }
 
     fun addUserOrderToOrder(orderId: String, userOrder: UserOrder, callback: (Boolean) -> Unit) {
-        val orderRef = FirebaseDatabase.getInstance().getReference(TABLE_ORDERS).child(orderId).child(TABLE_USER_ORDERS)
+        val orderRef = FirebaseDatabase.getInstance().getReference(TABLE_ORDERS).child(orderId)
+            .child(TABLE_USER_ORDERS)
 
         orderRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -51,7 +52,8 @@ class OrderDataBaseFirebase(private var database: FirebaseDatabase) {
     }
 
     fun updateUserOrder(orderId: String, userOrder: UserOrder, callback: (Boolean) -> Unit) {
-        val orderRef = FirebaseDatabase.getInstance().getReference(TABLE_ORDERS).child(orderId).child(TABLE_USER_ORDERS)
+        val orderRef = FirebaseDatabase.getInstance().getReference(TABLE_ORDERS).child(orderId)
+            .child(TABLE_USER_ORDERS)
 
         orderRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -63,7 +65,7 @@ class OrderDataBaseFirebase(private var database: FirebaseDatabase) {
                     }
                 }
                 val index = userOrdersList.indexOfFirst { it.user.userId == userOrder.user.userId }
-                if(index != -1) {
+                if (index != -1) {
                     userOrdersList[index] = userOrder
                     orderRef.setValue(userOrdersList).addOnCompleteListener { task ->
                         callback(task.isSuccessful)
@@ -79,8 +81,13 @@ class OrderDataBaseFirebase(private var database: FirebaseDatabase) {
         })
     }
 
-    fun updateUserOrderList(orderId: String, userOrders: List<UserOrder>, callback: (Boolean) -> Unit) {
-        val orderRef = FirebaseDatabase.getInstance().getReference(TABLE_ORDERS).child(orderId).child(TABLE_USER_ORDERS)
+    fun updateUserOrderList(
+        orderId: String,
+        userOrders: List<UserOrder>,
+        callback: (Boolean) -> Unit
+    ) {
+        val orderRef = FirebaseDatabase.getInstance().getReference(TABLE_ORDERS).child(orderId)
+            .child(TABLE_USER_ORDERS)
 
         orderRef.setValue(userOrders).addOnCompleteListener { task ->
             callback(task.isSuccessful)
@@ -94,8 +101,10 @@ class OrderDataBaseFirebase(private var database: FirebaseDatabase) {
             callback(task.isSuccessful)
         }
     }
-    fun updateOrder(order: Order, callback: (Boolean) -> Unit){
-        val orderRef= FirebaseDatabase.getInstance().getReference(TABLE_ORDERS).child(order.orderId)
+
+    fun updateOrder(order: Order, callback: (Boolean) -> Unit) {
+        val orderRef =
+            FirebaseDatabase.getInstance().getReference(TABLE_ORDERS).child(order.orderId)
         orderRef.setValue(order).addOnCompleteListener { task ->
             callback(task.isSuccessful)
         }
@@ -116,7 +125,33 @@ class OrderDataBaseFirebase(private var database: FirebaseDatabase) {
             }
         })
     }
-    fun getOrderByState(estado: Estado,user: User, callback: (Order?) -> Unit) {
+
+
+    fun getOrderByGroup(groupId: String, callback: (Order?) -> Unit) {
+        val ordersRef = database.getReference(TABLE_ORDERS)
+
+        val query =
+            ordersRef.orderByChild(TABLE_GROUPS + "/groupId").equalTo(groupId).limitToFirst(1)
+
+        query.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    val order = snapshot.children.first().getValue(Order::class.java)
+                    order?.orderId =
+                        snapshot.children.first().key.toString()
+                    callback(order)
+                } else {
+                    callback(null)
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                callback(null)
+            }
+        })
+    }
+
+    fun getOrderByState(estado: Estado, user: User, callback: (Order?) -> Unit) {
         val myRef = database.getReference(TABLE_ORDERS)
 
         myRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -124,14 +159,13 @@ class OrderDataBaseFirebase(private var database: FirebaseDatabase) {
                 for (snapshot in dataSnapshot.children) {
                     val order = snapshot.getValue(Order::class.java)
                     if (order != null && order.estado == estado) {
-                        val userOrders = order.userOrders // Asumiendo que es una lista de objetos de tipo UserOrder
-                        if (userOrders != null) {
-                            for (userOrder in userOrders) {
-                                if (userOrder.user.userId == user.userId) {
-                                    order.orderId = snapshot.key.toString()
-                                    callback(order) // Retorna la orden filtrada
-                                    return // Termina la búsqueda después de encontrar la primera coincidencia
-                                }
+                        val userOrders =
+                            order.userOrders // Asumiendo que es una lista de objetos de tipo UserOrder
+                        for (userOrder in userOrders) {
+                            if (userOrder.user.userId == user.userId) {
+                                order.orderId = snapshot.key.toString()
+                                callback(order) // Retorna la orden filtrada
+                                return // Termina la búsqueda después de encontrar la primera coincidencia
                             }
                         }
                     }
@@ -145,7 +179,6 @@ class OrderDataBaseFirebase(private var database: FirebaseDatabase) {
         })
     }
 
-
     fun getOrdersByUser(userId: String, callback: (List<Order>) -> Unit) {
         val myRef = database.getReference(TABLE_ORDERS)
 
@@ -156,9 +189,74 @@ class OrderDataBaseFirebase(private var database: FirebaseDatabase) {
                     val order = orderSnapshot.getValue(Order::class.java)
                     order?.orderId = orderSnapshot.key.toString()
                     order?.userOrders?.forEach { userOrder ->
-                        if(userOrder.user.userId == userId) {
+                        if (userOrder.user.userId == userId) {
                             orders.add(order)
                         }
+                    }
+                }
+                callback(orders)
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                callback(emptyList())
+            }
+        })
+    }
+
+    fun getOrdersByState(callback: (List<Order>) -> Unit) {
+        val myRef = database.getReference(TABLE_ORDERS)
+
+        myRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val orders = mutableListOf<Order>()
+                dataSnapshot.children.forEach { orderSnapshot ->
+                    val order = orderSnapshot.getValue(Order::class.java)
+                    if (order != null && order.estado.equals(Estado.PENDIENTE)) {
+                        orders.add(order)
+                    }
+                }
+                callback(orders)
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                callback(emptyList())
+            }
+        })
+    }
+
+    fun getOrdersByDeliveredId(deliverId: String, callback: (List<Order>) -> Unit) {
+        val myRef = database.getReference(TABLE_ORDERS)
+
+        myRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val orders = mutableListOf<Order>()
+                dataSnapshot.children.forEach { orderSnapshot ->
+                    val order = orderSnapshot.getValue(Order::class.java)
+                    if (order != null && order.repartidor?.userId.equals(deliverId)) {
+                        orders.add(order)
+                    }
+                }
+                callback(orders)
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                callback(emptyList())
+            }
+        })
+    }
+
+    fun getOrdersOnTheWayId(deliverId: String, callback: (List<Order>) -> Unit) {
+        val myRef = database.getReference(TABLE_ORDERS)
+
+        myRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val orders = mutableListOf<Order>()
+                dataSnapshot.children.forEach { orderSnapshot ->
+                    val order = orderSnapshot.getValue(Order::class.java)
+                    if (order != null && order.repartidor?.userId.equals(deliverId) &&
+                        order.estado.equals(Estado.ENCAMINO)
+                    ) {
+                        orders.add(order)
                     }
                 }
                 callback(orders)

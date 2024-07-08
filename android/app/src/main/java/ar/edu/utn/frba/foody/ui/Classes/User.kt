@@ -8,5 +8,6 @@ data class User(
     var numeroContacto: Int = 0,
     var groupId: String = "",
     var admin: Boolean = false,
-    var tarjetas: MutableList<Card.CardInfo> = mutableListOf()
+    var tarjetas: MutableList<Card.CardInfo> = mutableListOf(),
+    var repartidor: String = "No"
 )
