@@ -158,7 +158,8 @@ fun DishesGrid(
                 viewModel,
                 dishes[index],
                 userOrder.items.firstOrNull { x -> x.dish.dishId == dishes[index].dishId },
-                loading
+                loading,
+                userOrder
             )
         }
     }
@@ -169,7 +170,8 @@ fun DishCard(
     viewModel: OrderViewModel,
     dish: Dish,
     userOrderItemInfo: OrderItemInfo?,
-    loading: Boolean
+    loading: Boolean,
+    userOrder: UserOrder
 ) {
     val showDialog = remember { mutableStateOf(false) }
 
@@ -214,7 +216,8 @@ fun DishCard(
                     viewModel.changeItemQuantityIfExists(
                         userOrderItemInfo,
                         1,
-                        dish)
+                        dish,
+                        userOrder.user.userId)
                 }) {
                     Icon(
                         imageVector = Icons.Default.KeyboardArrowUp,
@@ -226,7 +229,8 @@ fun DishCard(
                     viewModel.changeItemQuantityIfExists(
                         userOrderItemInfo,
                         -1,
-                        dish
+                        dish,
+                        userOrder.user.userId
                     )
                 }) {
                     Icon(
