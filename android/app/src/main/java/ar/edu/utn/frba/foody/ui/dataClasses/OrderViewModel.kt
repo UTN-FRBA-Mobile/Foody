@@ -135,8 +135,6 @@ class OrderViewModel() : ViewModel() {
         return getAssignedUserOrder()
     }
     fun getAssignedUserOrder(): UserOrder {
-        println(user)
-        println(order.userOrders)
         val userOrder = order.userOrders.firstOrNull() { x -> x.user.userId == this.user.userId }
         if (userOrder == null) {
             return updateUserOrder(order)

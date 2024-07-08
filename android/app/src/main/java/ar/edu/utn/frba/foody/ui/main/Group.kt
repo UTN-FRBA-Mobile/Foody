@@ -104,8 +104,13 @@ fun GroupScreen(
                 onClick = {
                     groupViewModel.deleteUser(user) {
                         if (it != null) {
-                            orderViewModel.updateGroup(it)
-                            orderViewModel.updateUserOrders(user)
+                            if (it.members.isEmpty()) {
+                                orderViewModel.deleteCurrentOrder()
+                                orderViewModel.removeOrderFromSession()
+                            } else {
+                                orderViewModel.updateGroup(it)
+                                orderViewModel.updateUserOrders(user)
+                            }
                         }
                     }
                     orderViewModel.user.groupId = ""
