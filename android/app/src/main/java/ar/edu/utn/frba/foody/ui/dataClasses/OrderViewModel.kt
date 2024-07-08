@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.Address
 import ar.edu.utn.frba.foody.ui.Classes.Dish
@@ -20,6 +21,7 @@ import ar.edu.utn.frba.foody.ui.Classes.Restaurant
 import ar.edu.utn.frba.foody.ui.Classes.User
 import ar.edu.utn.frba.foody.ui.Classes.UserOrder
 import ar.edu.utn.frba.foody.ui.dataBase.Firebase.OrderDataBaseFirebase
+import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 import java.util.Calendar
 
 class OrderViewModel() : ViewModel() {
@@ -30,13 +32,17 @@ class OrderViewModel() : ViewModel() {
     private var orderDetail by mutableStateOf(Order(""))
     var orderDataBaseFirebase: OrderDataBaseFirebase? = null
     var user by mutableStateOf(User(""))
+    var navController: NavController? = null
+
 
     private val _addUserOrderResult = MutableLiveData<Boolean>()
     val addUserOrderResult: LiveData<Boolean> get() = _addUserOrderResult
     fun setServices(
         orderDataBaseFirebase: OrderDataBaseFirebase,
+        navController: NavController
     ) {
         this.orderDataBaseFirebase = orderDataBaseFirebase
+        this.navController = navController
     }
     fun updateOrderLogin() {
         this.findAllOrdersForUser()
@@ -280,6 +286,16 @@ class OrderViewModel() : ViewModel() {
         orderDataBaseFirebase?.getOrdersByState() { orders ->
             if (orders.isNotEmpty()) {
                 this.pendingOrders = orders.toMutableList()
+
+            }
+        }
+    }
+    fun findAllOrdersByState2() {
+        orderDataBaseFirebase?.getOrdersByState() { orders ->
+            if (orders.isNotEmpty()) {
+                this.pendingOrders = orders.toMutableList()
+                var order_id = this.getAllOrdersByState().last().orderId
+                navController?.navigate(AppScreens.Progress_Order_Screen.createRoute(order_id))
             }
         }
     }
