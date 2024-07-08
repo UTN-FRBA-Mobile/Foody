@@ -1,9 +1,11 @@
 package ar.edu.utn.frba.foody.ui.main
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -44,6 +47,7 @@ import ar.edu.utn.frba.foody.ui.Classes.Order
 import ar.edu.utn.frba.foody.ui.Classes.OrderItemInfo
 import ar.edu.utn.frba.foody.ui.Classes.UserOrder
 import ar.edu.utn.frba.foody.ui.composables.DishAlert
+import ar.edu.utn.frba.foody.ui.composables.SimpleAlert
 import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
@@ -63,7 +67,7 @@ fun CartScreen(
     AppScaffold(
         { BottomGroupCart(navController, orderViewModel = viewModel, order = order) },
         { TopGroupCart(navController, origin) }) {
-        OrdersGrid(viewModel, order.userOrders,navController)
+        OrdersGrid(viewModel, order.userOrders, navController)
     }
 }
 
@@ -95,16 +99,20 @@ fun BottomGroupCart(
     orderViewModel: OrderViewModel,
     order: Order
 ) {
-    val buttons = mutableListOf<ButtonInterface>()
-    if (order.group != null) {
-        buttons.add(
-            ButtonInterface(
-                resourceId = R.drawable.group_icon,
-                imageDescription = "Group Icon",
-                route = AppScreens.Group_Screen.route
-            )
-        )
+    val showAlert = remember {
+        mutableStateOf(false)
     }
+
+    SimpleAlert(
+        show = showAlert.value,
+        text = "¿Estás seguro que deseas vaciar el carrito?",
+        onConfirm = {
+            showAlert.value = false
+            orderViewModel.emptyUserOrder()
+        },
+        onDismiss = { showAlert.value = false }
+    )
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -123,29 +131,36 @@ fun BottomGroupCart(
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        IconButton(
-            onClick = { orderViewModel.emptyUserOrder() },
-            modifier = Modifier
-                .weight(1f)
-                .padding(vertical = 8.dp)
+        if (
+            order.userOrders.any { userOrder -> userOrder.items.isNotEmpty() } && order.group == null
+            ||
+            orderViewModel.user.admin && order.group != null && order.userOrders.any { userOrder -> userOrder.items.isNotEmpty() }
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.empty_cart_icon),
-                contentDescription = "Empty Cart Icon",
-                modifier = Modifier.size(24.dp),
-                contentScale = ContentScale.FillBounds
-            )
-        }
-        buttons.forEach { button ->
             IconButton(
-                onClick = { navController.navigate(button.route) },
+                onClick = { showAlert.value = true },
                 modifier = Modifier
                     .weight(1f)
                     .padding(vertical = 8.dp)
             ) {
                 Image(
-                    painter = painterResource(id = button.resourceId),
-                    contentDescription = button.imageDescription,
+                    painter = painterResource(id = R.drawable.empty_cart_icon),
+                    contentDescription = "Empty Cart Icon",
+                    modifier = Modifier.size(24.dp),
+                    contentScale = ContentScale.FillBounds
+                )
+            }
+        }
+
+        if (order.group != null) {
+            IconButton(
+                onClick = { navController.navigate(AppScreens.Group_Screen.route) },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 8.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.group_icon),
+                    contentDescription = "Group Icon",
                     modifier = Modifier.size(24.dp),
                     contentScale = ContentScale.FillBounds
                 )
@@ -154,6 +169,7 @@ fun BottomGroupCart(
     }
 }
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun OrdersGrid(
     viewModel: OrderViewModel,
@@ -166,21 +182,27 @@ fun OrdersGrid(
         contentScale = ContentScale.Crop,
         modifier = Modifier.fillMaxSize()
     )
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(1),
-        contentPadding = PaddingValues(8.dp),
-        modifier = Modifier.fillMaxSize(),
-
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(1),
+            contentPadding = PaddingValues(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = 615.dp)
         ) {
-        items(userOrders.size) { index ->
-            if (userOrders[index].items.isNotEmpty()) {
-                OrderCard(viewModel, userOrders[index])
+            items(userOrders.size) { index ->
+                if (userOrders[index].items.isNotEmpty()) {
+                    OrderCard(viewModel, userOrders[index])
+                }
             }
         }
     }
     Spacer(modifier = Modifier.width(8.dp))
-    if(viewModel.getPickedOrder().userOrders.isNotEmpty() ||
-        viewModel.getPickedOrder().userOrders.any { userOrder -> userOrder.items.isNotEmpty()}){
+    if (viewModel.getPickedOrder().userOrders.isNotEmpty() ||
+        viewModel.getPickedOrder().userOrders.any { userOrder -> userOrder.items.isNotEmpty() }
+    ) {
         Box(
             modifier = Modifier
                 .padding(horizontal = 32.dp)
@@ -248,6 +270,20 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
     val showDialog = remember { mutableStateOf(false) }
     val totalPrice = orderItem.quantity * orderItem.dish.price
 
+    val showAlert = remember {
+        mutableStateOf(false)
+    }
+
+    SimpleAlert(
+        show = showAlert.value,
+        text = "¿Estás seguro que deseas eliminar el plato?",
+        onConfirm = {
+            showAlert.value = false
+            viewModel.deleteItem(orderItem.dish.dishId)
+        },
+        onDismiss = { showAlert.value = false }
+    )
+
     DishAlert(show = showDialog.value, dish = orderItem.dish, totalPrice) {
         showDialog.value = false
     }
@@ -267,13 +303,13 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(
-                onClick = {
-                viewModel.deleteItem(orderItem.dish.dishId)
-                },
-                enabled = viewModel.enableChangeUserOrderButton(userOrder.user.userId)
-            ) {
-                Icon(imageVector = Icons.Default.Clear, contentDescription = "Remove")
+            if ((viewModel.getPickedOrder().group != null && (viewModel.user.admin || viewModel.user.userId == userOrder.user.userId)) || viewModel.getPickedOrder().group == null) {
+                IconButton(
+                    onClick = { showAlert.value = true },
+                    enabled = viewModel.enableChangeUserOrderButton(userOrder.user.userId)
+                ) {
+                    Icon(imageVector = Icons.Default.Clear, contentDescription = "Remove")
+                }
             }
 
             Spacer(modifier = Modifier.width(8.dp))
@@ -284,7 +320,7 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
 
             IconButton(
                 onClick = {
-                viewModel.changeItemQuantity(orderItem.dish.dishId, 1)
+                    viewModel.changeItemQuantity(orderItem.dish.dishId, 1)
                 },
                 enabled = viewModel.enableChangeUserOrderButton(userOrder.user.userId)
             ) {
@@ -293,8 +329,9 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
 
             Text(text = orderItem.quantity.toString(), fontSize = 18.sp)
 
-            IconButton(onClick = {
-                viewModel.changeItemQuantity(orderItem.dish.dishId, -1)
+            IconButton(
+                onClick = {
+                    viewModel.changeItemQuantity(orderItem.dish.dishId, -1)
                 },
                 enabled = viewModel.enableChangeUserOrderButton(userOrder.user.userId)
             ) {
