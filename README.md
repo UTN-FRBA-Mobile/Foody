@@ -22,3 +22,19 @@ Foody es tu servicio de pedido de comidas. Elige entre una variedad de restauran
 - Desde que pagas el pedido y hasta que te llegue podes visualizar el estado del pedido para realizar un seguimiento del mismo
 
 ## Capturas de Pantalla
+
+<p float="left">
+  <img style="margin-left:10px;margin-right:10px" src="https://github.com/UTN-FRBA-Mobile/Foody/blob/fixes/android/app/src/main/res/drawable/screenshots/Screenshot%202024-07-08%20184239.png" width="30%" />
+  <img style="margin-left:10px;margin-right:10px" src="https://github.com/UTN-FRBA-Mobile/Foody/blob/fixes/android/app/src/main/res/drawable/screenshots/Screenshot%202024-07-08%20184511.png" width="30%" />
+  <img style="margin-left:10px;margin-right:10px" src="https://github.com/UTN-FRBA-Mobile/Foody/blob/fixes/android/app/src/main/res/drawable/screenshots/Screenshot%202024-07-08%20184707.png" width="30%" />
+</p>
+<p float="left">
+  <img style="margin-left:10px;margin-right:10px" src="https://github.com/UTN-FRBA-Mobile/Foody/blob/fixes/android/app/src/main/res/drawable/screenshots/Screenshot%202024-07-08%20184752.png" width="30%" />
+  <img style="margin-left:10px;margin-right:10px" src="https://github.com/UTN-FRBA-Mobile/Foody/blob/fixes/android/app/src/main/res/drawable/screenshots/Screenshot%202024-07-08%20184820.png" width="30%" />
+  <img style="margin-left:10px;margin-right:10px" src="https://github.com/UTN-FRBA-Mobile/Foody/blob/fixes/android/app/src/main/res/drawable/screenshots/Screenshot%202024-07-08%20184837.png" width="30%" />
+</p>
+<p float="left">
+  <img style="margin-left:10px;margin-right:10px" src="https://github.com/UTN-FRBA-Mobile/Foody/blob/fixes/android/app/src/main/res/drawable/screenshots/Screenshot%202024-07-08%20184854.png" width="30%" />
+  <img style="margin-left:10px;margin-right:10px" src="https://github.com/UTN-FRBA-Mobile/Foody/blob/fixes/android/app/src/main/res/drawable/screenshots/Screenshot%202024-07-08%20184923.png" width="30%" />
+  <img style="margin-left:10px;margin-right:10px" src="https://github.com/UTN-FRBA-Mobile/Foody/blob/fixes/android/app/src/main/res/drawable/screenshots/Screenshot%202024-07-08%20184953.png" width="30%" />
+</p>

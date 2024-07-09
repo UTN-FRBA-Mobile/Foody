@@ -35,19 +35,11 @@ fun SessionScreen(
                 mainViewModel = viewModel,
                 orderViewModel = orderViewModel)
         }else{
-            /*viewModel.fetchUserByEmail(userSession.value.split("-")[0], userSession.value.split("-")[1])
-            orderViewModel.user = viewModel.user.value!!
-            orderViewModel.removeOrderFromSession()
-            orderViewModel.updateOrderLogin()
-            groupViewModel.userLogged=viewModel.user.value!!
-            */
+            viewModel.fetchUserByEmail(userSession.value.split("-")[0], userSession.value.split("-")[1])
             val notification = intent.getStringExtra("notification")
             if (notification != null) {
-                orderViewModel.findAllOrdersByState()
-                if( orderViewModel.getAllOrdersByState().isNotEmpty()) {
-                    var order_id = orderViewModel.getAllOrdersByState().last().orderId
-                    navController.navigate(AppScreens.Progress_Order_Screen.createRoute(order_id))
-                }
+                orderViewModel.findAllOrdersByState2()
+
             }
             else {
                 HomeScreen(

@@ -121,7 +121,7 @@ class OrderDataBaseFirebase(private var database: FirebaseDatabase) {
         val query =
             ordersRef.orderByChild(TABLE_GROUPS + "/groupId").equalTo(groupId).limitToFirst(1)
 
-        query.addListenerForSingleValueEvent(object : ValueEventListener {
+        query.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
                     val order = snapshot.children.first().getValue(Order::class.java)

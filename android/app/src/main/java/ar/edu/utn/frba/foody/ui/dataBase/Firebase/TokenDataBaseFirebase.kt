@@ -14,8 +14,9 @@ class TokenDataBaseFirebase(private var database: FirebaseDatabase) {
 
         val user = UserDeviceToken(token = token, userId = userId)
 
-        myRef.child(user.userId).setValue(user)
+        myRef.child(user.token).setValue(user)
     }
+
     fun deleteUserDeviceToken(token: String, userId: String) {
         val myRef = database.getReference(TABLE)
 

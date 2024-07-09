@@ -109,6 +109,7 @@ fun JoinGroupScreen(
                     onClick = {
                         groupViewModel.verifyGroupExist(name, password) { group ->
                             if (group != null) {
+                                groupViewModel.updateGroup(group)
                                 orderViewModel.deleteCurrentOrder()
                                 orderViewModel.getOrderByGroup(group.groupId) { order ->
                                     if (order != null) {

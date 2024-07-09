@@ -59,10 +59,16 @@ fun CartScreen(
     groupViewModel: GroupViewModel,
     origin: String,
 ) {
-    val order = viewModel.getPickedOrder()
+    var order = viewModel.getPickedOrder()
 
     if (order.group != null) {
         groupViewModel.updateGroup(order.group!!)
+        viewModel.getOrderByGroup(order.group!!.groupId){
+            order2 ->
+            if (order2 != null) {
+                order=order2
+            }
+        }
     }
     AppScaffold(
         { BottomGroupCart(navController, orderViewModel = viewModel, order = order) },
@@ -108,7 +114,7 @@ fun BottomGroupCart(
         text = "¿Estás seguro que deseas vaciar el carrito?",
         onConfirm = {
             showAlert.value = false
-            orderViewModel.emptyUserOrder()
+            orderViewModel.emptyUserOrder("")
         },
         onDismiss = { showAlert.value = false }
     )
@@ -279,7 +285,7 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
         text = "¿Estás seguro que deseas eliminar el plato?",
         onConfirm = {
             showAlert.value = false
-            viewModel.deleteItem(orderItem.dish.dishId)
+            viewModel.deleteItem(orderItem.dish.dishId, userOrder.user.userId)
         },
         onDismiss = { showAlert.value = false }
     )
@@ -320,7 +326,7 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
 
             IconButton(
                 onClick = {
-                    viewModel.changeItemQuantity(orderItem.dish.dishId, 1)
+                    viewModel.changeItemQuantity(orderItem.dish.dishId, 1, userOrder.user.userId)
                 },
                 enabled = viewModel.enableChangeUserOrderButton(userOrder.user.userId)
             ) {
@@ -331,7 +337,7 @@ fun OrderItem(viewModel: OrderViewModel, orderItem: OrderItemInfo, userOrder: Us
 
             IconButton(
                 onClick = {
-                    viewModel.changeItemQuantity(orderItem.dish.dishId, -1)
+                    viewModel.changeItemQuantity(orderItem.dish.dishId, -1, userOrder.user.userId)
                 },
                 enabled = viewModel.enableChangeUserOrderButton(userOrder.user.userId)
             ) {

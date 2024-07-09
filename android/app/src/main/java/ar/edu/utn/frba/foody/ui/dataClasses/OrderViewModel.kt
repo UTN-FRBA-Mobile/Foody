@@ -34,7 +34,6 @@ class OrderViewModel() : ViewModel() {
     var user by mutableStateOf(User(""))
     var navController: NavController? = null
 
-
     private val _addUserOrderResult = MutableLiveData<Boolean>()
     val addUserOrderResult: LiveData<Boolean> get() = _addUserOrderResult
     fun setServices(
@@ -186,8 +185,8 @@ class OrderViewModel() : ViewModel() {
     fun getTotal(): Double {
         return order.userOrders.sumOf { x -> x.items.sumOf { y -> y.quantity * y.dish.price } }
     }
-    fun deleteItem(dishId: Int) {
-        val userOrderIndex = order.userOrders.indexOfFirst { it.user.userId == user.userId }
+    fun deleteItem(dishId: Int, userId: String) {
+        val userOrderIndex = order.userOrders.indexOfFirst { it.user.userId == userId }
         val userOrder = order.userOrders[userOrderIndex]
         if (userOrder.items.size > 1) {
             val updatedItems = userOrder.items.filter { it.dish.dishId != dishId }
@@ -198,16 +197,16 @@ class OrderViewModel() : ViewModel() {
             orderDataBaseFirebase?.updateUserOrder(order.orderId,
                 updatedUserOrder) {}
         } else {
-            this.emptyUserOrder()
+            this.emptyUserOrder(userId)
         }
     }
-    fun changeItemQuantity(dishId: Int, variation: Int) {
-        val userOrderIndex = order.userOrders.indexOfFirst { it.user.userId == user.userId }
+    fun changeItemQuantity(dishId: Int, variation: Int, userId: String) {
+        val userOrderIndex = order.userOrders.indexOfFirst { it.user.userId == userId }
         val userOrder = order.userOrders[userOrderIndex]
         val userItemIndex = userOrder.items.indexOfFirst { it.dish.dishId == dishId }
         val userItem = userOrder.items[userItemIndex]
         if (userItem.quantity + variation == 0) {
-            deleteItem(dishId)
+            deleteItem(dishId, userId)
             return
         }
         val newQuantity = userItem.quantity + variation
@@ -243,14 +242,15 @@ class OrderViewModel() : ViewModel() {
     fun changeItemQuantityIfExists(
         orderItem: OrderItemInfo?,
         variation: Int,
-        dish: Dish
+        dish: Dish,
+        userId: String
     ) {
         if (orderItem == null) {
             if (variation > 0) {
                 addItem(variation, dish)
             }
         } else {
-            changeItemQuantity(dish.dishId, variation)
+            changeItemQuantity(dish.dishId, variation, userId)
         }
     }
     fun getOrder() {
@@ -286,19 +286,20 @@ class OrderViewModel() : ViewModel() {
         orderDataBaseFirebase?.getOrdersByState() { orders ->
             if (orders.isNotEmpty()) {
                 this.pendingOrders = orders.toMutableList()
-
             }
         }
     }
+
     fun findAllOrdersByState2() {
         orderDataBaseFirebase?.getOrdersByState() { orders ->
             if (orders.isNotEmpty()) {
                 this.pendingOrders = orders.toMutableList()
-                var order_id = this.getAllOrdersByState().last().orderId
-                navController?.navigate(AppScreens.Progress_Order_Screen.createRoute(order_id))
+                var order_id = pendingOrders.last().orderId
+                navController!!.navigate(AppScreens.Progress_Order_Screen.createRoute(order_id))
             }
         }
     }
+
     fun findOrdersDeliveredById() {
         orderDataBaseFirebase?.getOrdersByDeliveredId(user.userId) { orders ->
             if (orders.isNotEmpty()) {
@@ -315,8 +316,13 @@ class OrderViewModel() : ViewModel() {
         return pendingOrders
     }
 
-    fun emptyUserOrder() {
-        val userOrders = order.userOrders.filter { x -> x.user != user }
+    fun emptyUserOrder(userId: String) {
+        var userIdToEmpty = userId
+
+        if(userId == "")
+            userIdToEmpty = user.userId
+
+        val userOrders = order.userOrders.filter { x -> x.user.userId != userId }
         order = order.copy(userOrders = userOrders.toMutableList())
 
         orderDataBaseFirebase?.updateUserOrderList(
