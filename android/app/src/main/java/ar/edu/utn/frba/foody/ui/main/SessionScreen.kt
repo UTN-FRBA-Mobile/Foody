@@ -24,6 +24,7 @@ fun SessionScreen(
 ) {
     val context = LocalContext.current
     val dataStore = StoreUserSession(context)
+
     val userSession = dataStore.getSession.collectAsState(initial = "")
 
     AppScaffold () {

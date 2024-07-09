@@ -35,7 +35,8 @@ import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
 fun OrdersScreen(navController: NavController, viewModel: OrderViewModel) {
-    val orders = viewModel.getAllOrdersForUser()
+    viewModel.findAllOrdersByState()
+
     AppScaffold(
         null,
         { TopGroupOrderList(navController = navController) }
@@ -73,7 +74,7 @@ fun OrdersScreen(navController: NavController, viewModel: OrderViewModel) {
                     .fillMaxWidth()
                     .height(505.dp)
             ) {
-                orders.forEach { order ->
+                viewModel.getAllOrdersForUser().forEach { order ->
                     item {
                         if (viewModel.hasItems(order) && order.status != Status.INPROGRESS) {
                             OrderItem(
@@ -83,7 +84,7 @@ fun OrdersScreen(navController: NavController, viewModel: OrderViewModel) {
                         }
                     }
                 }
-                if (orders.isNotEmpty()) {
+                if (viewModel.getAllOrdersForUser().isNotEmpty()) {
                     item {
                         Divider()
                     }

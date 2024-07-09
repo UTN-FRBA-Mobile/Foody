@@ -20,11 +20,13 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -33,14 +35,27 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import ar.edu.utn.frba.foody.R
 import ar.edu.utn.frba.foody.ui.Classes.OrderState
+import ar.edu.utn.frba.foody.ui.dataBase.StoreUserSession.StoreUserSession
+import ar.edu.utn.frba.foody.ui.dataClasses.GroupViewModel
+import ar.edu.utn.frba.foody.ui.dataClasses.MainViewModel
 import ar.edu.utn.frba.foody.ui.dataClasses.OrderViewModel
 import ar.edu.utn.frba.foody.ui.navigation.AppScreens
 
 @Composable
 fun ProgressOrderScreen(
-    navController: NavController, orderViewModel: OrderViewModel, order_id: String
+    navController: NavController, orderViewModel: OrderViewModel, order_id: String,
+    viewModel:MainViewModel,groupViewModel:GroupViewModel
 ) {
     val order = orderViewModel.getOrderById(order_id)
+    val context = LocalContext.current
+    val dataStore = StoreUserSession(context)
+    val userSession = dataStore.getSession.collectAsState(initial = "")
+
+    viewModel.fetchUserByEmail(userSession.value.split("-")[0], userSession.value.split("-")[1])
+    orderViewModel.user = viewModel.user.value!!
+    orderViewModel.removeOrderFromSession()
+    orderViewModel.updateOrderLogin()
+    groupViewModel.userLogged=viewModel.user.value!!
 
     AppScaffold(
         null,

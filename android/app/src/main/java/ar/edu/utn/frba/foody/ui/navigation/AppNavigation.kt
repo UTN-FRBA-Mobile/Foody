@@ -58,7 +58,7 @@ fun AppNavigation(
             )
         }
         composable(route = AppScreens.Splash_Screen.route){
-            SplashScreen(navController = navController)
+            SplashScreen(navController = navController,intent,orderViewModel)
         }
         composable(route = AppScreens.Home_Screen.route) {
             HomeScreen(
@@ -123,7 +123,8 @@ fun AppNavigation(
 
         ) {backStackEntry->
             ProgressOrderScreen(navController = navController, orderViewModel = orderViewModel,
-                backStackEntry.arguments?.getString("order_id") ?: "unknown"
+                backStackEntry.arguments?.getString("order_id") ?: "unknown",
+                viewModel,groupViewModel
             )
         }
         composable(route = AppScreens.Group_Screen.route) {
