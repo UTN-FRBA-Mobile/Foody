@@ -59,10 +59,16 @@ fun CartScreen(
     groupViewModel: GroupViewModel,
     origin: String,
 ) {
-    val order = viewModel.getPickedOrder()
+    var order = viewModel.getPickedOrder()
 
     if (order.group != null) {
         groupViewModel.updateGroup(order.group!!)
+        viewModel.getOrderByGroup(order.group!!.groupId){
+            order2 ->
+            if (order2 != null) {
+                order=order2
+            }
+        }
     }
     AppScaffold(
         { BottomGroupCart(navController, orderViewModel = viewModel, order = order) },
